@@ -7,9 +7,6 @@ import bio.knowledge.model.core.IdentifiedEntity;
 
 public interface Concept extends IdentifiedEntity, AnnotatedEntity {
 
-	public static final String SEMGROUP_FIELD_START = "[" ;
-	public static final String SEMGROUP_FIELD_END   = "]" ;
-	
 	/**
 	 * 
 	 * @param the Concept Semantic Group 

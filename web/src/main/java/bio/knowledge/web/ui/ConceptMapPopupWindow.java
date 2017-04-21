@@ -65,7 +65,6 @@ import bio.knowledge.model.Concept;
 import bio.knowledge.model.Evidence;
 import bio.knowledge.model.EvidenceCode;
 import bio.knowledge.model.Predicate;
-import bio.knowledge.model.Reference;
 import bio.knowledge.model.Statement;
 import bio.knowledge.service.AnnotationService;
 import bio.knowledge.service.Cache;
@@ -393,8 +392,8 @@ public class ConceptMapPopupWindow {
 			}
 
 			String relationLabel;
-			if (((Predicate) comboBoxPredicate.getValue()) != null) {
-				relationLabel = ((Predicate) comboBoxPredicate.getValue()).getName();
+			if (((Neo4jPredicate) comboBoxPredicate.getValue()) != null) {
+				relationLabel = ((Neo4jPredicate) comboBoxPredicate.getValue()).getName();
 			} else {
 				// open up the search box?
 				relationLabel = "";
@@ -408,7 +407,7 @@ public class ConceptMapPopupWindow {
 			String uri = uriEvidenceText.getValue();
 
 			String statementId = String.valueOf(edgeId);
-			Predicate relation = (Predicate) comboBoxPredicate.getValue();
+			Neo4jPredicate relation = (Neo4jPredicate) comboBoxPredicate.getValue();
 
 			// assert the Statement
 			Statement statement = 
@@ -435,7 +434,7 @@ public class ConceptMapPopupWindow {
 						conceptService.getDetailsByAccessionId(sourceId).get(), relation,
 						conceptService.getDetailsByAccessionId(targetId).get());
 
-				Evidence evidence = evidenceService.createByEvidenceId(evidenceId);
+				Neo4jEvidence evidence = evidenceService.createByEvidenceId(evidenceId);
 				statement.setEvidence(evidence);
 
 				// not putting this back into the statement object might have been a bit of a problem
@@ -446,7 +445,7 @@ public class ConceptMapPopupWindow {
 			// statement should no longer be null here no matter what the case.
 			if (statement != null) {
 				// May have seen this Reference before?
-				Reference reference = referenceService.findByUri(uri);
+				Neo4jReference reference = referenceService.findByUri(uri);
 				if (reference == null) {
 					reference = new Neo4jReference();
 					reference.setUri(uri);
@@ -579,7 +578,7 @@ public class ConceptMapPopupWindow {
 		graphNodeContainer.addBean(moreNodesStub);
 	}
 	
-	public void addConceptToComboBoxes(Concept concept) {
+	public void addConceptToComboBoxes(Neo4jConcept concept) {
 		Node node = new Node(concept);
 		NodeData nd = node.getData();
 		graphNodeContainer.addBean(nd);

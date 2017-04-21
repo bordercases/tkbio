@@ -85,6 +85,9 @@ import com.vaadin.ui.Window;
 import bio.knowledge.authentication.AuthenticationContext;
 import bio.knowledge.authentication.AuthenticationManager;
 import bio.knowledge.authentication.UserProfile;
+import bio.knowledge.database.neo4j.Neo4jAnnotation;
+import bio.knowledge.database.neo4j.Neo4jConcept;
+import bio.knowledge.database.neo4j.Neo4jGeneralStatement;
 import bio.knowledge.database.repository.ConceptMapArchiveRepository;
 import bio.knowledge.graph.ConceptMapDisplay;
 import bio.knowledge.graph.jsonmodels.Edge;
@@ -92,7 +95,6 @@ import bio.knowledge.graph.jsonmodels.EdgeData;
 import bio.knowledge.graph.jsonmodels.Layout;
 import bio.knowledge.graph.jsonmodels.Node;
 import bio.knowledge.graph.jsonmodels.NodeData;
-import bio.knowledge.model.Annotation;
 import bio.knowledge.model.Concept;
 import bio.knowledge.model.ConceptMapArchive;
 import bio.knowledge.model.SemanticGroup;
@@ -321,7 +323,7 @@ public class DesktopUI extends UI implements MessageService {
 	 * @param sourceNode
 	 * @param targetNode
 	 */
-	public void addEdgeToConceptMap( Concept sourceNode, Concept targetNode ) {
+	public void addEdgeToConceptMap( Neo4jConcept sourceNode, Neo4jConcept targetNode ) {
 		getConceptMap().getElements().getEdges().addEdge(
 				new Edge( sourceNode.getAccessionId(), targetNode.getAccessionId() ));
 	}
@@ -562,7 +564,7 @@ public class DesktopUI extends UI implements MessageService {
 	 * 
 	 * @param annotation
 	 */
-	public void displayReference(Annotation annotation) {
+	public void displayReference(Neo4jAnnotation annotation) {
 		
 		query.setCurrentAnnotation( annotation ) ;
 		

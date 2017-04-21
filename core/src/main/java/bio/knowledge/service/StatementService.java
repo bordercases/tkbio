@@ -58,7 +58,6 @@ import bio.knowledge.datasource.DataSourceRegistry;
 import bio.knowledge.datasource.SimpleDataService;
 import bio.knowledge.datasource.wikidata.WikiDataDataSource;
 import bio.knowledge.model.Concept;
-import bio.knowledge.model.Evidence;
 import bio.knowledge.model.Predicate;
 import bio.knowledge.model.RdfUtil;
 import bio.knowledge.model.SemanticGroup;
@@ -227,7 +226,7 @@ public class StatementService
 				}
 				
 				// fill evidence relationship
-				Evidence evidence = (Evidence) entry.get("evidence");
+				Neo4jEvidence evidence = (Neo4jEvidence)entry.get("evidence");
 				if ( evidence == null) {
 					// set empty evidence relationship,it means subject and
 					// object available for statement without any evidence
@@ -355,11 +354,10 @@ public class StatementService
 			statement.setObject(object);
 		}
 		
-		Evidence evidence = (Evidence) entry.get("evidence");
+		Neo4jEvidence evidence = (Neo4jEvidence)entry.get("evidence");
 		if ( evidence == null) {
 			// set empty evidence relationship,it means subject and
 			// object available for statement without any evidence
-			// TODO: Replace with what?
 			evidence =  new Neo4jEvidence();
 		}
 		evidence.setStatement(statement);
@@ -503,7 +501,7 @@ public class StatementService
 				
 				statement.setObject((Concept) entry.get("object"));
 				
-				Evidence evidence = (Evidence)entry.get("evidence");
+				Neo4jEvidence evidence = (Neo4jEvidence)entry.get("evidence");
 				if ( evidence == null) {
 					// set empty evidence relationship,it means subject and
 					// object available for statement without any evidence

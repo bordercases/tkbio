@@ -39,6 +39,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import bio.knowledge.database.neo4j.Neo4jConcept;
 import bio.knowledge.database.repository.ConceptMapArchiveRepository;
 import bio.knowledge.database.repository.LibraryRepository;
 import bio.knowledge.model.Concept;
@@ -198,7 +199,7 @@ public class ConceptMapArchiveService extends IdentifiedEntityServiceImpl<Concep
 		case BY_CONCEPT:
 			Optional<Concept> optConcept = query.getCurrentSelectedConcept();
 			if ( optConcept.isPresent() ) {
-				Concept concept = (Concept) optConcept.get() ;
+				Neo4jConcept concept = (Neo4jConcept)optConcept.get() ;
 				Library library = concept.getLibrary();
 				words = filter.split(SEPARATOR);
 				return getConceptMapArchiveByLibraryFiltered(
@@ -285,7 +286,7 @@ public class ConceptMapArchiveService extends IdentifiedEntityServiceImpl<Concep
 			case BY_CONCEPT:
 				Optional<Concept> optConcept = query.getCurrentSelectedConcept();
 				if ( optConcept.isPresent() ) {
-					Concept concept = (Concept) optConcept.get() ;
+					Neo4jConcept concept = (Neo4jConcept)optConcept.get() ;
 					Library library = concept.getLibrary() ;
 					String[] words = new String[0];
 					return getConceptMapArchiveByLibraryFiltered(

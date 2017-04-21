@@ -47,6 +47,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
+import bio.knowledge.database.neo4j.Neo4jConcept;
 import bio.knowledge.datasource.DataSourceException;
 import bio.knowledge.datasource.wikidata.ConceptDescriptor;
 import bio.knowledge.model.Concept;

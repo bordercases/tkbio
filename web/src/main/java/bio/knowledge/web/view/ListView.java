@@ -91,14 +91,17 @@ import com.vaadin.ui.themes.ValoTheme;
 import bio.knowledge.authentication.AuthenticationContext;
 import bio.knowledge.authentication.AuthenticationManager;
 import bio.knowledge.authentication.UserProfile;
+import bio.knowledge.database.neo4j.Neo4jAnnotation;
+import bio.knowledge.database.neo4j.Neo4jConcept;
+import bio.knowledge.database.neo4j.Neo4jEvidence;
+import bio.knowledge.database.neo4j.Neo4jGeneralStatement;
+import bio.knowledge.database.neo4j.Neo4jPredicate;
 import bio.knowledge.graph.jsonmodels.Node;
-import bio.knowledge.model.Annotation;
 import bio.knowledge.model.Concept;
 import bio.knowledge.model.ConceptMapArchive;
 import bio.knowledge.model.DomainModelException;
 import bio.knowledge.model.Evidence;
 import bio.knowledge.model.Library;
-import bio.knowledge.model.Predicate;
 import bio.knowledge.model.SemanticGroup;
 import bio.knowledge.model.Statement;
 import bio.knowledge.model.core.IdentifiedEntity;
@@ -878,7 +881,7 @@ public class ListView extends BaseView {
 			DesktopUI ui = (DesktopUI) UI.getCurrent();
 			for (Object item: items) {
 				
-				Statement statement = (Statement) item;
+				Neo4jGeneralStatement statement = (Neo4jGeneralStatement) item;
 				
 				Concept subject       = statement.getSubject() ;
 				String predicateLabel = statement.getRelation().getName();
@@ -1390,22 +1393,22 @@ public class ListView extends BaseView {
 
 			// if (propertyId.equals(COL_ID_RELATION)) {
 			if (propertyId.equals(COL_ID_RELATION)) {
-				if (value instanceof Predicate) {
-					definition = ((Predicate) value).getDescription();
+				if (value instanceof Neo4jPredicate) {
+					definition = ((Neo4jPredicate) value).getDescription();
 					description = "<span style=\"font-weight: bold;\">" + name + ": " + "</span>" + definition;
 				}
 			}
 
-			int tfstart = name.lastIndexOf(Concept.SEMGROUP_FIELD_START);
+			int tfstart = name.lastIndexOf(Neo4jConcept.SEMGROUP_FIELD_START);
 			if (tfstart != -1) {
-				int tfend = name.lastIndexOf(Concept.SEMGROUP_FIELD_END);
+				int tfend = name.lastIndexOf(Neo4jConcept.SEMGROUP_FIELD_END);
 				if (tfend != -1) {
 					String semtypeCode = name.substring(tfstart + 1, tfend);
 					description = name.substring(0, tfstart);
 					try {
 						SemanticType semtype = SemanticType.lookUpByCode(semtypeCode);
-						description += " " + Concept.SEMGROUP_FIELD_START + semtype.getDescription()
-								+ Concept.SEMGROUP_FIELD_END;
+						description += " " + Neo4jConcept.SEMGROUP_FIELD_START + semtype.getDescription()
+								+ Neo4jConcept.SEMGROUP_FIELD_END;
 					} catch (DomainModelException dme) {
 						// code not recognized...fail silently
 					}
@@ -1666,7 +1669,7 @@ public class ListView extends BaseView {
 		SUBJECT, OBJECT;
 	}
 
-	private void selectionContext(DesktopUI ui, PopupWindow conceptDetailsWindow, Concept selectedConcept) {
+	private void selectionContext(DesktopUI ui, PopupWindow conceptDetailsWindow, Neo4jConcept selectedConcept) {
 		ui.queryUpdate(selectedConcept, RelationSearchMode.RELATIONS);
 		conceptDetailsWindow.close();
 		ui.gotoStatementsTable();
@@ -1679,10 +1682,10 @@ public class ListView extends BaseView {
 	
 	// Handler for Concept details in various data tables
 	private void onConceptDetailsSelection(RendererClickEvent event, ConceptRole role) {
-		Statement statement = (Statement) event.getItemId();
-		Concept subject = statement.getSubject();
-		Predicate predicate = statement.getRelation();
-		Concept object = statement.getObject();
+		Neo4jGeneralStatement statement = (Neo4jGeneralStatement) event.getItemId();
+		Neo4jConcept subject = statement.getSubject();
+		Neo4jPredicate predicate = statement.getRelation();
+		Neo4jConcept object = statement.getObject();
 
 		RelationSearchMode searchMode = query.getRelationSearchMode();
 		if (searchMode.equals(RelationSearchMode.WIKIDATA) && role.equals(ConceptRole.OBJECT)) {
@@ -1704,7 +1707,7 @@ public class ListView extends BaseView {
 
 			String predicateLabel;
 
-			Concept selectedConcept;
+			Neo4jConcept selectedConcept;
 
 			if (role.equals(ConceptRole.SUBJECT)) {
 				selectedConcept = subject;
@@ -1792,7 +1795,7 @@ public class ListView extends BaseView {
 		// view used for searching while creating a user annotation
 		registry.setMapping(
 				ViewName.ANNOTATIONS_VIEW, 
-				new BeanItemContainer<Concept>(Concept.class),
+				new BeanItemContainer<Neo4jConcept>(Neo4jConcept.class),
 				// TODO: use the cache to get the results
 				conceptService, 
 				new String[] { "name|*", "type" }, 
@@ -1803,7 +1806,7 @@ public class ListView extends BaseView {
 			ViewName.ANNOTATIONS_VIEW, 
 			"name", 
 			event -> {
-				Concept concept = (Concept) event.getItemId();
+				Neo4jConcept concept = (Neo4jConcept) event.getItemId();
 				DesktopUI ui = (DesktopUI) UI.getCurrent();
 	
 				ui.addNodeToConceptMap(concept);
@@ -1836,14 +1839,14 @@ public class ListView extends BaseView {
 		// concepts view
 		registry.setMapping(
 				ViewName.CONCEPTS_VIEW,
-				new BeanItemContainer<Concept>(Concept.class), 
+				new BeanItemContainer<Neo4jConcept>(Neo4jConcept.class), 
 				conceptService,
 				new String[] { "name|*", "semanticGroup", "synonyms|*", "library|*" },
 				null, 
 				null);
 
 		registry.addSelectionHandler(ViewName.CONCEPTS_VIEW, "name", event -> {
-			Concept concept = (Concept) event.getItemId();
+			Neo4jConcept concept = (Neo4jConcept) event.getItemId();
 
 			DesktopUI ui = (DesktopUI) UI.getCurrent();
 
@@ -1869,7 +1872,7 @@ public class ListView extends BaseView {
 		registry.addSelectionHandler(ViewName.CONCEPTS_VIEW, "synonyms",e->{/*NOP*/});
 
 		registry.addSelectionHandler(ViewName.CONCEPTS_VIEW, "library", event -> {
-			Concept concept = (Concept) event.getItemId();
+			Neo4jConcept concept = (Neo4jConcept) event.getItemId();
 
 			// Ignore ConceptSemanticType entries with empty libraries
 			Library library = concept.getLibrary();
@@ -1902,7 +1905,7 @@ public class ListView extends BaseView {
 			}
 		});
 
-		registry.setMapping(ViewName.RELATIONS_VIEW, new BeanItemContainer<Statement>(Statement.class),
+		registry.setMapping(ViewName.RELATIONS_VIEW, new BeanItemContainer<Neo4jGeneralStatement>(Neo4jGeneralStatement.class),
 				statementService, new String[] { "subject|*", COL_ID_RELATION, "object|*", "evidence|*" }, null);
 
 		registry.addSelectionHandler(ViewName.RELATIONS_VIEW, COL_ID_SUBJECT,
@@ -1914,7 +1917,7 @@ public class ListView extends BaseView {
 		registry.addSelectionHandler(ViewName.RELATIONS_VIEW, COL_ID_EVIDENCE, event -> {
 			DesktopUI ui = (DesktopUI) UI.getCurrent();
 
-			Statement selectedStatement = (Statement) event.getItemId();
+			Neo4jGeneralStatement selectedStatement = (Neo4jGeneralStatement) event.getItemId();
 			query.setCurrentStatement(selectedStatement);
 
 			_logger.trace("Display Evidence for " + selectedStatement.getName());
@@ -1923,7 +1926,7 @@ public class ListView extends BaseView {
 		});
 
 		registry.setMapping(ViewName.EVIDENCE_VIEW, 
-				new BeanItemContainer<Annotation>(Annotation.class),
+				new BeanItemContainer<Neo4jAnnotation>(Neo4jAnnotation.class),
 				annotationService,
 				new String[] { /* "reference|*", */"publicationDate", "supportingText|*" /* ,"evidenceCode" */ }, 
 				null, 
@@ -1933,7 +1936,7 @@ public class ListView extends BaseView {
 				ViewName.EVIDENCE_VIEW, 
 				COL_ID_SUPPORTING_TEXT, 
 				event -> {
-					Annotation annotation = (Annotation) event.getItemId();
+					Neo4jAnnotation annotation = (Neo4jAnnotation) event.getItemId();
 		
 					_logger.trace("Display PubMed Reference for Annotation " + annotation.toString() + "...");
 		
