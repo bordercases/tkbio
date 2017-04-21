@@ -51,17 +51,21 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
+import bio.knowledge.database.neo4j.Neo4jAnnotation;
+import bio.knowledge.database.neo4j.Neo4jConcept;
+import bio.knowledge.database.neo4j.Neo4jEvidence;
+import bio.knowledge.database.neo4j.Neo4jGeneralStatement;
+import bio.knowledge.database.neo4j.Neo4jPredicate;
+import bio.knowledge.database.neo4j.Neo4jReference;
 import bio.knowledge.graph.jsonmodels.Node;
 import bio.knowledge.graph.jsonmodels.NodeData;
-import bio.knowledge.model.neo4j.Neo4jAnnotation;
-import bio.knowledge.model.neo4j.Neo4jConcept;
-import bio.knowledge.model.neo4j.Neo4jEvidence;
-import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
-import bio.knowledge.model.neo4j.Neo4jPredicate;
-import bio.knowledge.model.neo4j.Neo4jReference;
 import bio.knowledge.model.Annotation;
 import bio.knowledge.model.Annotation.Type;
+import bio.knowledge.model.Concept;
+import bio.knowledge.model.Evidence;
 import bio.knowledge.model.EvidenceCode;
+import bio.knowledge.model.Predicate;
+import bio.knowledge.model.Statement;
 import bio.knowledge.service.AnnotationService;
 import bio.knowledge.service.Cache;
 import bio.knowledge.service.ConceptService;
@@ -172,12 +176,12 @@ public class ConceptMapPopupWindow {
 	public void conceptMapNodePopUp(String accessionId, String name, int x, int y) {
 
 		// Generate popup content from passed data
-		Optional<Neo4jConcept> conceptOpt = conceptService.getDetailsByAccessionId(accessionId);
+		Optional<Concept> conceptOpt = conceptService.getDetailsByAccessionId(accessionId);
 
 		if (!conceptOpt.isPresent())
 			return;
 
-		Neo4jConcept selectedConcept = conceptOpt.get();
+		Concept selectedConcept = conceptOpt.get();
 		
 		addAnno = new Button("Add Annotation", e -> {
 			parentUi.getPredicatePopupWindow().conceptMapUserAnnotation(selectedConcept, x, y);
@@ -233,20 +237,20 @@ public class ConceptMapPopupWindow {
 			String uri) {
 
 		// Generate popup content from passed data
-		Optional<Neo4jConcept> sourceOpt = conceptService.getDetailsByAccessionId(sourceId);
+		Optional<Concept> sourceOpt = conceptService.getDetailsByAccessionId(sourceId);
 		if (!sourceOpt.isPresent())
 			return;
-		Neo4jConcept sourceConcept = sourceOpt.get();
+		Concept sourceConcept = sourceOpt.get();
 		String sourceName = sourceConcept.getName();
 
-		Optional<Neo4jConcept> targetOpt = conceptService.getDetailsByAccessionId(targetId);
+		Optional<Concept> targetOpt = conceptService.getDetailsByAccessionId(targetId);
 		if (!targetOpt.isPresent())
 			return;
-		Neo4jConcept targetConcept = targetOpt.get();
+		Concept targetConcept = targetOpt.get();
 		String targetName = targetConcept.getName();
 
 		// TODO: How to handle the User's Annotation case here?
-		Neo4jGeneralStatement selectedStatement = 
+		Statement selectedStatement = 
 				statementService.findbySourceAndTargetAccessionId(sourceId, targetId, label);
 
 		// Create buttons related to node popup
@@ -299,13 +303,13 @@ public class ConceptMapPopupWindow {
 
 	}
 
-	public void conceptMapUserAnnotation(Neo4jConcept selectedConcept, int x, int y) {
+	public void conceptMapUserAnnotation(Concept selectedConcept, int x, int y) {
 		query.tempCoordX(x);
 		query.tempCoordY(y);
 		
 		// create the collections necessary for the menus
 		// predicate
-		List<Neo4jPredicate> predicateCollection = predicateService.findAllPredicates();
+		List<Predicate> predicateCollection = predicateService.findAllPredicates();
 
 		// graph nodes
 		// because it's essentially json data we need to manufacture the new
@@ -406,20 +410,20 @@ public class ConceptMapPopupWindow {
 			Neo4jPredicate relation = (Neo4jPredicate) comboBoxPredicate.getValue();
 
 			// assert the Statement
-			Neo4jGeneralStatement statement = 
+			Statement statement = 
 					statementService.findbySourceAndTargetAccessionId(sourceId, targetId, relationLabel);
 
 			// statement doesn't exist in database
 			if (statement == null) {
 				// find subject
-				Neo4jConcept subject = conceptService.findByAccessionId(sourceId);
+				Concept subject = conceptService.findByAccessionId(sourceId);
 				if (subject == null) {
 					// subject = new Concept();
 					return;
 				}
 
 				// find object
-				Neo4jConcept object = conceptService.findByAccessionId(targetId);
+				Concept object = conceptService.findByAccessionId(targetId);
 				if (object == null) {
 					// object = new Concept();
 					return;
@@ -469,13 +473,13 @@ public class ConceptMapPopupWindow {
 				}
 
 				// Hopefully Statement.evidence is not null here!
-				Neo4jEvidence evidence = statement.getEvidence();
+				Evidence evidence = statement.getEvidence();
 				// ..update and save?
 				evidence.addAnnotation(annotation);
-				evidenceService.save(evidence);
+				evidenceService.save((Neo4jEvidence) evidence);
 
-				List<Neo4jConcept> subjects = statement.getSubjects();
-				for (Neo4jConcept s : subjects) {
+				List<Concept> subjects = statement.getSubjects();
+				for (Concept s : subjects) {
 					s.incrementUsage();
 					/*
 					 * TODO: Don't think that we need to replace subject in
@@ -485,8 +489,8 @@ public class ConceptMapPopupWindow {
 					conceptService.save(s);
 				}
 
-				List<Neo4jConcept> objects = statement.getObjects();
-				for (Neo4jConcept o : objects) {
+				List<Concept> objects = statement.getObjects();
+				for (Concept o : objects) {
 					o.incrementUsage();
 					/*
 					 * TODO: Don't think that we need to replace subject in
@@ -553,7 +557,7 @@ public class ConceptMapPopupWindow {
 	}
 
 	public void addToGraphNodeContainerFromKBQuery() {
-		Neo4jConcept lastConcept = query.getLastSelectedConcept();
+		Concept lastConcept = query.getLastSelectedConcept();
 		Node node = new Node(lastConcept);
 		NodeData nd = node.getData();
 		initGraphNodeContainer();

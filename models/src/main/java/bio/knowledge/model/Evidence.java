@@ -3,10 +3,10 @@ package bio.knowledge.model;
 import java.util.Set;
 
 import bio.knowledge.model.core.IdentifiedEntity;
-import bio.knowledge.model.neo4j.Neo4jAnnotation;
-import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
+import bio.knowledge.model.Annotation;
+import bio.knowledge.model.Statement;
 
-public interface Evidence {
+public interface Evidence extends IdentifiedEntity {
 
 	/**
 	 * @return
@@ -16,7 +16,7 @@ public interface Evidence {
 	/**
 	 * @return
 	 */
-	Neo4jGeneralStatement getStatement();
+	Statement getStatement();
 
 	/**
 	 * 

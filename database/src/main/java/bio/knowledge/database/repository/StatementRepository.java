@@ -35,8 +35,8 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.data.repository.query.Param;
 
-import bio.knowledge.model.neo4j.Neo4jConcept;
-import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
+import bio.knowledge.database.neo4j.Neo4jAbstractStatement;
+import bio.knowledge.database.neo4j.Neo4jConcept;
 
 /**
  * @author Richard Bruskiewich
@@ -45,13 +45,13 @@ import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
  * @author Chandan Mishra
  *
  */
-public interface StatementRepository extends GraphRepository<Neo4jGeneralStatement> {
+public interface StatementRepository extends GraphRepository<Neo4jAbstractStatement> {
 
 	/**
 	 * @return
 	 */
 	@Query("MATCH (statement:Statement) RETURN statement")
-	Iterable<Neo4jGeneralStatement> getStatements() ;
+	Iterable<Neo4jAbstractStatement> getStatements() ;
 
 	/**
 	 * 
@@ -113,7 +113,7 @@ public interface StatementRepository extends GraphRepository<Neo4jGeneralStateme
 	" SKIP  {1}.pageNumber*{1}.pageSize"+
 	" LIMIT {1}.pageSize" 
 	)
-	List<Neo4jGeneralStatement> findByNameLikeIgnoreCase( @Param("conceptId") Optional<Neo4jConcept> currentConcept, @Param("filter") String filter, Pageable pageable);
+	List<Neo4jAbstractStatement> findByNameLikeIgnoreCase( @Param("conceptId") Optional<Neo4jConcept> currentConcept, @Param("filter") String filter, Pageable pageable);
 
 	/**
 	 * @author Chandan Mishra

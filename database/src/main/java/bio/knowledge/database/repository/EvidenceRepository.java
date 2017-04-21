@@ -29,7 +29,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.data.repository.query.Param;
 
-import bio.knowledge.model.neo4j.Neo4jEvidence;
+import bio.knowledge.database.neo4j.Neo4jEvidence;
 
 /**
  * @author Richard

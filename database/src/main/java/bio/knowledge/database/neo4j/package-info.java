@@ -5,4 +5,4 @@
  * @author Richard
  *
  */
-package bio.knowledge.model.neo4j;
+package bio.knowledge.database.neo4j;

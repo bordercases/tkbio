@@ -1,6 +1,8 @@
 package bio.knowledge.model;
 
-public interface Reference {
+import bio.knowledge.model.core.IdentifiedEntity;
+
+public interface Reference extends IdentifiedEntity {
 
 	/**
 	 * @return the PMID

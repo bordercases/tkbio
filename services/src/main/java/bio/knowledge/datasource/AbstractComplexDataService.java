@@ -29,8 +29,8 @@ package bio.knowledge.datasource;
 import java.util.HashMap;
 import java.util.Map;
 
+import bio.knowledge.database.neo4j.Neo4jConcept;
 import bio.knowledge.model.SemanticGroup;
-import bio.knowledge.model.neo4j.Neo4jConcept;
 
 /**
  * @author Richard

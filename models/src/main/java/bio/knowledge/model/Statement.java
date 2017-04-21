@@ -2,88 +2,89 @@ package bio.knowledge.model;
 
 import java.util.List;
 
-import bio.knowledge.model.neo4j.Neo4jConcept;
-import bio.knowledge.model.neo4j.Neo4jEvidence;
-import bio.knowledge.model.neo4j.Neo4jPredicate;
+import bio.knowledge.model.Concept;
+import bio.knowledge.model.Evidence;
+import bio.knowledge.model.Predicate;
+import bio.knowledge.model.core.IdentifiedEntity;
 
-public interface Statement {
+public interface Statement extends IdentifiedEntity {
 
 	/**
 	 * 
 	 * @param subject to be added to the Statement
 	 */
-	void addSubject(Neo4jConcept subject);
+	void addSubject(Concept subject);
 
 	/**
 	 * @param subjects set to be added with the Statement
 	 */
-	void setSubjects(List<Neo4jConcept> subjects);
+	void setSubjects(List<Concept> subjects);
 
 	/**
 	 * @return subjects associated with the Statement
 	 */
-	List<Neo4jConcept> getSubjects();
+	List<Concept> getSubjects();
 
 	/**
 	 * 
 	 * @param subject
 	 */
-	void setSubject(Neo4jConcept subject);
+	void setSubject(Concept subject);
 
 	/**
 	 * 
 	 * @return
 	 */
-	Neo4jConcept getSubject();
+	Concept getSubject();
 
 	/**
 	 * @param predicate the predicate to set
 	 */
-	void setRelation(Neo4jPredicate relation);
+	void setRelation(Predicate relation);
 
 	/**
 	 * @return the predicate
 	 */
-	Neo4jPredicate getRelation();
+	Predicate getRelation();
 
 	/**
 	 * 
 	 * @param subject to be added to the Statement
 	 */
-	void addObject(Neo4jConcept object);
+	void addObject(Concept object);
 
 	/**
 	 * @param objects set to be added with the Statement
 	 */
-	void setObjects(List<Neo4jConcept> objects);
+	void setObjects(List<Concept> objects);
 
 	/**
 	 * @return objects associated with the Statement
 	 */
-	List<Neo4jConcept> getObjects();
+	List<Concept> getObjects();
 
 	/**
 	 * 
 	 * @param object
 	 */
-	void setObject(Neo4jConcept object);
+	void setObject(Concept object);
 
 	/**
 	 * 
 	 * @return
 	 */
-	Neo4jConcept getObject();
+	Concept getObject();
 
 	/**
 	 * 
 	 * @param evidence to be associated with the Statement
 	 */
-	void setEvidence(Neo4jEvidence evidence);
+	void setEvidence(Evidence evidence);
 
 	/**
 	 * @return associated Evidence (e.g. References) supporting the Statement
 	 */
-	Neo4jEvidence getEvidence();
+	Evidence getEvidence();
 
 	/*
 	 * (non-Javadoc)

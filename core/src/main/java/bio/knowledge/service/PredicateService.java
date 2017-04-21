@@ -35,15 +35,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import bio.knowledge.database.neo4j.Neo4jPredicate;
 import bio.knowledge.database.repository.PredicateRepository;
 import bio.knowledge.datasource.DataService;
 import bio.knowledge.datasource.DataSourceException;
 import bio.knowledge.datasource.DataSourceRegistry;
 import bio.knowledge.datasource.SimpleDataService;
 import bio.knowledge.datasource.wikidata.WikiDataDataSource;
+import bio.knowledge.model.Predicate;
 import bio.knowledge.model.datasource.Result;
 import bio.knowledge.model.datasource.ResultSet;
-import bio.knowledge.model.neo4j.Neo4jPredicate;
 import bio.knowledge.service.Cache.CacheLocation;
 
 /**
@@ -69,7 +70,7 @@ public class PredicateService {
      * @param name
      * @return
      */
-    public Neo4jPredicate findPredicateByName(String name) {
+    public Predicate findPredicateByName(String name) {
     	// Normalize to upper case
     	name = name.toUpperCase() ;
     	return predicateRepository.findPredicateByName(name) ;
@@ -79,23 +80,23 @@ public class PredicateService {
      * 
      * @return
      */
-    public List<Neo4jPredicate> findAllPredicates() {
-    	return predicateRepository.findAllPredicates() ;
+    public List<Predicate> findAllPredicates() {
+    	return (List<Predicate>)(List) predicateRepository.findAllPredicates() ;
     }
     
     /**
      * 
-     * @param predicate
+     * @param relation
      * @return
      */
-    public Neo4jPredicate annotate(Neo4jPredicate predicate) {
+    public Predicate annotate(Predicate relation) {
     	
-    	String accId = predicate.getAccessionId();
+    	String accId = relation.getAccessionId();
     	
     	// NOP - can't do any better here without an accession id
     	if(accId.isEmpty()) {
     		_logger.warn("PredicateService.annotate() warning: cannot annotate a Predicate without an Accession Id!?");
-    		return predicate; 
+    		return relation; 
     	}    
 	    
     	// check first for a cached (presumed annotated) version of the Predicate
@@ -106,23 +107,23 @@ public class PredicateService {
 		CacheLocation cacheLocation = 
 				cache.searchForEntity( "Predicate", nameSpace, new String[] {objectId} );
 		
-		Neo4jPredicate cachedPredicate = (Neo4jPredicate)cacheLocation.getEntity();
+		Predicate cachedPredicate = (Predicate) cacheLocation.getEntity();
 		
 		if (cachedPredicate == null) {
 			
 			// Not cached... then first, attempt to retrieve it from the local database
-			Neo4jPredicate databasePredicate = 
+			Predicate databasePredicate = 
 					predicateRepository.findPredicateByAccessionId(accId);
 			
 			if( databasePredicate == null ) {
 				// Predicate is not yet even registered in the database
 				// Maybe create it although, at this point, its name may be missing?
-				databasePredicate = predicate;
+				databasePredicate = relation;
 				
 				// Perform an initial save of the new 
 				// Predicate in the local database
 				// just in case it already has a name set
-				databasePredicate = predicateRepository.save(databasePredicate) ;
+				databasePredicate = predicateRepository.save((Neo4jPredicate) databasePredicate) ;
 			}
 			
 			String dbPredicateName = databasePredicate.getName();
@@ -143,7 +144,7 @@ public class PredicateService {
 				SimpleDataService<String> sds = (SimpleDataService<String>)ds ;
 				
 				CompletableFuture<ResultSet> futureMyGeneResultSet = 
-						sds.query(predicate.getAccessionId());
+						sds.query(relation.getAccessionId());
 				try {
 					ResultSet resultSet = 
 							futureMyGeneResultSet.get(DataService.TIMEOUT_DURATION, DataService.TIMEOUT_UNIT);
@@ -159,7 +160,7 @@ public class PredicateService {
 						databasePredicate.setName(literalPart[0]);
 						
 						// merge re-save the annotated Predicate in the local database?
-						databasePredicate = predicateRepository.save(databasePredicate) ;
+						databasePredicate = predicateRepository.save((Neo4jPredicate) databasePredicate) ;
 					}
 					
 				} catch (InterruptedException | ExecutionException | TimeoutException e) {
@@ -173,13 +174,13 @@ public class PredicateService {
 			cacheLocation.setEntity(databasePredicate);
 			
 			//... then return it to the caller!
-			predicate = databasePredicate ;
+			relation = databasePredicate ;
 			
 		} else {
 			// Found a cached, presumed completely annotated version of the Predicate... reuse!
-			predicate = cachedPredicate;
+			relation = cachedPredicate;
 		}
 		
-    	return predicate ;
+    	return relation ;
     }
 }

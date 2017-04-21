@@ -37,8 +37,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import bio.knowledge.database.neo4j.Neo4jConcept;
 import bio.knowledge.database.repository.ConceptRepository;
-import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.service.AuthenticationState;
 
 

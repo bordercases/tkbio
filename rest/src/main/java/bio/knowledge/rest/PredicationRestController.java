@@ -34,8 +34,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import bio.knowledge.database.neo4j.Neo4jGeneralStatement;
 import bio.knowledge.model.RdfUtil;
-import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
+import bio.knowledge.model.Statement;
 import bio.knowledge.service.ConceptService;
 import bio.knowledge.service.KBQuery;
 import bio.knowledge.service.KBQuery.RelationSearchMode;
@@ -73,7 +74,7 @@ public class PredicationRestController {
 	 * @return
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/data/{conceptId}")
-	public Iterable<Neo4jGeneralStatement> getStatements(@PathVariable String conceptId,
+	public Iterable<Statement> getStatements(@PathVariable String conceptId,
 			@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
 			@RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
 		// create pageable object

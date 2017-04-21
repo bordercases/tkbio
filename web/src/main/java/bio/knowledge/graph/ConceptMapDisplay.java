@@ -45,6 +45,9 @@ import com.vaadin.server.Page;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.Notification;
 
+import bio.knowledge.database.neo4j.Neo4jAnnotation;
+import bio.knowledge.database.neo4j.Neo4jConcept;
+import bio.knowledge.database.neo4j.Neo4jGeneralStatement;
 import bio.knowledge.graph.jsonmodels.Edge;
 import bio.knowledge.graph.jsonmodels.Edges;
 import bio.knowledge.graph.jsonmodels.Elements;
@@ -52,9 +55,8 @@ import bio.knowledge.graph.jsonmodels.Layout;
 import bio.knowledge.graph.jsonmodels.Node;
 import bio.knowledge.graph.jsonmodels.Nodes;
 import bio.knowledge.model.Annotation;
-import bio.knowledge.model.neo4j.Neo4jAnnotation;
-import bio.knowledge.model.neo4j.Neo4jConcept;
-import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
+import bio.knowledge.model.Concept;
+import bio.knowledge.model.Statement;
 import bio.knowledge.web.ui.DesktopUI;
 
 @JavaScript({
@@ -522,7 +524,7 @@ public class ConceptMapDisplay extends AbstractJavaScriptComponent implements Gr
 	 * 
 	 * @param concept
 	 */
-	public void addNodeToConceptMap(Neo4jConcept concept) {
+	public void addNodeToConceptMap(Concept concept) {
 	
 		// create the new node from the passed-in data
 		Node newNode = new Node(concept.getAccessionId(), concept.getName(), concept.getSemanticGroup().name(), "add");
@@ -617,7 +619,7 @@ public class ConceptMapDisplay extends AbstractJavaScriptComponent implements Gr
 	 * @param relationLabel
 	 */
 	
-	public void addEdgeToConceptMap(Neo4jGeneralStatement statement) {
+	public void addEdgeToConceptMap(Statement statement) {
 		// any statement pre-processing goes here
 		Annotation annotation = statement.getEvidence().getAnnotations().stream().collect(Collectors.toList()).get(0);
 		String description;
@@ -632,7 +634,7 @@ public class ConceptMapDisplay extends AbstractJavaScriptComponent implements Gr
 		this.addEdgeToConceptMap(statement.getSubject(), statement.getObject(), statement.getRelation().getName(), description, uri);
 	}
 	
-	public void addEdgeToConceptMap(Neo4jConcept subject, Neo4jConcept object, String relationLabel, String description, String uri) {
+	public void addEdgeToConceptMap(Concept subject, Concept object, String relationLabel, String description, String uri) {
 		Edge newEdge = new Edge( subject.getAccessionId(), object.getAccessionId(), relationLabel );
 		// any edge pre-processing would go here.
 		newEdge.getData().setDescription(description);

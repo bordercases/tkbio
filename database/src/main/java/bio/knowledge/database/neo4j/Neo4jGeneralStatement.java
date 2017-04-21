@@ -23,32 +23,79 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.model.neo4j;
+package bio.knowledge.database.neo4j;
+
+import java.util.List;
 
 import org.neo4j.ogm.annotation.NodeEntity;
 
+import bio.knowledge.model.Concept;
 import bio.knowledge.model.Predicate;
-import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
 
 /**
  * @author Richard
+ * 
+ * Reified node for statements of conceptual relations, which are now inspired
+ * by the notion of WikiData RDF statement triples, embellished with associated Evidence
  *
  */
-@NodeEntity(label="Predicate")
-public class Neo4jPredicate extends Neo4jAbstractIdentifiedEntity implements Predicate {
+@NodeEntity(label="Statement")
+public class Neo4jGeneralStatement extends Neo4jAbstractStatement {
 	
-	public Neo4jPredicate() { }
-	
-	public Neo4jPredicate( String name ) {
-		super(name) ;
+	protected Neo4jGeneralStatement() {
+		super();
+	}
+
+	public Neo4jGeneralStatement(String name){
+		super(name);
 	}
 	
-	public Neo4jPredicate( String name, String description ) {
-		super(name,description) ;
+	public Neo4jGeneralStatement(
+    		String accessionId,
+    		Neo4jPredicate predicate
+    ) {
+    	super(accessionId, predicate);
+    }
+	   
+	public Neo4jGeneralStatement(
+    		String accessionId,
+    		Concept subject,
+    		Predicate predicate,
+    		Concept object
+    ) {
+    	super(accessionId, subject, predicate, object) ;
+    }
+
+	public Neo4jGeneralStatement(
+    		String accessionId,
+    		String predicateName
+    ) {
+    	super(accessionId,predicateName) ;
+    }
+
+	@Override
+	public void addSubject(Concept subject) {
+		this.subjects.add(subject);
 	}
-	
-	public Neo4jPredicate( String predicateId, String name, String description ) {
-		super( predicateId, name, description ) ;
+
+	@Override
+	public void setSubject(Concept subject) {
+		this.subject = (Neo4jConcept) subject;
+	}
+
+	@Override
+	public void setRelation(Predicate relation) {
+		this.relation = (Neo4jPredicate) relation;
+	}
+
+	@Override
+	public void addObject(Concept object) {
+		this.objects = (List<Concept>) object;
+	}
+
+	@Override
+	public void setObject(Concept object) {
+		this.object = (Neo4jConcept) object;		
 	}
 	
 }

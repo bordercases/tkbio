@@ -46,7 +46,7 @@ public class Neo4jAbstractIdentifiedEntity
 
     /**
      */
-	private String accessionId = "";
+	protected String accessionId = "";
 
     /**
      */

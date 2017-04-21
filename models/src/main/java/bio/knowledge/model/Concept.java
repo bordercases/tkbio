@@ -2,7 +2,10 @@ package bio.knowledge.model;
 
 import java.util.Set;
 
-public interface Concept {
+import bio.knowledge.model.core.AnnotatedEntity;
+import bio.knowledge.model.core.IdentifiedEntity;
+
+public interface Concept extends IdentifiedEntity, AnnotatedEntity {
 
 	/**
 	 * 
@@ -96,5 +99,17 @@ public interface Concept {
 	 * @see java.lang.Object#toString()
 	 */
 	String toString();
+
+	
+	// These three seem Wikidata related. Extend into a new interface?
+	void setAccessionId(String qualifiedPropValueId);
+
+	void setName(String propValueId);
+
+	String getAccessionId();
+
+	Long getId();
+
+	String getName();
 
 }

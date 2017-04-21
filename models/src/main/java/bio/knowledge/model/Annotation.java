@@ -10,6 +10,7 @@ public interface Annotation extends IdentifiedEntity {
 	 */
 	public enum Type {
 		
+		// if this is returning a Syntax Error, it's an Eclipse bug: http://stackoverflow.com/a/13302555
 		Remark("remark"), 
 		Title("ti"), 
 		Abstract("ab");

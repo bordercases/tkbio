@@ -35,12 +35,12 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import bio.knowledge.database.neo4j.Neo4jConcept;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.model.SemanticGroup;
 import bio.knowledge.model.core.Feature;
 import bio.knowledge.model.core.Ontology;
 import bio.knowledge.model.core.OntologyTerm;
-import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.service.ConceptService;
 import bio.knowledge.service.core.ExternalDatabaseService;
 import bio.knowledge.service.core.OntologyService;
