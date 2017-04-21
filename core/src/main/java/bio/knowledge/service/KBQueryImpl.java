@@ -34,16 +34,13 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
-import bio.knowledge.database.neo4j.Neo4jAnnotation;
-import bio.knowledge.database.neo4j.Neo4jConcept;
-import bio.knowledge.database.neo4j.Neo4jGeneralStatement;
 import bio.knowledge.model.Annotation;
 import bio.knowledge.model.Concept;
 import bio.knowledge.model.ConceptMapArchive;
+import bio.knowledge.model.Evidence;
 import bio.knowledge.model.Library;
 import bio.knowledge.model.SemanticGroup;
 import bio.knowledge.model.Statement;
-import bio.knowledge.model.Evidence;
 
 /**
  * @author Richard
@@ -244,8 +241,7 @@ public class KBQueryImpl implements KBQuery {
 	/* (non-Javadoc)
 	 * @see bio.knowledge.service.KBQuery#setCurrentAnnotation(bio.knowledge.model.semmeddb.Annotation)
 	 */
-	@Override
-	public void setCurrentAnnotation(Neo4jAnnotation annotation) {
+	public void setCurrentAnnotation(Annotation annotation) {
 		this.currentAnnotation = Optional.of(annotation) ; 
 	}
 

@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import bio.knowledge.database.neo4j.Neo4jGeneralStatement;
 import bio.knowledge.model.RdfUtil;
 import bio.knowledge.model.Statement;
 import bio.knowledge.service.ConceptService;

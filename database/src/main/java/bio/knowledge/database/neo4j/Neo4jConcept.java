@@ -45,9 +45,6 @@ import bio.knowledge.model.core.neo4j.Neo4jAbstractAnnotatedEntity;
  */
 @NodeEntity(label="Concept")
 public class Neo4jConcept extends Neo4jAbstractAnnotatedEntity implements Concept {
-
-	public static final String SEMGROUP_FIELD_START = "[" ;
-	public static final String SEMGROUP_FIELD_END   = "]" ;
 	
     private SemanticGroup semanticGroup;
 

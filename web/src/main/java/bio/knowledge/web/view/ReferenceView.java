@@ -41,8 +41,6 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
-import bio.knowledge.database.neo4j.Neo4jAnnotation;
-import bio.knowledge.database.neo4j.Neo4jReference;
 import bio.knowledge.model.Annotation;
 import bio.knowledge.model.RdfUtil;
 import bio.knowledge.model.Reference;

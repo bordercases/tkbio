@@ -45,9 +45,6 @@ import com.vaadin.server.Page;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.Notification;
 
-import bio.knowledge.database.neo4j.Neo4jAnnotation;
-import bio.knowledge.database.neo4j.Neo4jConcept;
-import bio.knowledge.database.neo4j.Neo4jGeneralStatement;
 import bio.knowledge.graph.jsonmodels.Edge;
 import bio.knowledge.graph.jsonmodels.Edges;
 import bio.knowledge.graph.jsonmodels.Elements;

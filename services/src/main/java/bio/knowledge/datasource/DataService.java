@@ -28,7 +28,6 @@ package bio.knowledge.datasource;
 
 import java.util.concurrent.TimeUnit;
 
-import bio.knowledge.database.neo4j.Neo4jConcept;
 import bio.knowledge.model.SemanticGroup;
 
 /**

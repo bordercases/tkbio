@@ -36,13 +36,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import bio.knowledge.database.neo4j.Neo4jEvidence;
 import bio.knowledge.database.repository.AnnotationRepository;
-import bio.knowledge.model.EvidenceCode;
 import bio.knowledge.model.Annotation;
 import bio.knowledge.model.Evidence;
 import bio.knowledge.model.Reference;
-import bio.knowledge.model.Annotation.Type;
 import bio.knowledge.service.Cache.CacheLocation;
 import bio.knowledge.service.core.IdentifiedEntityServiceImpl;
 

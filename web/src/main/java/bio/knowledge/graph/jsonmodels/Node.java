@@ -31,7 +31,6 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import bio.knowledge.database.neo4j.Neo4jConcept;
 import bio.knowledge.model.Concept;
 
 /**
