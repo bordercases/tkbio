@@ -23,49 +23,45 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.model.neo4j;
+package bio.knowledge.database.neo4j;
 
 import org.neo4j.ogm.annotation.NodeEntity;
 
-/**
- * @author Richard
- * 
- * Reified node for statements of conceptual relations, which are now inspired
- * by the notion of WikiData RDF statement triples, embellished with associated Evidence
- *
- */
-@NodeEntity(label="Statement")
-public class Neo4jGeneralStatement extends Neo4jAbstractStatement {
+@NodeEntity(label="UserStatement")
+public class Neo4jUserStatement extends Neo4jGeneralStatement {
 	
-	protected Neo4jGeneralStatement() {
+	String userId;
+	
+	protected Neo4jUserStatement() {
 		super();
 	}
 
-	public Neo4jGeneralStatement(String name){
+	public Neo4jUserStatement(String name, String userId) {
 		super(name);
+		setUserId(userId);	
+	}
+
+	public Neo4jUserStatement(String accessionId, Neo4jPredicate predicate, String userId) {
+		super(accessionId, predicate);
+		setUserId(userId);	
+	}
+
+	public Neo4jUserStatement(String accessionId, Neo4jConcept subject, Neo4jPredicate predicate, Neo4jConcept object, String userId) {
+		super(accessionId, subject, predicate, object);
+		setUserId(userId);	
+	}
+
+	public Neo4jUserStatement(String accessionId, String predicateName, String userId) {
+		super(accessionId, predicateName);
+		setUserId(userId);	
 	}
 	
-	public Neo4jGeneralStatement(
-    		String accessionId,
-    		Neo4jPredicate predicate
-    ) {
-    	super(accessionId, predicate);
-    }
-	   
-	public Neo4jGeneralStatement(
-    		String accessionId,
-    		Neo4jConcept subject,
-    		Neo4jPredicate predicate,
-    		Neo4jConcept object
-    ) {
-    	super(accessionId, subject, predicate, object) ;
-    }
-
-	public Neo4jGeneralStatement(
-    		String accessionId,
-    		String predicateName
-    ) {
-    	super(accessionId,predicateName) ;
-    }
+	public String getUserId() {
+		return this.userId;
+	}
 	
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
 }

@@ -43,13 +43,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import bio.knowledge.model.SemanticGroup;
+import bio.knowledge.model.Statement;
+import bio.knowledge.model.Annotation;
+import bio.knowledge.model.Concept;
+import bio.knowledge.model.Evidence;
 import bio.knowledge.model.EvidenceCode;
-import bio.knowledge.model.neo4j.Neo4jAnnotation;
-import bio.knowledge.model.neo4j.Neo4jConcept;
-import bio.knowledge.model.neo4j.Neo4jEvidence;
-import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
-import bio.knowledge.model.neo4j.Neo4jPredicate;
-import bio.knowledge.model.neo4j.Neo4jReference;
+import bio.knowledge.model.Predicate;
 import bio.knowledge.service.AnnotationService;
 
 import bio.knowledge.database.repository.ReferenceRepository;
@@ -57,6 +56,12 @@ import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.database.repository.EvidenceRepository;
 import bio.knowledge.database.repository.PredicateRepository;
 import bio.knowledge.database.repository.StatementRepository;
+import bio.knowledge.database.neo4j.Neo4jAnnotation;
+import bio.knowledge.database.neo4j.Neo4jConcept;
+import bio.knowledge.database.neo4j.Neo4jEvidence;
+import bio.knowledge.database.neo4j.Neo4jGeneralStatement;
+import bio.knowledge.database.neo4j.Neo4jPredicate;
+import bio.knowledge.database.neo4j.Neo4jReference;
 import bio.knowledge.database.repository.AnnotationRepository;
 
 import bio.knowledge.test.core.TestConfiguration;
@@ -113,7 +118,7 @@ public class StatementTests {
 
 		 */
 		public final Neo4jAnnotation GLYP_UMBL_ANNOTATION = 
-				annotationService.createInstance(
+				new Neo4jAnnotation(
 						"kba:3668220", 
 						"Glycoprotein level in umbilical arterial and venous blood", 
 						Neo4jAnnotation.Type.Title,
@@ -277,6 +282,7 @@ public class StatementTests {
 		
 		assertEquals( annotation.getId(),   glyp2umbl.getId() ) ;
 		assertEquals( annotation.getType(),     glyp2umbl.getType() ) ;
+		// TODO: Ids are a database entity property. do these tests need to be generalized? see Reference interface for the call for this Id.
 		assertEquals( annotation.getReference().getId(), glyp2umbl.getReference().getId() ) ;
 		assertEquals( annotation.getReference().getPmid(), referenceTestData.PMID5905393 ) ;
 	}
@@ -368,27 +374,27 @@ public class StatementTests {
 			predicate = predicateRepository.save(predicate) ;
 		}
 		
-		Neo4jGeneralStatement UMBL_LOCATION_OF_GLYP = new Neo4jGeneralStatement( "540408", csUmbArt, predicate, csGProt ) ;
+		Statement UMBL_LOCATION_OF_GLYP = new Neo4jGeneralStatement( "540408", csUmbArt, predicate, csGProt ) ;
 		UMBL_LOCATION_OF_GLYP.setEvidence(GLYP_UMBL_EVIDENCE);
 		
 		System.out.println("NodeId (before saving):\t"+UMBL_LOCATION_OF_GLYP.getId()) ;
 		
-		UMBL_LOCATION_OF_GLYP = statementRepository.save(UMBL_LOCATION_OF_GLYP);
+		UMBL_LOCATION_OF_GLYP = statementRepository.save((Neo4jGeneralStatement) UMBL_LOCATION_OF_GLYP);
 		
 		System.out.println("NodeId (after saving):\t"+UMBL_LOCATION_OF_GLYP.getId()) ;
 		
-		Neo4jGeneralStatement p = statementRepository.findOne(UMBL_LOCATION_OF_GLYP.getId()) ;
+		Statement p = statementRepository.findOne(UMBL_LOCATION_OF_GLYP.getId()) ;
 		
 		assertNotNull(p) ;
 		
 		System.out.println( "\nTesting findOne() of UMBL_LOCATION_OF_GLYP:");
 		assertEquals( p.getId(), UMBL_LOCATION_OF_GLYP.getId() ) ;
 		
-		List<Neo4jConcept> subjects = p.getSubjects() ;
+		List<Concept> subjects = p.getSubjects() ;
 		assertNotNull(subjects) ;
 		assertTrue("Statement has subjects?",!subjects.isEmpty()) ;
-		Neo4jConcept subject = subjects.get(0) ;
-		Neo4jConcept origSubject = UMBL_LOCATION_OF_GLYP.getSubjects().get(0);
+		Concept subject = subjects.get(0) ;
+		Concept origSubject = UMBL_LOCATION_OF_GLYP.getSubjects().get(0);
 		assertEquals( subject.getId(), origSubject.getId() ) ;
 		assertEquals( subject.getAccessionId(), origSubject.getAccessionId() ) ;
 		System.out.println( "Subject accession id: "+subject.getAccessionId());
@@ -396,26 +402,26 @@ public class StatementTests {
 		assertEquals( p.getRelation(), UMBL_LOCATION_OF_GLYP.getRelation() ) ;
 		System.out.println( "Relation Name: "+UMBL_LOCATION_OF_GLYP.getRelation().getName() );
 		
-		List<Neo4jConcept> objects = p.getObjects() ;
+		List<Concept> objects = p.getObjects() ;
 		assertNotNull(objects) ;
 		assertTrue("Statement has objects?",!objects.isEmpty()) ;
-		Neo4jConcept object = objects.get(0) ;
-		Neo4jConcept origObject = UMBL_LOCATION_OF_GLYP.getObjects().get(0);
+		Concept object = objects.get(0) ;
+		Concept origObject = UMBL_LOCATION_OF_GLYP.getObjects().get(0);
 		assertEquals( object.getId(),  origObject.getId() ) ;
 		assertEquals( object.getAccessionId(),  origObject.getAccessionId() ) ;
 		System.out.println( "Object accession id: "+object.getAccessionId());
 		
-		Neo4jEvidence evidence = p.getEvidence() ;
+		Evidence evidence = p.getEvidence() ;
 		assertNotNull(evidence) ;
 		System.out.println("Evidence id:\t"+evidence.getId()) ;
 		
 		assertTrue("Statement has some evidence?",!evidence.getAnnotations().isEmpty()) ;
 		
-		for( Neo4jAnnotation annotation : evidence.getAnnotations() ) {
+		for( Annotation annotation : evidence.getAnnotations() ) {
 			System.out.println("Evidence Annotation found:\t"+annotation.getAccessionId()) ;
 			assertEquals( annotation.getId(), GLYP_UMBL_SENTENCE.getId() ) ;
 			
-			Neo4jReference reference = annotation.getReference();
+			Neo4jReference reference = (Neo4jReference) annotation.getReference();
 			assertEquals( reference.getId(), UMBL_REFERENCE.getId() ) ;
 			System.out.println("Annotation Reference found:\t"+reference.getAccessionId()) ;
 			
@@ -423,7 +429,7 @@ public class StatementTests {
 		}
 		
 		System.out.println("\nDirect dump of current statements:\n");
-		for(Neo4jGeneralStatement s : statementRepository.getStatements()) {
+		for(Statement s : statementRepository.getStatements()) {
 			System.out.println("Statement: "+s.getName());
 			
 			subjects = p.getSubjects() ;
@@ -432,7 +438,7 @@ public class StatementTests {
 			subject = subjects.get(0) ;
 			System.out.println("Subject accessionId: "+subject.getAccessionId());
 			
-			Neo4jPredicate relation = p.getRelation();
+			Predicate relation = p.getRelation();
 			System.out.println("Relation: "+relation.getName());
 			
 			objects = p.getObjects() ;

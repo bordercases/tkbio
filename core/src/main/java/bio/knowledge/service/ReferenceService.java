@@ -28,8 +28,8 @@ package bio.knowledge.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import bio.knowledge.database.neo4j.Neo4jReference;
 import bio.knowledge.database.repository.ReferenceRepository;
-import bio.knowledge.model.neo4j.Neo4jReference;
 
 /**
  * @author Richard

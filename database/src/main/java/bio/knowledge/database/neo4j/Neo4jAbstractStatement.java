@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.model.neo4j;
+package bio.knowledge.database.neo4j;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,18 +31,22 @@ import java.util.List;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.Transient;
 
+import bio.knowledge.database.neo4j.Neo4jConcept;
+import bio.knowledge.model.Concept;
+import bio.knowledge.model.Evidence;
+import bio.knowledge.model.Predicate;
 import bio.knowledge.model.Statement;
 import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
 
 public abstract class Neo4jAbstractStatement extends Neo4jAbstractIdentifiedEntity implements Statement {
 	@Relationship( type="SUBJECT" )
-    private List<Neo4jConcept> subjects = new ArrayList<Neo4jConcept>() ;
+	protected List<Concept> subjects = new ArrayList<Concept>() ;
     
 	@Relationship( type="RELATION" )
-    private Neo4jPredicate relation ;
+    protected Neo4jPredicate relation ;
 
 	@Relationship( type="OBJECT" )
-    private List<Neo4jConcept> objects = new ArrayList<Neo4jConcept>() ;
+    protected List<Concept> objects = new ArrayList<Concept>() ;
 	
 	/*
 	 *  The Transient subject and object attributes here
@@ -51,10 +55,10 @@ public abstract class Neo4jAbstractStatement extends Neo4jAbstractIdentifiedEnti
 	 */
 	
 	@Transient
-	private Neo4jConcept subject ;
+	protected Neo4jConcept subject ;
 	
 	@Transient
-	private Neo4jConcept object ;
+	protected Neo4jConcept object ;
 
     @Relationship( type="EVIDENCE" )
 	protected Neo4jEvidence evidence ;
@@ -72,7 +76,7 @@ public abstract class Neo4jAbstractStatement extends Neo4jAbstractIdentifiedEnti
 	
     /**
      * Constructor creates a new Statement (by Predicate)
-     * but defers setting of related concepts.
+     * but defers setting of related Neo4jConcepts.
      * 
      * 
      * @param accessionId
@@ -88,7 +92,7 @@ public abstract class Neo4jAbstractStatement extends Neo4jAbstractIdentifiedEnti
 	
     /**
      * Constructor creates a new Statement (by Predicate)
-     * but defers setting of related concepts.
+     * but defers setting of related Neo4jConcepts.
      * 
      * 
      * @param accessionId
@@ -97,20 +101,20 @@ public abstract class Neo4jAbstractStatement extends Neo4jAbstractIdentifiedEnti
      */
     protected Neo4jAbstractStatement(
     		String accessionId,
-    		Neo4jConcept subject,
-    		Neo4jPredicate predicate,
-    		Neo4jConcept object
+    		Concept subject2,
+    		Predicate predicate,
+    		Concept object2
     ) {
-    	super(accessionId,subject.getName()+" - "+predicate.getName()+" -> "+object.getName(),"") ;
-    	setSubject(subject);
-    	setObject(object);
+    	super(accessionId,subject2.getName()+" - "+predicate.getName()+" -> "+object2.getName(),"") ;
+    	setSubject(subject2);
+    	setObject(object2);
     	setRelation(predicate);
     	setEvidence(new Neo4jEvidence());
     }
 	
     /**
      * Constructor creates a new Statement (by Predicate.name)
-     * but defers setting of related concepts.
+     * but defers setting of related Neo4jConcepts.
      * 
      * @param accessionId
      * @param type
@@ -126,33 +130,29 @@ public abstract class Neo4jAbstractStatement extends Neo4jAbstractIdentifiedEnti
 	/* (non-Javadoc)
 	 * @see bio.knowledge.model.Statement#addSubject(bio.knowledge.model.neo4j.Neo4jConcept)
 	 */
-	@Override
 	public void addSubject(Neo4jConcept subject) {
 		if(subjects==null)
-			subjects = new ArrayList<Neo4jConcept>() ;
+			subjects = new ArrayList<Concept>() ;
 		subjects.add(subject);
 	}
 	
 	/* (non-Javadoc)
 	 * @see bio.knowledge.model.Statement#setSubjects(java.util.List)
 	 */
-	@Override
-	public void setSubjects(List<Neo4jConcept> subjects) {
+	public void setSubjects(List<Concept> subjects) {
 		this.subjects = subjects;
 	}
 
 	/* (non-Javadoc)
 	 * @see bio.knowledge.model.Statement#getSubjects()
 	 */
-	@Override
-	public List<Neo4jConcept> getSubjects() {
+	public List<Concept> getSubjects() {
 		return subjects;
 	}
 	
 	/* (non-Javadoc)
 	 * @see bio.knowledge.model.Statement#setSubject(bio.knowledge.model.neo4j.Neo4jConcept)
 	 */
-	@Override
 	public  void setSubject(Neo4jConcept subject) {
 		addSubject(subject);
 		this.subject = subject ;
@@ -169,7 +169,6 @@ public abstract class Neo4jAbstractStatement extends Neo4jAbstractIdentifiedEnti
 	/* (non-Javadoc)
 	 * @see bio.knowledge.model.Statement#setRelation(bio.knowledge.model.neo4j.Neo4jPredicate)
 	 */
-	@Override
 	public void setRelation(Neo4jPredicate relation) {
 		this.relation = relation;
 	}
@@ -185,33 +184,29 @@ public abstract class Neo4jAbstractStatement extends Neo4jAbstractIdentifiedEnti
 	/* (non-Javadoc)
 	 * @see bio.knowledge.model.Statement#addObject(bio.knowledge.model.neo4j.Neo4jConcept)
 	 */
-	@Override
 	public void addObject(Neo4jConcept object) {
 		if(objects==null)
-			objects = new ArrayList<Neo4jConcept>() ;
+			objects = new ArrayList<Concept>() ;
 		objects.add(object);
 	}
 	
 	/* (non-Javadoc)
 	 * @see bio.knowledge.model.Statement#setObjects(java.util.List)
 	 */
-	@Override
-	public void setObjects(List<Neo4jConcept> objects) {
+	public void setObjects(List<Concept> objects) {
 		this.objects = objects;
 	}
 
 	/* (non-Javadoc)
 	 * @see bio.knowledge.model.Statement#getObjects()
 	 */
-	@Override
-	public List<Neo4jConcept> getObjects() {
+	public List<Concept> getObjects() {
 		return objects;
 	}
 	
 	/* (non-Javadoc)
 	 * @see bio.knowledge.model.Statement#setObject(bio.knowledge.model.neo4j.Neo4jConcept)
 	 */
-	@Override
 	public void setObject(Neo4jConcept object) {
 		addObject(object);
 		this.object = object ;
@@ -228,9 +223,8 @@ public abstract class Neo4jAbstractStatement extends Neo4jAbstractIdentifiedEnti
 	/* (non-Javadoc)
 	 * @see bio.knowledge.model.Statement#setEvidence(bio.knowledge.model.neo4j.Neo4jEvidence)
 	 */
-	@Override
-	public void setEvidence( Neo4jEvidence evidence ) {
-		this.evidence = evidence;
+	public void setEvidence( Evidence evidence ) {
+		this.evidence = (Neo4jEvidence) evidence;
 	}
 
 	/* (non-Javadoc)

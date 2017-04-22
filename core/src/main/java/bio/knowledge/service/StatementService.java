@@ -45,6 +45,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import bio.knowledge.database.neo4j.Neo4jAbstractStatement;
+import bio.knowledge.database.neo4j.Neo4jConcept;
+import bio.knowledge.database.neo4j.Neo4jEvidence;
+import bio.knowledge.database.neo4j.Neo4jGeneralStatement;
+import bio.knowledge.database.neo4j.Neo4jPredicate;
 import bio.knowledge.database.repository.StatementRepository;
 import bio.knowledge.datasource.ComplexDataService;
 import bio.knowledge.datasource.DataService;
@@ -52,14 +57,13 @@ import bio.knowledge.datasource.DataServiceUtility;
 import bio.knowledge.datasource.DataSourceRegistry;
 import bio.knowledge.datasource.SimpleDataService;
 import bio.knowledge.datasource.wikidata.WikiDataDataSource;
+import bio.knowledge.model.Concept;
+import bio.knowledge.model.Predicate;
 import bio.knowledge.model.RdfUtil;
 import bio.knowledge.model.SemanticGroup;
+import bio.knowledge.model.Statement;
 import bio.knowledge.model.datasource.Result;
 import bio.knowledge.model.datasource.ResultSet;
-import bio.knowledge.model.neo4j.Neo4jConcept;
-import bio.knowledge.model.neo4j.Neo4jEvidence;
-import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
-import bio.knowledge.model.neo4j.Neo4jPredicate;
 import bio.knowledge.model.wikidata.WikiDataPropertySemanticType;
 import bio.knowledge.service.Cache.CacheLocation;
 import bio.knowledge.service.core.IdentifiedEntityServiceImpl;
@@ -72,7 +76,7 @@ import bio.knowledge.service.core.IdentifiedEntityServiceImpl;
  */
 @Service
 public class StatementService 
-	extends IdentifiedEntityServiceImpl<Neo4jGeneralStatement>
+	extends IdentifiedEntityServiceImpl<Statement>
 	implements DataServiceUtility {
 
 	private Logger _logger = LoggerFactory.getLogger(StatementService.class);
@@ -91,57 +95,19 @@ public class StatementService
 
 	private String SEPARATOR = " ";
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * bio.knowledge.service.core.IdentifiedEntityService#createInstance(java.
-	 * lang.Object[])
-	 */
-	@Override
-	public Neo4jGeneralStatement createInstance(Object... args) {
 
-		if (args.length == 1)
-			return new Neo4jGeneralStatement(
-					(String) args[0]  		  // Statement AccessionId
-			);
-		else if (args.length == 2)
-			if (args[1] instanceof Neo4jPredicate) {
-				return new Neo4jGeneralStatement(
-						(String) args[0],   // Statement AccessionId
-						(Neo4jPredicate) args[1] // Predicate by object
-				);
-			} else if (args[1] instanceof String) {
-				return new Neo4jGeneralStatement(
-						(String) args[0],   // Statement AccessionId
-						(Neo4jPredicate) args[1] // Predicate by object
-				);
-			} else
-				throw new RuntimeException("Invalid argument to StatementService.createInstance() ?");
-		
-		else if (args.length == 4)
-			return new Neo4jGeneralStatement(
-					(String) args[0],  		  // Statement AccessionId
-					(Neo4jConcept) args[1],        // Subject
-					(Neo4jPredicate) args[2],      // Predicate
-					(Neo4jConcept) args[3]         // Object
-			);
-		else
-			throw new RuntimeException("Invalid StatementService.createInstance() arguments?");
-	}
+	private List<Statement> statementList = new ArrayList<Statement>();
 
-	private List<Neo4jGeneralStatement> statementList = new ArrayList<Neo4jGeneralStatement>();
-
-	private Stream<Neo4jGeneralStatement> getStatementStream() {
+	private Stream<Statement> getStatementStream() {
 		// TODO: should this function be RelationSearchMode aware?
-		List<Neo4jGeneralStatement> statements = new ArrayList<Neo4jGeneralStatement>();
-		for (Neo4jGeneralStatement c : statementRepository.getStatements()) {
+		List<Statement> statements = new ArrayList<Statement>();
+		for (Statement c : statementRepository.getStatements()) {
 			statements.add(c);
 		}
 		return statements.stream();
 	}
 
-	public List<Neo4jGeneralStatement> getStatements() {
+	public List<Statement> getStatements() {
 		if (statementList.isEmpty()) {
 			statementList = getStatementStream().sorted().collect(toList());
 		}
@@ -154,7 +120,7 @@ public class StatementService
 	 * @see bio.knowledge.service.core.IdentifiedEntityService#getIdentifiers()
 	 */
 	@Override
-	public List<Neo4jGeneralStatement> getIdentifiers() {
+	public List<Statement> getIdentifiers() {
 		return getStatements();
 	}
 
@@ -167,8 +133,8 @@ public class StatementService
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public Page<Neo4jGeneralStatement> getIdentifiers(Pageable pageable) {
-		return (Page<Neo4jGeneralStatement>) (Page) statementRepository.findAll(pageable);
+	public Page<Statement> getIdentifiers(Pageable pageable) {
+		return (Page<Statement>) (Page) statementRepository.findAll(pageable);
 	}
 
 	/*
@@ -179,14 +145,14 @@ public class StatementService
 	 * java.lang.String, org.springframework.data.domain.Pageable)
 	 */
 	@SuppressWarnings({ "unchecked" })
-	private Page<Neo4jGeneralStatement> findByFilter(String filter, Pageable pageable) {
+	private Page<Statement> findByFilter(String filter, Pageable pageable) {
 
 		long startTime = System.currentTimeMillis();
 
 		/*
 		 * Searches are constrained to the currently selected currentQueryConcept; 
 		 */
-		Optional<Neo4jConcept> currentConceptOpt = query.getCurrentQueryConcept();
+		Optional<Concept> currentConceptOpt = query.getCurrentQueryConcept();
 		Optional<Set<SemanticGroup>> currentConceptTypes = query.getConceptTypes();
 		
 		if (!currentConceptOpt.isPresent()) return null;
@@ -203,7 +169,7 @@ public class StatementService
 			}
 		}
 
-		Neo4jConcept concept = currentConceptOpt.get() ;
+		Concept concept = currentConceptOpt.get() ;
 		String accessionId = concept.getAccessionId() ;
 		
 		// this is key used for caching purpose,(conceptId + Selected SemanticType + textFilter + pageable)
@@ -217,9 +183,9 @@ public class StatementService
 
 		// Is key present ? then fetch it from cache
 		//List<Statement> cachedResult = (List<Statement>) cache.getResultSetCache().get(cacheKey);
-		List<Neo4jGeneralStatement> cachedResult = (List<Neo4jGeneralStatement>)cacheLocation.getResultSet();
+		List<Statement> cachedResult = (List<Statement>)cacheLocation.getResultSet();
 
-		List<Neo4jGeneralStatement> statements ;
+		List<Statement> statements ;
 		
 		if (cachedResult == null) {
 			
@@ -227,13 +193,13 @@ public class StatementService
 			
 			if (filter.trim().isEmpty() && !currentConceptTypes.isPresent()) {
 				_logger.trace("Filter Empty : Calling findByConcept ");
-				data = statementRepository.findByConcept(concept, conceptTypeFilter, pageable);
+				data = statementRepository.findByConcept((Neo4jConcept) concept, conceptTypeFilter, pageable);
 
 			} else {
 				_logger.trace("Filter is there : " + filter + " Calling findByConceptFiltered");
 				// splitting for word by word search
 				String[] words = filter.split(SEPARATOR);
-				data = statementRepository.findByConceptFiltered(concept, conceptTypeFilter, words,
+				data = statementRepository.findByConceptFiltered((Neo4jConcept) concept, conceptTypeFilter, words,
 						pageable);
 			}
 			
@@ -241,21 +207,21 @@ public class StatementService
 			for (Map<String, Object> entry : data) {
 				
 				// statement object, used as DAO, without any relationships
-				Neo4jGeneralStatement statement = (Neo4jGeneralStatement) entry.get("statement");
+				Statement statement = (Statement) entry.get("statement");
 				
 				// fill  subject relationship
 				if (entry.get("subject") != null) {
-					Neo4jConcept subject = (Neo4jConcept) entry.get("subject");
+					Concept subject = (Concept) entry.get("subject");
 					statement.setSubject(subject);
 				}
 				if (entry.get("relation") != null) {
-					Neo4jPredicate relation = (Neo4jPredicate) entry.get("relation");
+					Predicate relation = (Predicate) entry.get("relation");
 					relation = predicateService.annotate(relation) ;
 					statement.setRelation(relation);
 				}
 				// fill object relationship
 				if (entry.get("object") != null) {
-					Neo4jConcept object = (Neo4jConcept) entry.get("object");
+					Concept object = (Concept) entry.get("object");
 					statement.setObject(object);
 				}
 				
@@ -283,12 +249,12 @@ public class StatementService
 		}
 		long endTime = System.currentTimeMillis();
 		_logger.trace("Total Time(in ms) by findByFilter : " + (endTime - startTime));
-		return new PageImpl<Neo4jGeneralStatement>(statements, pageable, statements.size());
+		return new PageImpl<Statement>(statements, pageable, statements.size());
 
 	}
 
 	@Override
-	public Page<Neo4jGeneralStatement> findByNameLike(String filter, Pageable pageable) {
+	public Page<Statement> findByNameLike(String filter, Pageable pageable) {
 		switch (query.getRelationSearchMode()) {
 			case PMID:
 				return findByPMID(filter, pageable);
@@ -308,7 +274,7 @@ public class StatementService
 	 */
 	@Override
 	@SuppressWarnings({})
-	public Page<Neo4jGeneralStatement> findAll(Pageable pageable) {
+	public Page<Statement> findAll(Pageable pageable) {
 		switch (query.getRelationSearchMode()) {
 			case PMID:
 				return findByPMID("", pageable);
@@ -361,7 +327,7 @@ public class StatementService
 		} 
 	}
 
-	public Neo4jGeneralStatement findbySourceAndTargetAccessionId(String sourceAccessionId, String targetAccessionId, String relationName){
+	public Statement findbySourceAndTargetAccessionId(String sourceAccessionId, String targetAccessionId, String relationName){
 
 		List<Map<String, Object>> result = null ;
 		result = statementRepository.
@@ -370,20 +336,20 @@ public class StatementService
 		if(result==null || result.isEmpty()) return null ;
 		
 		Map<String, Object> entry = result.get(0);
-		Neo4jGeneralStatement statement = (Neo4jGeneralStatement)entry.get("statement");
+		Statement statement = (Statement)entry.get("statement");
 
-		Neo4jConcept subject = (Neo4jConcept) entry.get("subject");
+		Concept subject = (Concept) entry.get("subject");
 		if (subject != null) {
 			statement.setSubject(subject);
 		}
 		
-		Neo4jPredicate relation = (Neo4jPredicate) entry.get("relation");
+		Predicate relation = (Predicate) entry.get("relation");
 		if (relation != null) {
 			relation = predicateService.annotate(relation) ;
 			statement.setRelation(relation);
 		}
 		
-		Neo4jConcept object = (Neo4jConcept) entry.get("object");
+		Concept object = (Concept) entry.get("object");
 		if (object != null) {
 			statement.setObject(object);
 		}
@@ -408,10 +374,10 @@ public class StatementService
 	 */
 	private long countHelper(String filter) {
 
-		Optional<Neo4jConcept> currentConceptOpt = query.getCurrentQueryConcept();
+		Optional<Concept> currentConceptOpt = query.getCurrentQueryConcept();
 		if (!currentConceptOpt.isPresent()) return 0L;
 		
-		Neo4jConcept concept = currentConceptOpt.get() ;
+		Concept concept = currentConceptOpt.get() ;
 		String accessionId = concept.getAccessionId();
 		
 		Optional<Set<SemanticGroup>> currentConceptTypes = query.getConceptTypes();
@@ -447,7 +413,7 @@ public class StatementService
 		
 		if (filter.trim().isEmpty() &&  !currentConceptTypes.isPresent()) {
 			if (count == null) {
-				count = statementRepository.countByConcept(concept, conceptTypeFilter);
+				count = statementRepository.countByConcept((Neo4jConcept) concept, conceptTypeFilter);
 				_logger.trace("Inside countEntries (From Database) : " + count);
 			}
 			_logger.trace("Inside countEntries (From Cached Result) : " + count);
@@ -456,7 +422,7 @@ public class StatementService
 			if (count == null) {
 				count = statementRepository.
 							countByNameLikeIgnoreCase(
-									concept,
+									(Neo4jConcept) concept,
 									filter.split(" "), 
 									conceptTypeFilter
 							);
@@ -478,16 +444,16 @@ public class StatementService
 	 * @return
 	 */
 	@SuppressWarnings({ "unchecked" })
-	private Page<Neo4jGeneralStatement> findByPMID(String filter, Pageable pageable) {
+	private Page<Statement> findByPMID(String filter, Pageable pageable) {
 		
 		long startTime = System.currentTimeMillis();
 
-		List<Neo4jGeneralStatement> statements = new ArrayList<>();
+		List<Statement> statements = new ArrayList<>();
 		List<Map<String, Object>> data = new ArrayList<>();
 		
 		Optional<String> currentPmidOpt = query.getCurrentPmid();
 		if (!currentPmidOpt.isPresent()){
-			return new PageImpl<Neo4jGeneralStatement>(statements, pageable, statements.size());
+			return new PageImpl<Statement>(statements, pageable, statements.size());
 		}
 		
 		Optional<Set<SemanticGroup>> currentConceptTypes = query.getConceptTypes();
@@ -517,7 +483,7 @@ public class StatementService
 		// Is key present ? then fetch it from cache
 		//List<Statement> cachedResult = (List<Statement>) cache.getResultSetCache().get(cacheKey);
 		
-		List<Neo4jGeneralStatement> cachedResult = (List<Neo4jGeneralStatement>)cacheLocation.getResultSet();
+		List<Statement> cachedResult = (List<Statement>)cacheLocation.getResultSet();
 		
 		if (cachedResult == null) {
 				// splitting for word by word search
@@ -525,15 +491,15 @@ public class StatementService
 				data = statementRepository.findByPMID(currentPmidOpt.get(), conceptTypeFilter, words, pageable);
 			for (Map<String, Object> entry : data) {
 				// statement object without any relationships
-				Neo4jGeneralStatement statement = (Neo4jGeneralStatement) entry.get("statement");
+				Statement statement = (Statement) entry.get("statement");
 				
-				statement.setSubject((Neo4jConcept) entry.get("subject"));
+				statement.setSubject((Concept) entry.get("subject"));
 				
-				Neo4jPredicate relation = (Neo4jPredicate) entry.get("relation");
+				Predicate relation = (Predicate) entry.get("relation");
 				relation = predicateService.annotate(relation) ;
 				statement.setRelation(relation);
 				
-				statement.setObject((Neo4jConcept) entry.get("object"));
+				statement.setObject((Concept) entry.get("object"));
 				
 				Neo4jEvidence evidence = (Neo4jEvidence)entry.get("evidence");
 				if ( evidence == null) {
@@ -555,7 +521,7 @@ public class StatementService
 		}
 		long endTime = System.currentTimeMillis();
 		_logger.trace("Total Time(in ms) by findByFilterByPMID : " + (endTime - startTime));
-		return new PageImpl<Neo4jGeneralStatement>(statements, pageable, statements.size());
+		return new PageImpl<Statement>(statements, pageable, statements.size());
 
 	}
 	
@@ -630,14 +596,14 @@ public class StatementService
 	/**
 	 * @return
 	 */
-	public Neo4jConcept getCanonicalSubject(Neo4jGeneralStatement p) {
+	public Concept getCanonicalSubject(Statement p) {
 		
-		List<Neo4jConcept> subjects = p.getSubjects() ;
+		List<Concept> subjects = p.getSubjects() ;
 		
 		// might trigger a NPE in caller?
 		if( subjects==null || subjects.size()==0 ) return null ; 
 		
-		Optional<Neo4jConcept> currentConcept = query.getCurrentQueryConcept();
+		Optional<Concept> currentConcept = query.getCurrentQueryConcept();
 		if (!currentConcept.isPresent()) return subjects.get(0) ;
 
 		// else, heuristic?
@@ -651,14 +617,14 @@ public class StatementService
 	 * @param p 
 	 * @return
 	 */
-	public Neo4jConcept getCanonicalObject(Neo4jGeneralStatement p) {
+	public Concept getCanonicalObject(Statement p) {
 		
-		List<Neo4jConcept> objects = p.getObjects() ;
+		List<Concept> objects = p.getObjects() ;
 		
 		// might trigger a NPE in caller?
 		if( objects==null || objects.size()==0 ) return null ; 
 		
-		Optional<Neo4jConcept> currentConceptOpt = query.getCurrentQueryConcept();
+		Optional<Concept> currentConceptOpt = query.getCurrentQueryConcept();
 		if (!currentConceptOpt.isPresent()) return objects.get(0) ;
 
 		// else, heuristic?
@@ -673,7 +639,7 @@ public class StatementService
 	
 	private void runQuery(
 			String serviceName,
-			Neo4jConcept concept, 
+			Concept concept, 
 			Function<? super ResultSet, ? extends Void> resultHandler 
 	) {
 		DataService dataService = 
@@ -691,7 +657,7 @@ public class StatementService
 	// simple runQuery with paging of results
 	private void runQuery(
 			String serviceName,
-			Neo4jConcept concept, String filter, Pageable pageable, 
+			Concept concept, String filter, Pageable pageable, 
 			Function<? super ResultSet, ? extends Void> resultHandler 
 	) {
 		DataService dataService = 
@@ -716,8 +682,8 @@ public class StatementService
 	
 	private Void loadWikiDataResults( 
 			ResultSet rs, 
-			Neo4jConcept subject, 
-			List<Neo4jGeneralStatement> statements 
+			Concept subject, 
+			List<Statement> statements 
 	) {
 		rs.stream().forEach(r->{
 			
@@ -737,13 +703,13 @@ public class StatementService
 				
 				propId = RdfUtil.getObjectId(propUri) ;
 				
-				Neo4jPredicate property = new Neo4jPredicate( propUri, plPart[0], pdPart[0] ) ;
+				Predicate predicate = new Neo4jPredicate( propUri, plPart[0], pdPart[0] ) ;
 				String propValue = (String) r.get("propValue") ;
 								
 				String statementId = subject.getAccessionId()+"-"+propId+"-"+propValue ;
-				Neo4jGeneralStatement p = new Neo4jGeneralStatement( 
+				Statement p = new Neo4jGeneralStatement( 
 						statementId, // not yet sure what unique id to put here...
-			    		property 
+			    		predicate.getName()
 			    ) ;
 				
 				// Subject is the focus of attention!
@@ -756,12 +722,12 @@ public class StatementService
 				String propValueId = RdfUtil.getObjectId(propValue) ;
 				String qualifiedPropValueId = wikiDataType.getDefaultQualifier()+propValueId ;
 
-				Optional<Class<? extends Neo4jConcept>> nodeTypeOpt = 
+				Optional<Class<? extends Concept>> nodeTypeOpt = 
 						wikiDataType.getNodeType() ;
 				
-				Neo4jConcept wikiItem ;
+				Concept wikiItem ;
 				if(nodeTypeOpt.isPresent()) {
-					Class<? extends Neo4jConcept> nodeType = nodeTypeOpt.get() ;
+					Class<? extends Concept> nodeType = nodeTypeOpt.get() ;
 					wikiItem = nodeType.newInstance() ;
 					wikiItem.setName(propValueId);
 				} else
@@ -788,7 +754,7 @@ public class StatementService
 				_logger.error("... parsing error: "+e.getMessage());
 			}
 		});
-		return (Void)null ;
+		return (Void) null;
 	}
 	
 	private Void countWikiDataResults( ResultSet rs, Long[] count ) {
@@ -808,18 +774,18 @@ public class StatementService
 		return (Void)null ;
 	}
 	
-	private Neo4jConcept getCurrentConcept() {
-		Optional<Neo4jConcept> selectedConceptOpt = query.getCurrentSelectedConcept();
+	private Concept getCurrentConcept() {
+		Optional<Concept> selectedConceptOpt = query.getCurrentSelectedConcept();
 		if (!selectedConceptOpt.isPresent()) return null;
 		return selectedConceptOpt.get();
 	}	
 	
 	@SuppressWarnings({ "unchecked" })
-	private Page<Neo4jGeneralStatement> findWikiDataByFilter( String filter, Pageable pageable ) {
+	private Page<Statement> findWikiDataByFilter( String filter, Pageable pageable ) {
 
-		List<Neo4jGeneralStatement> statements = new ArrayList<>();
+		List<Statement> statements = new ArrayList<>();
 
-		Neo4jConcept concept = getCurrentConcept();
+		Concept concept = getCurrentConcept();
 
 		if(concept!=null) {
 
@@ -835,7 +801,7 @@ public class StatementService
 			
 			// Is key present ? then fetch it from cache
 			//List<Statement> cachedResult = (List<Statement>) cache.getResultSetCache().get(cacheKey);
-			List<Neo4jGeneralStatement> cachedResult = (List<Neo4jGeneralStatement>)cacheLocation.getResultSet();
+			List<Statement> cachedResult = (List<Statement>) cacheLocation.getResultSet();
 			
 			if (cachedResult == null) {
 
@@ -845,7 +811,7 @@ public class StatementService
 
 				case GENE:
 					// Retrieve Paged WikiData properties for the Gene Name == Gene Symbol?
-					final List<Neo4jGeneralStatement> newStatements = new ArrayList<>();
+					final List<Statement> newStatements = new ArrayList<>();
 					runQuery( 
 							WikiDataDataSource.WD_CDS_3_ID, 
 							concept,
@@ -875,7 +841,7 @@ public class StatementService
 		} else // no concept currently selected?
 			statements = new ArrayList<>(); // send back empty Statement List...
 
-		return new PageImpl<Neo4jGeneralStatement>(statements, pageable, statements.size());
+		return new PageImpl<Statement>(statements, pageable, statements.size());
 	}
 
 	/**
@@ -884,7 +850,7 @@ public class StatementService
 	 */
 	private long countByWikiData(String filter) {
 		
-		Neo4jConcept concept = getCurrentConcept() ;
+		Concept concept = getCurrentConcept() ;
 		
 		// Access WikiData here and count properties matched by filter
 		
@@ -937,8 +903,8 @@ public class StatementService
 	 * @param statement
 	 * @return
 	 */
-	public Neo4jGeneralStatement save(Neo4jGeneralStatement statement) {
-		return statementRepository.save(statement);
+	public Statement save(Statement statement) {
+		return statementRepository.save((Neo4jAbstractStatement) statement);
 	}
 	
 }

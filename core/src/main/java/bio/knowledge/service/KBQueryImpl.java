@@ -34,13 +34,16 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
+import bio.knowledge.database.neo4j.Neo4jAnnotation;
+import bio.knowledge.database.neo4j.Neo4jConcept;
+import bio.knowledge.database.neo4j.Neo4jGeneralStatement;
+import bio.knowledge.model.Annotation;
+import bio.knowledge.model.Concept;
 import bio.knowledge.model.ConceptMapArchive;
 import bio.knowledge.model.Library;
 import bio.knowledge.model.SemanticGroup;
-import bio.knowledge.model.neo4j.Neo4jAnnotation;
-import bio.knowledge.model.neo4j.Neo4jConcept;
-import bio.knowledge.model.neo4j.Neo4jEvidence;
-import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
+import bio.knowledge.model.Statement;
+import bio.knowledge.model.Evidence;
 
 /**
  * @author Richard
@@ -72,7 +75,7 @@ public class KBQueryImpl implements KBQuery {
 	@Autowired
 	private ConceptService conceptService ;
 
-	private Optional<Neo4jConcept> queryConcept = Optional.empty() ;
+	private Optional<Concept> queryConcept = Optional.empty() ;
 
 	/* (non-Javadoc)
 	 * @see bio.knowledge.service.KBQuery#setCurrentQueryConcept(bio.knowledge.model.Concept)
@@ -87,7 +90,7 @@ public class KBQueryImpl implements KBQuery {
 	 * @see bio.knowledge.service.KBQuery#getCurrentQueryConcept()
 	 */
 	@Override
-	public Optional<Neo4jConcept> getCurrentQueryConcept() {
+	public Optional<Concept> getCurrentQueryConcept() {
 		return queryConcept;
 	}
 	
@@ -175,17 +178,17 @@ public class KBQueryImpl implements KBQuery {
 		return currentImportedMaps;
 	}
 
-	private Optional<Neo4jConcept> selectedConcept = Optional.empty() ;
+	private Optional<Concept> selectedConcept = Optional.empty() ;
 
 	/* (non-Javadoc)
 	 * @see bio.knowledge.service.KBQuery#setCurrentQueryConcept(bio.knowledge.model.Concept)
 	 */
 	@Override
-	public void setCurrentSelectedConcept(Neo4jConcept query) {
+	public void setCurrentSelectedConcept(Concept query) {
 		if(query==null)
 			selectedConcept = Optional.empty() ;
 		else {
-			String identifier = ((Neo4jConcept)query).getAccessionId();
+			String identifier = query.getAccessionId();
 			selectedConcept = conceptService.getDetailsByConceptAccessionId(identifier) ;
 		}
 	}
@@ -194,18 +197,18 @@ public class KBQueryImpl implements KBQuery {
 	 * @see bio.knowledge.service.KBQuery#getCurrentQueryConcept()
 	 */
 	@Override
-	public Optional<Neo4jConcept> getCurrentSelectedConcept() {
+	public Optional<Concept> getCurrentSelectedConcept() {
 		return selectedConcept;
 	}
 
-	private Optional< Neo4jGeneralStatement > currentStatement = Optional.empty() ;
+	private Optional<Statement> currentStatement = Optional.empty() ;
 	
 	/* (non-Javadoc)
 	 * @see bio.knowledge.service.KBQuery#setCurrentStatement(bio.knowledge.model.semmeddb.Statement)
 	 */
 	@Override
-	public void setCurrentStatement(Neo4jGeneralStatement statement) {
-		Neo4jEvidence evidence = statement.getEvidence();
+	public void setCurrentStatement(Statement statement) {
+		Evidence evidence = statement.getEvidence();
 		this.currentEvidence  = Optional.of(evidence) ;
 		this.currentStatement = Optional.of(statement);
 	}
@@ -214,17 +217,17 @@ public class KBQueryImpl implements KBQuery {
 	 * @see bio.knowledge.service.KBQuery#getCurrentStatement()
 	 */
 	@Override
-	public Optional<Neo4jGeneralStatement> getCurrentStatement() {
+	public Optional<Statement> getCurrentStatement() {
 		return currentStatement;
 	}
 
-	private Optional< Neo4jEvidence > currentEvidence = Optional.empty() ;
+	private Optional< Evidence > currentEvidence = Optional.empty() ;
 	
 	/* (non-Javadoc)
 	 * @see bio.knowledge.service.KBQuery#setCurrentEvidence(java.util.Set)
 	 */
 	@Override
-	public void setCurrentEvidence( Neo4jEvidence evidence ) {
+	public void setCurrentEvidence( Evidence evidence ) {
 		currentEvidence = Optional.of(evidence) ;
 	}
 
@@ -232,11 +235,11 @@ public class KBQueryImpl implements KBQuery {
 	 * @see bio.knowledge.service.KBQuery#getCurrentEvidence()
 	 */
 	@Override
-	public Optional< Neo4jEvidence > getCurrentEvidence() {
+	public Optional< Evidence > getCurrentEvidence() {
 		return currentEvidence;
 	}
 
-	private Optional< Neo4jAnnotation > currentAnnotation = Optional.empty() ;
+	private Optional<Annotation> currentAnnotation = Optional.empty() ;
 	
 	/* (non-Javadoc)
 	 * @see bio.knowledge.service.KBQuery#setCurrentAnnotation(bio.knowledge.model.semmeddb.Annotation)
@@ -250,7 +253,7 @@ public class KBQueryImpl implements KBQuery {
 	 * @see bio.knowledge.service.KBQuery#getCurrentAnnotation()
 	 */
 	@Override
-	public Optional<Neo4jAnnotation> getCurrentAnnotation() {
+	public Optional<Annotation> getCurrentAnnotation() {
 		return currentAnnotation;
 	}
 	
@@ -396,7 +399,7 @@ public class KBQueryImpl implements KBQuery {
 
 	private ConceptSearchMode conceptSearchMode = ConceptSearchMode.DEFAULT ;
 
-	private Neo4jConcept lastSelectedConcept;
+	private Concept lastSelectedConcept;
 	
 	@Override
 	public void setConceptSearchMode(ConceptSearchMode mode) {
@@ -409,12 +412,12 @@ public class KBQueryImpl implements KBQuery {
 	}
 
 	@Override
-	public void setLastSelectedConcept(Neo4jConcept concept) {
+	public void setLastSelectedConcept(Concept concept) {
 		this.lastSelectedConcept = concept;
 	}
 
 	@Override
-	public Neo4jConcept getLastSelectedConcept() {
+	public Concept getLastSelectedConcept() {
 		// TODO Auto-generated method stub
 		return lastSelectedConcept;
 	}

@@ -41,9 +41,11 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
+import bio.knowledge.database.neo4j.Neo4jAnnotation;
+import bio.knowledge.database.neo4j.Neo4jReference;
+import bio.knowledge.model.Annotation;
 import bio.knowledge.model.RdfUtil;
-import bio.knowledge.model.neo4j.Neo4jAnnotation;
-import bio.knowledge.model.neo4j.Neo4jReference;
+import bio.knowledge.model.Reference;
 import bio.knowledge.service.AnnotationService;
 import bio.knowledge.service.KBQuery;
 import bio.knowledge.web.design.ReferenceDesign;
@@ -78,13 +80,13 @@ public class ReferenceView extends ReferenceDesign implements View {
 
 		removeAllComponents();
 		
-		Optional<Neo4jAnnotation> annotationOpt = query.getCurrentAnnotation();
+		Optional<Annotation> annotationOpt = query.getCurrentAnnotation();
 		
-		Neo4jReference reference = null ;
+		Reference reference = null ;
 		final String[] uri = new String[1] ;
 		if (annotationOpt.isPresent()) {
 			
-			Neo4jAnnotation annotation = annotationOpt.get();
+			Annotation annotation = annotationOpt.get();
 			reference = annotationService.getReference(annotation);
 			
 			String accId = reference.getAccessionId();

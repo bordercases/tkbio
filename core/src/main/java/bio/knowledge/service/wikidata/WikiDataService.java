@@ -34,6 +34,7 @@ import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import bio.knowledge.database.neo4j.Neo4jConcept;
 import bio.knowledge.datasource.DataService;
 import bio.knowledge.datasource.DataServiceUtility;
 import bio.knowledge.datasource.DataSourceRegistry;
@@ -43,7 +44,6 @@ import bio.knowledge.datasource.wikidata.WikiDataDataSource;
 import bio.knowledge.model.SemanticGroup;
 import bio.knowledge.model.datasource.Result;
 import bio.knowledge.model.datasource.ResultSet;
-import bio.knowledge.model.neo4j.Neo4jConcept;
 
 /**
  * @author Richard

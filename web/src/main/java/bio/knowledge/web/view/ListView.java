@@ -91,18 +91,21 @@ import com.vaadin.ui.themes.ValoTheme;
 import bio.knowledge.authentication.AuthenticationContext;
 import bio.knowledge.authentication.AuthenticationManager;
 import bio.knowledge.authentication.UserProfile;
+import bio.knowledge.database.neo4j.Neo4jAnnotation;
+import bio.knowledge.database.neo4j.Neo4jConcept;
+import bio.knowledge.database.neo4j.Neo4jEvidence;
+import bio.knowledge.database.neo4j.Neo4jGeneralStatement;
+import bio.knowledge.database.neo4j.Neo4jPredicate;
 import bio.knowledge.graph.jsonmodels.Node;
+import bio.knowledge.model.Concept;
 import bio.knowledge.model.ConceptMapArchive;
 import bio.knowledge.model.DomainModelException;
+import bio.knowledge.model.Evidence;
 import bio.knowledge.model.Library;
 import bio.knowledge.model.SemanticGroup;
+import bio.knowledge.model.Statement;
 import bio.knowledge.model.core.IdentifiedEntity;
 import bio.knowledge.model.core.OntologyTerm;
-import bio.knowledge.model.neo4j.Neo4jAnnotation;
-import bio.knowledge.model.neo4j.Neo4jConcept;
-import bio.knowledge.model.neo4j.Neo4jEvidence;
-import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
-import bio.knowledge.model.neo4j.Neo4jPredicate;
 import bio.knowledge.model.organization.ContactForm;
 import bio.knowledge.model.umls.SemanticType;
 import bio.knowledge.service.AnnotationService;
@@ -880,9 +883,9 @@ public class ListView extends BaseView {
 				
 				Neo4jGeneralStatement statement = (Neo4jGeneralStatement) item;
 				
-				Neo4jConcept subject       = statement.getSubject() ;
+				Concept subject       = statement.getSubject() ;
 				String predicateLabel = statement.getRelation().getName();
-				Neo4jConcept object        = statement.getObject() ;
+				Concept object        = statement.getObject() ;
 				
 				// Unusual case of missing data (mostly in sample data?)
 				if( subject == null || object == null ) continue ;
@@ -892,9 +895,9 @@ public class ListView extends BaseView {
 				ui.addEdgeToConceptMap(subject, object, predicateLabel);
 				
 				// just in case, reset the currently active highlighted node(?)
-				Optional<Neo4jConcept> selectedConceptOpt = query.getCurrentSelectedConcept();
+				Optional<Concept> selectedConceptOpt = query.getCurrentSelectedConcept();
 				if (selectedConceptOpt.isPresent()) { 
-					Neo4jConcept concept = selectedConceptOpt.get();
+					Concept concept = selectedConceptOpt.get();
 					ui.setHighlightedNode(concept) ;
 				}
 			}
@@ -1043,7 +1046,7 @@ public class ListView extends BaseView {
 
 		// currentQueryConcept might be empty
 		// and/or ignored for some views
-		Optional<Neo4jConcept> currentQueryConcept = query.getCurrentQueryConcept(); 
+		Optional<Concept> currentQueryConcept = query.getCurrentQueryConcept(); 
 		
 		if (viewName.equals(ViewName.EVIDENCE_VIEW)) {
 
@@ -1058,10 +1061,10 @@ public class ListView extends BaseView {
 					
 				case RELATIONS:
 
-					Optional<Neo4jEvidence> evidenceOpt = query.getCurrentEvidence() ;
+					Optional<Evidence> evidenceOpt = query.getCurrentEvidence() ;
 					if ( evidenceOpt.isPresent() ) {
-						Neo4jEvidence evidence = evidenceOpt.get() ;
-						Neo4jGeneralStatement statement = evidence.getStatement() ;
+						Evidence evidence = evidenceOpt.get() ;
+						Statement statement = evidence.getStatement() ;
 						if( statement != null ) {
 							String subject      = statement.getSubject().getName();
 							String object       = statement.getObject().getName();
@@ -1094,7 +1097,7 @@ public class ListView extends BaseView {
 				
 				case BY_CONCEPT:
 			        if( currentQueryConcept.isPresent() ) {
-						Neo4jConcept concept = currentQueryConcept.get() ;
+			        	Concept concept = currentQueryConcept.get() ;
 			        	target = concept.getName()+" ["+concept.getSemanticGroup().getDescription()+"]" ;
 			        	title += "for Concept" ;
 			        } else
@@ -1138,7 +1141,7 @@ public class ListView extends BaseView {
 
 				case RELATIONS:
 					if (currentQueryConcept.isPresent()) {
-						Neo4jConcept concept = currentQueryConcept.get();
+						Concept concept = currentQueryConcept.get();
 						dataTableLabel = formatDataTableLabel("Relations for Concept ",
 								concept.getName() + " (as " + concept.getSemanticGroup().getDescription() + ")");
 					} // else
@@ -1148,9 +1151,9 @@ public class ListView extends BaseView {
 				case WIKIDATA:
 					// For WikiData retrieval, it is the currently selected concept
 					// that is of interest...
-					Optional<Neo4jConcept> currentSelectedConcept = query.getCurrentSelectedConcept();
+					Optional<Concept> currentSelectedConcept = query.getCurrentSelectedConcept();
 					if (currentSelectedConcept.isPresent()) {
-						Neo4jConcept concept = currentSelectedConcept.get();
+						Concept concept = currentSelectedConcept.get();
 	
 						dataTableLabel = formatDataTableLabel("Data Properties for Concept", concept.getName());
 					} else
