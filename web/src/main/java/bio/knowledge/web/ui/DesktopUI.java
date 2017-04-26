@@ -122,6 +122,7 @@ import bio.knowledge.web.view.ViewName;
 import bio.knowledge.web.view.components.LibraryDetails;
 import bio.knowledge.web.view.components.SaveWindow;
 import bio.knowledge.web.view.components.UserDetails;
+import bio.knowledge.web.view.concept.RelationsView;
 
 /**
  * The main UI (homepage)
@@ -414,8 +415,9 @@ public class DesktopUI extends UI implements MessageService {
 
 		}
 
-		relationsTabNavigator.navigateTo(ViewName.LIST_VIEW + "/" + ViewName.RELATIONS_VIEW);
-
+		//relationsTabNavigator.navigateTo(ViewName.LIST_VIEW + "/" + ViewName.RELATIONS_VIEW);
+		relationsTabNavigator.navigateTo(RelationsView.NAME);
+		
 		TabSheet tabsheet = desktopView.getDataTabSheet();
 		tabsheet.setSelectedTab(relationsTab);
 	}
@@ -840,7 +842,8 @@ public class DesktopUI extends UI implements MessageService {
 			} else if (caption.equals(ViewName.EVIDENCE_TAB)) {
 				evidenceTabNavigator.navigateTo(ViewName.LIST_VIEW + "/" + ViewName.EVIDENCE_VIEW);
 			} else if (caption.equals(ViewName.RELATIONS_TAB)) {
-				relationsTabNavigator.navigateTo(ViewName.LIST_VIEW + "/" + ViewName.RELATIONS_VIEW);
+				//relationsTabNavigator.navigateTo(ViewName.LIST_VIEW + "/" + ViewName.RELATIONS_VIEW);
+				relationsTabNavigator.navigateTo(RelationsView.NAME);
 			}
 		});
 
@@ -1494,7 +1497,7 @@ public class DesktopUI extends UI implements MessageService {
 			// "knowledge.bio/#user=emailOrUsername", or even group lookups like
 			// "knowledge.bio/#group=emailOrUsername:groupName"
 			if (uri.startsWith("map=")) {
-				applicationNavigator.navigateTo(ListView.NAME);
+				applicationNavigator.navigateTo(ViewName.LIST_VIEW);
 
 				UserProfile user = authenticationManager.getCurrentUser();
 
@@ -1562,6 +1565,8 @@ public class DesktopUI extends UI implements MessageService {
 		applicationNavigator.addView(DesktopView.NAME, desktopView);
 		applicationNavigator.addView(ListView.NAME, desktopView);
 		applicationNavigator.addView(ReferenceView.NAME, desktopView);
+		applicationNavigator.addView(RelationsView.NAME, desktopView);
+		
 	}
 
 	private String currentConceptMapName = "";

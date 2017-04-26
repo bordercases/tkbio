@@ -27,6 +27,7 @@ package bio.knowledge.web.view;
 
 public interface ViewName { 
 	
+	static final public String DESKTOP_VIEW = "desktop";
 	// View for simple display of data listing of one data type
 	static final public String LIST_VIEW = "list" ;
 
@@ -43,4 +44,7 @@ public interface ViewName {
 	static final public String RELATIONS_VIEW   = "relations";
 	static final public String EVIDENCE_VIEW    = "evidence";
 	static final public String ANNOTATIONS_VIEW = "user_searching";
+	
+	static final public String sCONCEPTS_VIEW = "sconcepts";
+	
 }

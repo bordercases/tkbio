@@ -218,31 +218,31 @@ public class ConceptService
 						new String[] { searchString, conceptCodes, pageKey }
 				);
 		
-		List<Neo4jConcept> searchedConceptResult = new ArrayList<>();
+		List<Concept> searchedConceptResult = new ArrayList<>();
 		// Is key present ? then fetch it from cache
 		// List<Concept> cachedResult = (List<Concept>) cache.getResultSetCache().get(cacheKey);
 		
-		List<Neo4jConcept> cachedResult = (List<Neo4jConcept>) cacheLocation.getResultSet();
+		List<Concept> cachedResult = (List<Concept>) cacheLocation.getResultSet();
 		
 		// Is key present ? then fetch it from cache
 		if (cachedResult == null) {
 			String[] words = searchString.split(SEPARATOR);
 			if(words.length==0) {
-				searchedConceptResult = conceptRepository.findAllByPage(
+				searchedConceptResult = (List<Concept>) (List) conceptRepository.findAllByPage(
 						pageable,
 						authenticationState.getUserId(),
 						authenticationState.getGroupIds()
 				);
 			} else {
 				if(filter.trim().isEmpty() && !initialConceptTypesOpt.isPresent()){
-					searchedConceptResult = conceptRepository.findByInitialSearch(
+					searchedConceptResult = (List<Concept>) (List) conceptRepository.findByInitialSearch(
 							words,
 							pageable,
 							authenticationState.getUserId(),
 							authenticationState.getGroupIds()
 					);
 				} else {
-					searchedConceptResult = conceptRepository.findByNameLikeIgnoreCase(
+					searchedConceptResult = (List<Concept>) (List) conceptRepository.findByNameLikeIgnoreCase(
 							conceptTypes,
 							words,
 							pageable,

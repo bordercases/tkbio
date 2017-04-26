@@ -26,8 +26,10 @@
 package bio.knowledge.web.view;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +44,18 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
+import bio.knowledge.authentication.AuthenticationContext;
+import bio.knowledge.model.core.IdentifiedEntity;
+import bio.knowledge.service.AnnotationService;
+import bio.knowledge.service.AuthenticationState;
+import bio.knowledge.service.ConceptMapArchiveService;
+import bio.knowledge.service.ConceptService;
+import bio.knowledge.service.KBQuery;
+import bio.knowledge.service.StatementService;
+import bio.knowledge.service.core.IdentifiedEntityService;
 import bio.knowledge.service.core.MessageService;
+import bio.knowledge.service.core.OntologyTermService;
+import bio.knowledge.service.organization.ContactFormService;
 import bio.knowledge.web.ui.DesktopUI;
 
 /**
@@ -56,7 +69,44 @@ public abstract class BaseView extends VerticalLayout implements View, MessageSe
 	protected Logger _logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Autowired
-	private MessageSource messageSource ;
+	protected MessageSource messageSource ;
+	
+	@Autowired
+	protected KBQuery query;
+	
+	@Autowired
+	protected AuthenticationContext context;
+
+	@Autowired
+	protected OntologyTermService ontologyTermService;
+
+	@Autowired
+	protected IdentifiedEntityService<IdentifiedEntity> identifierService;
+
+	@Autowired
+	protected ContactFormService contactFormService;
+
+	@Autowired
+	protected ConceptService conceptService ;
+
+	@Autowired
+	protected ConceptMapArchiveService conceptMapArchiveService;
+
+	@Autowired
+	protected StatementService statementService ;
+	
+	@Autowired
+	protected AnnotationService annotationService ;
+	
+	@Autowired
+	protected AuthenticationState authenticationState;
+	
+	protected Map<String, Object> serviceDirectory = new HashMap<String, Object>() {{
+		put("query", query);
+		put("conceptService", conceptService);
+		put("statementService", statementService);
+		put("annotationService", annotationService);
+	}};
 	
 	public DesktopUI getCurrentUI() {
 		return (DesktopUI)(UI.getCurrent());
