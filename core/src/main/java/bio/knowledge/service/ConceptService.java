@@ -182,8 +182,9 @@ public class ConceptService
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public
 	// TODO: I think this is where the refactoring faltered
-	private Page<Concept> findAllFiltered(String filter, Pageable pageable) {
+ Page<Concept> findAllFiltered(String filter, Pageable pageable) {
 		KnowledgeSource ks1 = new KnowledgeSource("tkbio", "knowledge.bio", "http://localhost:8090/api/");
 		KnowledgeSource ks2 = new KnowledgeSource("broken", "broken server", "broken link");
 		KnowledgeSourcePool pool = new KnowledgeSourcePool("pool", "pool");
@@ -936,7 +937,7 @@ public class ConceptService
 
 	public int size() {
 		// TODO Auto-generated method stub
-		return 100;
+		return 30;
 	}
 
 }

@@ -7,6 +7,7 @@ import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Panel;
 
@@ -33,7 +34,7 @@ import org.vaadin.addons.lazyquerycontainer.QueryView;
 public class RelationsView extends BaseView {
 
 	public static final String NAME = "concept";
-	String searchInput = "";
+	String searchInput = "diabetes";
 	
 	@Override
 	public void enter(ViewChangeEvent event) {
@@ -60,13 +61,15 @@ public class RelationsView extends BaseView {
 
 		rlqd.setSortState(sortPropertyIds, sortPropertyAscendingStates);
 		
-		RelationsQueryFactory rqf = new RelationsQueryFactory(rlqd, serviceDirectory);
+		RelationsQueryFactory rqf = new RelationsQueryFactory(rlqd, conceptService);
 		LazyQueryContainer lqc = new LazyQueryContainer(rlqd, rqf);
-		
-		List<Concept> testList = new ArrayList<Concept>() {{
-			add(new Neo4jConcept());
-		}}; 
-		relationGrid.setContainerDataSource(new BeanItemContainer(Concept.class, testList));
+		lqc.addContainerProperty("id", String.class, "", true, true);
+		lqc.addContainerProperty("name", String.class, "", true, true);
+
+//		List<Concept> testList = new ArrayList<Concept>() {{
+//			add(new Neo4jConcept());
+//		}}; 
+		relationGrid.setContainerDataSource(lqc);
 		
 		vLayout.addComponent(relationGrid);
 		relationsPane.setContent(vLayout);

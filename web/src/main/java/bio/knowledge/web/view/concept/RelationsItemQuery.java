@@ -1,16 +1,19 @@
 package bio.knowledge.web.view.concept;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.vaadin.addons.lazyquerycontainer.AbstractBeanQuery;
 import org.vaadin.addons.lazyquerycontainer.Query;
 import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
 
-import com.github.andrewoma.dexx.collection.ArrayList;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanItem;
 
+import bio.knowledge.service.core.IdentifiedEntityServiceImpl;
 import bio.knowledge.service.core.TableSorter;
 import bio.knowledge.model.Concept;
 import bio.knowledge.model.neo4j.Neo4jConcept;
@@ -21,11 +24,12 @@ public class RelationsItemQuery implements Query {
 	private RelationsQueryDefinition definition;
 	private Object[] sortPropertyIds;
 	private boolean[] sortStates;
+	private ConceptService conceptService;
 
 	public RelationsItemQuery(RelationsQueryDefinition definition,
-			Map<String, Object> serviceDirectory) {
+			ConceptService conceptService) {
 		this.definition = definition;
-		this.serviceDirectory = serviceDirectory;
+		this.conceptService = conceptService;
 		this.sortPropertyIds = definition.getSortPropertyIds();
 		this.sortStates = definition.getSortPropertyAscendingStates();
 	}
@@ -38,25 +42,20 @@ public class RelationsItemQuery implements Query {
 	
 	@Override
 	public int size() {
-		ConceptService conceptService =
-				(ConceptService) serviceDirectory.get("conceptService");		
 		return conceptService.size();
 	}
 
 	@Override
 	public List<Item> loadItems(int start, int count) {
-		ConceptService conceptService =
-				(ConceptService) serviceDirectory.get("conceptService");
-		
 		// doesn't use parts of definition?
-		List<Concept> concepts = conceptService.getDataPage(start, count, definition.getSearchInput(), TableSorter.SUBJECT, true);
+//		List<Concept> concepts = conceptService.getDataPage(start, count, definition.getSearchInput(), TableSorter.SUBJECT, true);
+		System.out.println("Load Items Start: "+start);
+		List<Concept> concepts = conceptService.findAllFiltered(definition.getSearchInput(), new PageRequest(start, count)).getContent();
         List<Item> items = (List<Item>) new ArrayList<Item>();
         for(Concept concept : concepts) {
                 items.add(new BeanItem<Concept>(concept));
         }
-        
-	    return items;
-	    
+	    return items;    
 	}
 
 	@Override

@@ -6,14 +6,16 @@ import org.vaadin.addons.lazyquerycontainer.Query;
 import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
 import org.vaadin.addons.lazyquerycontainer.QueryFactory;
 
+import bio.knowledge.service.ConceptService;
+
 public class RelationsQueryFactory implements QueryFactory {
     
 	private RelationsQueryDefinition definition;
-    private Map<String, Object> serviceDirectory; 
+    private ConceptService conceptService; 
 	
-	public RelationsQueryFactory(RelationsQueryDefinition definition, Map<String, Object> serviceDirectory) {
+	public RelationsQueryFactory(RelationsQueryDefinition definition, ConceptService conceptService) {
 		this.definition = definition;
-		this.serviceDirectory = serviceDirectory;
+		this.conceptService = conceptService;
 	}
 	
     public void setQueryDefinition(RelationsQueryDefinition definition) {
@@ -22,7 +24,7 @@ public class RelationsQueryFactory implements QueryFactory {
 	
 	@Override
 	public Query constructQuery(QueryDefinition definition) {
-		return new RelationsItemQuery(((RelationsQueryDefinition) definition), serviceDirectory);
+		return new RelationsItemQuery(((RelationsQueryDefinition) definition), conceptService);
 	}
 
 }

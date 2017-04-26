@@ -101,13 +101,6 @@ public abstract class BaseView extends VerticalLayout implements View, MessageSe
 	@Autowired
 	protected AuthenticationState authenticationState;
 	
-	protected Map<String, Object> serviceDirectory = new HashMap<String, Object>() {{
-		put("query", query);
-		put("conceptService", conceptService);
-		put("statementService", statementService);
-		put("annotationService", annotationService);
-	}};
-	
 	public DesktopUI getCurrentUI() {
 		return (DesktopUI)(UI.getCurrent());
 	}
