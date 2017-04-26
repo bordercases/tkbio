@@ -80,7 +80,7 @@ public class Neo4jConcept extends Neo4jAbstractAnnotatedEntity implements Concep
     
     private Set<String> terms = new HashSet<String>() ;
     
-    protected Neo4jConcept() {
+    public Neo4jConcept() {
     	super() ;
     }
     

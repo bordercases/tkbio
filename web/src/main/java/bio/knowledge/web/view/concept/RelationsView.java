@@ -1,6 +1,7 @@
 package bio.knowledge.web.view.concept;
 
 import com.vaadin.data.Item;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Grid;
@@ -9,11 +10,16 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Panel;
 
+import bio.knowledge.model.Concept;
+import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.service.ConceptService;
+import bio.knowledge.service.core.TableSorter;
 import bio.knowledge.web.view.BaseView;
 import bio.knowledge.web.view.ListView;
 import bio.knowledge.web.view.components.DataTableBuilder;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.vaadin.addons.lazyquerycontainer.BeanQueryFactory;
@@ -32,7 +38,7 @@ public class RelationsView extends BaseView {
 	@Override
 	public void enter(ViewChangeEvent event) {
 		removeAllComponents();
-		Panel relationsWindow = new Panel();
+		Panel relationsPane = new Panel();
 		//Grid dataTable = DataTableBuilder.build(null, null);
 		//conceptWindow.setContent(dataTable);
 		
@@ -51,14 +57,20 @@ public class RelationsView extends BaseView {
 		// TODO:
 		Object[] sortPropertyIds = new Object[0];
 		boolean[] sortPropertyAscendingStates = new boolean[0];
+
 		rlqd.setSortState(sortPropertyIds, sortPropertyAscendingStates);
 		
 		RelationsQueryFactory rqf = new RelationsQueryFactory(rlqd, serviceDirectory);
-		relationGrid.setContainerDataSource(new LazyQueryContainer(rlqd, rqf));
+		LazyQueryContainer lqc = new LazyQueryContainer(rlqd, rqf);
+		
+		List<Concept> testList = new ArrayList<Concept>() {{
+			add(new Neo4jConcept());
+		}}; 
+		relationGrid.setContainerDataSource(new BeanItemContainer(Concept.class, testList));
 		
 		vLayout.addComponent(relationGrid);
-		relationsWindow.setContent(vLayout);
-		addComponent(relationsWindow);
+		relationsPane.setContent(vLayout);
+		addComponent(relationsPane);
 		
 	}
 }

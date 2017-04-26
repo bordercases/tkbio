@@ -39,8 +39,7 @@ public enum TableSorter {
 	RELATION("relation"), 
 	EVIDENCE("evidence"), 
 	ANNOTATION("annotation"), 
-	DEFAULT("name")
-	;
+	DEFAULT("name");
 	
 	// sort by 
 	private String type;

@@ -79,7 +79,7 @@ public abstract class IdentifiedEntityServiceImpl<T extends IdentifiedEntity>
  	 * @param pageSize is equal to or greater than 1
  	 * @return a List ('Page') of DataFile records
  	 */
- 	public List<T> getDataPage( int pageIndex, int pageSize, String filter, TableSorter sorter, boolean isAscending) {
+ 	public List<T> getDataPage(int pageIndex, int pageSize, String filter, TableSorter sorter, boolean isAscending) {
  		// Note that PageRequests are zero-based indexed
 // 		if( pageNo < 1 ) 
 // 			pageNo = 0 ;

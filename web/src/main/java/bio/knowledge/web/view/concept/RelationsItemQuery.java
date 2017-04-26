@@ -11,6 +11,7 @@ import com.github.andrewoma.dexx.collection.ArrayList;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanItem;
 
+import bio.knowledge.service.core.TableSorter;
 import bio.knowledge.model.Concept;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.service.ConceptService;
@@ -31,7 +32,7 @@ public class RelationsItemQuery implements Query {
 
 	@Override
     public Item constructItem() {
-            return new BeanItem<Concept>(new Concept());
+            return new BeanItem<Concept>(new Neo4jConcept());
     }
 	
 	
@@ -47,7 +48,8 @@ public class RelationsItemQuery implements Query {
 		ConceptService conceptService =
 				(ConceptService) serviceDirectory.get("conceptService");
 		
-		List<Concept> concepts = conceptService.load(definition.getSearchInput(), start, count, sortPropertyIds, sortStates);
+		// doesn't use parts of definition?
+		List<Concept> concepts = conceptService.getDataPage(start, count, definition.getSearchInput(), TableSorter.SUBJECT, true);
         List<Item> items = (List<Item>) new ArrayList<Item>();
         for(Concept concept : concepts) {
                 items.add(new BeanItem<Concept>(concept));
