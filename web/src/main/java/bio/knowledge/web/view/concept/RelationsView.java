@@ -27,8 +27,7 @@ import org.vaadin.addons.lazyquerycontainer.QueryView;
 public class RelationsView extends BaseView {
 
 	public static final String NAME = "concept";
-	
-    ConceptService conceptProvider;
+	String userInput = "";
 	
 	@Override
 	public void enter(ViewChangeEvent event) {
@@ -45,8 +44,14 @@ public class RelationsView extends BaseView {
 //		queryFactory.setQueryConfiguration(serviceDirectory);
 		
 		// TODO:
-		// boolean compositeItems, int batchSize, java.lang.Object idPropertyId
-		LazyQueryDefinition rlqd = new LazyQueryDefinition(false, 10, null);
+		// DONE: boolean compositeItems, DONE: int batchSize, DONE: java.lang.Object idPropertyId
+		// Check
+		RelationsQueryDefinition rlqd = new RelationsQueryDefinition(userInput, false, 10, null);
+		
+		// TODO:
+		Object[] sortPropertyIds = new Object[0];
+		boolean[] sortPropertyAscendingStates = new boolean[0];
+		rlqd.setSortState(sortPropertyIds, sortPropertyAscendingStates);
 		
 		RelationsQueryFactory rqf = new RelationsQueryFactory(rlqd, serviceDirectory);
 		relationGrid.setContainerDataSource(new LazyQueryContainer(rlqd, rqf));

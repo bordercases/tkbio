@@ -8,21 +8,21 @@ import org.vaadin.addons.lazyquerycontainer.QueryFactory;
 
 public class RelationsQueryFactory implements QueryFactory {
     
-	private QueryDefinition definition;
+	private RelationsQueryDefinition definition;
     private Map<String, Object> serviceDirectory; 
 	
-	public RelationsQueryFactory(QueryDefinition definition, Map<String, Object> serviceDirectory) {
+	public RelationsQueryFactory(RelationsQueryDefinition definition, Map<String, Object> serviceDirectory) {
 		this.definition = definition;
 		this.serviceDirectory = serviceDirectory;
 	}
 	
-    public void setQueryDefinition(QueryDefinition definition) {
+    public void setQueryDefinition(RelationsQueryDefinition definition) {
             this.definition=definition;
     }
 	
 	@Override
 	public Query constructQuery(QueryDefinition definition) {
-		return new RelationsItemQuery(definition, serviceDirectory);
+		return new RelationsItemQuery(((RelationsQueryDefinition) definition), serviceDirectory);
 	}
 
 }

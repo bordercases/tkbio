@@ -17,16 +17,16 @@ import bio.knowledge.service.ConceptService;
 
 public class RelationsItemQuery implements Query {
 	Map<String, Object> serviceDirectory;
-	private QueryDefinition definition;
+	private RelationsQueryDefinition definition;
 	private Object[] sortPropertyIds;
 	private boolean[] sortStates;
 
-	public RelationsItemQuery(QueryDefinition definition,
+	public RelationsItemQuery(RelationsQueryDefinition definition,
 			Map<String, Object> serviceDirectory) {
 		this.definition = definition;
 		this.serviceDirectory = serviceDirectory;
 		this.sortPropertyIds = definition.getSortPropertyIds();
-		this.sortStates = definition.getDefaultSortPropertyAscendingStates();
+		this.sortStates = definition.getSortPropertyAscendingStates();
 	}
 
 	@Override
@@ -47,7 +47,7 @@ public class RelationsItemQuery implements Query {
 		ConceptService conceptService =
 				(ConceptService) serviceDirectory.get("conceptService");
 		
-		List<Concept> concepts = conceptService.load(start, count, sortPropertyIds, sortStates);
+		List<Concept> concepts = conceptService.load(definition.getUserInput(), start, count, sortPropertyIds, sortStates);
         List<Item> items = (List<Item>) new ArrayList<Item>();
         for(Concept concept : concepts) {
                 items.add(new BeanItem<Concept>(concept));
