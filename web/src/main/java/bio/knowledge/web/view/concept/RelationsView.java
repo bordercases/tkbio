@@ -27,7 +27,7 @@ import org.vaadin.addons.lazyquerycontainer.QueryView;
 public class RelationsView extends BaseView {
 
 	public static final String NAME = "concept";
-	String userInput = "";
+	String searchInput = "";
 	
 	@Override
 	public void enter(ViewChangeEvent event) {
@@ -46,7 +46,7 @@ public class RelationsView extends BaseView {
 		// TODO:
 		// DONE: boolean compositeItems, DONE: int batchSize, DONE: java.lang.Object idPropertyId
 		// Check
-		RelationsQueryDefinition rlqd = new RelationsQueryDefinition(userInput, false, 10, null);
+		RelationsQueryDefinition rlqd = new RelationsQueryDefinition(searchInput, false, 10, null);
 		
 		// TODO:
 		Object[] sortPropertyIds = new Object[0];

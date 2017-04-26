@@ -47,7 +47,7 @@ public class RelationsItemQuery implements Query {
 		ConceptService conceptService =
 				(ConceptService) serviceDirectory.get("conceptService");
 		
-		List<Concept> concepts = conceptService.load(definition.getUserInput(), start, count, sortPropertyIds, sortStates);
+		List<Concept> concepts = conceptService.load(definition.getSearchInput(), start, count, sortPropertyIds, sortStates);
         List<Item> items = (List<Item>) new ArrayList<Item>();
         for(Concept concept : concepts) {
                 items.add(new BeanItem<Concept>(concept));
