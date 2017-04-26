@@ -55,16 +55,26 @@ public interface EvidenceRepository extends GraphRepository<Neo4jEvidence> {
 	@Query("MATCH (evidence:Evidence:IdentifiedEntity:DatabaseEntity { accessionId : \"kbe:\"+{evidenceId} }) RETURN evidence")
 	public Neo4jEvidence findByEvidenceId(@Param("evidenceId") String evidenceId);
 	
-	@Query(
-			" MATCH (evidence:Evidence:IdentifiedEntity:DatabaseEntity) " +
-			" WHERE ID(evidence) = {evidenceId} " +
+	@Query(	" MATCH (evidence:Evidence:IdentifiedEntity:DatabaseEntity { accessionId : \"kbe:\"+{evidenceId} }) " +
 			" RETURN evidence " +
 			" SKIP  {pageNumber} * {pageSize} " +
 			" LIMIT {pageSize} "
-			
 	)
 	public List<Neo4jEvidence> apiGetEvidence(
 		@Param("evidenceId") String evidenceId,
+		@Param("pageNumber") Integer pageNumber,
+		@Param("pageSize") Integer pageSize
+	);
+	
+	@Query(	" MATCH (evidence:Evidence:IdentifiedEntity:DatabaseEntity { accessionId : \"kbe:\"+{evidenceId} }) " + 
+			" WHERE ANY (x IN {filter} WHERE LOWER(evidence.name) CONTAINS LOWER(x)) " +
+			" RETURN evidence " +
+			" SKIP  {pageNumber} * {pageSize} " +
+			" LIMIT {pageSize} "
+	)
+	public List<Neo4jEvidence> apiGetEvidenceFiltered(
+		@Param("evidenceId") String evidenceId,
+		@Param("filter") String[] filter,
 		@Param("pageNumber") Integer pageNumber,
 		@Param("pageSize") Integer pageSize
 	);

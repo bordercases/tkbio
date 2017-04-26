@@ -28,6 +28,7 @@ package bio.knowledge.service;
 import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -52,6 +54,10 @@ import bio.knowledge.datasource.DataService;
 import bio.knowledge.datasource.DataServiceUtility;
 import bio.knowledge.datasource.DataSourceException;
 import bio.knowledge.datasource.DataSourceRegistry;
+import bio.knowledge.datasource.GetConceptDataService;
+import bio.knowledge.datasource.GetConceptDataService.ConceptImpl;
+import bio.knowledge.datasource.KnowledgeSource;
+import bio.knowledge.datasource.KnowledgeSourcePool;
 import bio.knowledge.datasource.SimpleDataService;
 import bio.knowledge.datasource.wikidata.WikiDataDataSource;
 import bio.knowledge.model.Concept;
@@ -178,87 +184,113 @@ public class ConceptService
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	// TODO: I think this is where the refactoring faltered
 	private Page<Concept> findAllFiltered(String filter, Pageable pageable) {
-		String searchString = query.getCurrentQueryText();
-		if ( 
-				searchString == null 
-				
-				// Empty filter is problematic if used in a search so we don't allow it 
-				|| searchString.isEmpty() 
-
-				/* DEPRECATED - we'll allow (helps user annotation discovery...)
-				 * We don't let people search against 
-				 * production with less than 
-				 * 3 characters... Too slow!
-				 */
-//				|| searchString.trim().length()<3  
-			) {
-			return null;
-		} else {
-			searchString = filter + SEPARATOR + searchString;
-		}
-
-		// getting selected semanticSemanticGroups filter after initial concept seach 
-		Optional<Set<SemanticGroup>> initialConceptTypesOpt = query.getInitialConceptTypes();
-		ArrayList<String> conceptTypes = new ArrayList<String>();
-		String conceptCodes = new String();
-		if (initialConceptTypesOpt.isPresent()) {
-			Set<SemanticGroup> initialConceptTypes = initialConceptTypesOpt.get();
-			for (SemanticGroup type : initialConceptTypes) {
-				conceptTypes.add(type.name());
-				// appending all concept types for making cache key
-				conceptCodes = conceptCodes + type.name();
-			}
-		}
+//		KnowledgeSource ks1 = new KnowledgeSource("tkbio1", "knowledge.bio", "http://localhost:8080/");
+		KnowledgeSource ks2 = new KnowledgeSource("tkbio2", "knowledge.bio", "http://localhost:8080/api/");
+		KnowledgeSourcePool pool = new KnowledgeSourcePool("pool", "pool");
+//		pool.addKnowledgeSource(ks1);
+		pool.addKnowledgeSource(ks2);
+		GetConceptDataService service = new GetConceptDataService(pool);
+		List<String> f = new ArrayList<String>();
+		f.add("diabetes");
+		CompletableFuture<List<ConceptImpl>> future = service.query(
+				f,
+				new ArrayList<String>(),
+				pageable.getPageNumber(),
+				pageable.getPageSize()
+		);
 		
-		String pageKey = new Integer(pageable.hashCode()).toString();
-		CacheLocation cacheLocation = 
-				cache.searchForResultSet(
-						"Concept", 
-						searchString, 
-						new String[] { searchString, conceptCodes, pageKey }
-				);
-		
-		List<Concept> searchedConceptResult = new ArrayList<>();
-		// Is key present ? then fetch it from cache
-		// List<Concept> cachedResult = (List<Concept>) cache.getResultSetCache().get(cacheKey);
-		
-		List<Concept> cachedResult = (List<Concept>) cacheLocation.getResultSet();
-		
-		// Is key present ? then fetch it from cache
-		if (cachedResult == null) {
-			String[] words = searchString.split(SEPARATOR);
-			if(words.length==0) {
-				searchedConceptResult = (List<Concept>) (List) conceptRepository.findAllByPage(
-						pageable,
-						authenticationState.getUserId(),
-						authenticationState.getGroupIds()
-				);
-			} else {
-				if(filter.trim().isEmpty() && !initialConceptTypesOpt.isPresent()){
-					searchedConceptResult = (List<Concept>) (List) conceptRepository.findByInitialSearch(
-							words,
-							pageable,
-							authenticationState.getUserId(),
-							authenticationState.getGroupIds()
-					);
-				} else {
-					searchedConceptResult = (List<Concept>) (List) conceptRepository.findByNameLikeIgnoreCase(
-							conceptTypes,
-							words,
-							pageable,
-							authenticationState.getUserId(),
-							authenticationState.getGroupIds()
-					);
-				}
-			}
+		try {
+			List<ConceptImpl> concepts = future.get(DataService.TIMEOUT_DURATION, DataService.TIMEOUT_UNIT);
+			return (Page<Concept>) (Page) new PageImpl(concepts);
 			
-			//cache.getResultSetCache().put(cacheKey, searchedConceptResult);
-			cacheLocation.setResultSet(searchedConceptResult);
-			
-		} else {
-			searchedConceptResult = cachedResult;
+		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+			future.completeExceptionally(e);
 		}
-		return new PageImpl(searchedConceptResult);
+		
+		return (Page<Concept>) (Page) new PageImpl(new ArrayList<Concept>());
+		
+		
+//		String searchString = query.getCurrentQueryText();
+//		if ( 
+//				searchString == null 
+//				
+//				// Empty filter is problematic if used in a search so we don't allow it 
+//				|| searchString.isEmpty() 
+//
+//				/* DEPRECATED - we'll allow (helps user annotation discovery...)
+//				 * We don't let people search against 
+//				 * production with less than 
+//				 * 3 characters... Too slow!
+//				 */
+////				|| searchString.trim().length()<3  
+//			) {
+//			return null;
+//		} else {
+//			searchString = filter + SEPARATOR + searchString;
+//		}
+//
+//		// getting selected semanticSemanticGroups filter after initial concept seach 
+//		Optional<Set<SemanticGroup>> initialConceptTypesOpt = query.getInitialConceptTypes();
+//		ArrayList<String> conceptTypes = new ArrayList<String>();
+//		String conceptCodes = new String();
+//		if (initialConceptTypesOpt.isPresent()) {
+//			Set<SemanticGroup> initialConceptTypes = initialConceptTypesOpt.get();
+//			for (SemanticGroup type : initialConceptTypes) {
+//				conceptTypes.add(type.name());
+//				// appending all concept types for making cache key
+//				conceptCodes = conceptCodes + type.name();
+//			}
+//		}
+//		
+//		String pageKey = new Integer(pageable.hashCode()).toString();
+//		CacheLocation cacheLocation = 
+//				cache.searchForResultSet(
+//						"Concept", 
+//						searchString, 
+//						new String[] { searchString, conceptCodes, pageKey }
+//				);
+//		
+//		List<Neo4jConcept> searchedConceptResult = new ArrayList<>();
+//		// Is key present ? then fetch it from cache
+//		// List<Concept> cachedResult = (List<Concept>) cache.getResultSetCache().get(cacheKey);
+//		
+//		List<Neo4jConcept> cachedResult = (List<Neo4jConcept>) cacheLocation.getResultSet();
+//		
+//		// Is key present ? then fetch it from cache
+//		if (cachedResult == null) {
+//			String[] words = searchString.split(SEPARATOR);
+//			if(words.length==0) {
+//				searchedConceptResult = conceptRepository.findAllByPage(
+//						pageable,
+//						authenticationState.getUserId(),
+//						authenticationState.getGroupIds()
+//				);
+//			} else {
+//				if(filter.trim().isEmpty() && !initialConceptTypesOpt.isPresent()){
+//					searchedConceptResult = conceptRepository.findByInitialSearch(
+//							words,
+//							pageable,
+//							authenticationState.getUserId(),
+//							authenticationState.getGroupIds()
+//					);
+//				} else {
+//					searchedConceptResult = conceptRepository.findByNameLikeIgnoreCase(
+//							conceptTypes,
+//							words,
+//							pageable,
+//							authenticationState.getUserId(),
+//							authenticationState.getGroupIds()
+//					);
+//				}
+//			}
+//			
+//			//cache.getResultSetCache().put(cacheKey, searchedConceptResult);
+//			cacheLocation.setResultSet(searchedConceptResult);
+//			
+//		} else {
+//			searchedConceptResult = cachedResult;
+//		}
+//		return new PageImpl(searchedConceptResult);
 	}
 
 	/* (non-Javadoc)
