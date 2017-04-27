@@ -18,8 +18,8 @@ public class RelationsQueryFactory implements QueryFactory {
 		this.conceptService = conceptService;
 	}
 	
-    public void setQueryDefinition(RelationsQueryDefinition definition) {
-            this.definition=definition;
+	public void setQueryDefinition(RelationsQueryDefinition definition) {
+            this.definition = definition;
     }
 	
 	@Override

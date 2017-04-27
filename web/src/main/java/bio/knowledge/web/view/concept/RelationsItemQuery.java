@@ -27,7 +27,6 @@ public class RelationsItemQuery implements Query {
 	private ConceptService conceptService;
 
 	public RelationsItemQuery(RelationsQueryDefinition definition,
-							
 							ConceptService conceptService) {
 		this.definition = definition;
 		this.conceptService = conceptService;
@@ -44,23 +43,15 @@ public class RelationsItemQuery implements Query {
 	@Override
 	public int size() {
 		// set to the size of the batch to load one batch at a time
-		return conceptService.size();
+		return this.definition.getStartCount();
 	}
 
 	@Override
 	public List<Item> loadItems(int start, int count) {
-		// doesn't use parts of definition?
-//		List<Concept> concepts = conceptService.getDataPage(start, count, definition.getSearchInput(), TableSorter.SUBJECT, true);
-		// int page = (int) Math.ceil(start / count);
-		// look for the next 10
-		int page = (int) Math.ceil( (this.definition.getStartCount() + count) / count);
+		// spoofing the start count
+		int page = (int) Math.ceil( (this.definition.getStartCount() - count) / count);
 		List<Concept> concepts = conceptService.findAllFiltered(definition.getSearchInput(), new PageRequest(page, count)).getContent();
         List<Item> items = (List<Item>) new ArrayList<Item>();
-
-        try {
-            Thread.sleep(100 + (int) (Math.random() * 1000));
-        } catch (InterruptedException e) {
-        }
         
         for(Concept concept : concepts) {
                 items.add(new BeanItem<Concept>(concept));

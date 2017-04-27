@@ -1,5 +1,6 @@
 package bio.knowledge.web.view.concept;
 
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanItemContainer;
@@ -30,6 +31,7 @@ import java.util.List;
 import org.vaadin.addons.lazyquerycontainer.BeanQueryFactory;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryDefinition;
+import org.vaadin.addons.lazyquerycontainer.LazyQueryView;
 import org.vaadin.addons.lazyquerycontainer.Query;
 import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
 import org.vaadin.addons.lazyquerycontainer.QueryView;
@@ -49,16 +51,13 @@ public class RelationsView extends BaseView {
 		//conceptWindow.setContent(dataTable);
 		
 		VerticalLayout vLayout = new VerticalLayout();
+		Button getMore = new Button();
+		getMore.setCaption("Get more options");
+
 		Grid relationsGrid = new Grid();
 		relationsGrid.setHeightMode(HeightMode.ROW);
 		relationsGrid.setHeightByRows(10d);
-		GridScrollDetector gsd = new GridScrollDetector() {
-			@Override
-			public void endHasBeenReached() {
-				System.out.println("Reached Bottom");
-			}	
-		};
-		gsd.extend(relationsGrid);
+		
 		
 //		BeanQueryFactory<ConceptBeanQuery> queryFactory = new 
 //				BeanQueryFactory<ConceptBeanQuery>(ConceptBeanQuery.class);
@@ -76,16 +75,36 @@ public class RelationsView extends BaseView {
 		rlqd.setSortState(sortPropertyIds, sortPropertyAscendingStates);
 		
 		RelationsQueryFactory rqf = new RelationsQueryFactory(rlqd, conceptService);
-		LazyQueryContainer lqc = new LazyQueryContainer(rlqd, rqf);
+		LazyQueryContainer lqc = new LazyQueryContainer(new LazyQueryView(rlqd, rqf));
 		lqc.addContainerProperty("id", String.class, "", true, true);
 		lqc.addContainerProperty("name", String.class, "", true, true);
 
-//		List<Concept> testList = new ArrayList<Concept>() {{
-//			add(new Neo4jConcept());
-//		}}; 
+		GridScrollDetector gsd = new GridScrollDetector() {
+			@Override
+			public void endHasBeenReached() {
+				System.out.println("Reached Bottom");
+			}	
+		};
+		gsd.extend(relationsGrid);
+		
+		getMore.addClickListener(e -> {
+			// get grid lazy container
+			LazyQueryContainer currentRQC = (LazyQueryContainer) relationsGrid.getContainerDataSource();
+			
+			// get definition of the container's query view
+			RelationsQueryDefinition currentRQD = (RelationsQueryDefinition) currentRQC.getQueryView().getQueryDefinition();
+			
+			// change the definition to include an increment
+			// will be converted to a page
+			currentRQD.setStartCount(currentRQD.getStartCount() + currentRQD.getBatchSize());
+			
+			// reload the data
+			currentRQC.refresh();
+		});
+		
 		relationsGrid.setContainerDataSource(lqc);
 		
-		vLayout.addComponent(relationsGrid);
+		vLayout.addComponents(relationsGrid, getMore);
 		relationsPane.setContent(vLayout);
 		addComponent(relationsPane);
 		
