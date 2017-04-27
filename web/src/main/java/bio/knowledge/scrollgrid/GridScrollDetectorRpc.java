@@ -1,4 +1,4 @@
-package bio.knowledge.web.view.concept;
+package bio.knowledge.scrollgrid;
 
 import com.vaadin.shared.communication.ServerRpc;
 

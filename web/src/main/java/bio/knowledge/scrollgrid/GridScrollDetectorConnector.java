@@ -1,7 +1,7 @@
-package bio.knowledge.web.view.concept;
+package bio.knowledge.scrollgrid;
 
 import bio.knowledge.model.core.IdentifiedEntity;
-import bio.knowledge.web.view.concept.GridScrollDetector;
+import bio.knowledge.scrollgrid.GridScrollDetector;
 import elemental.json.JsonObject;
 
 import com.google.gwt.core.client.Scheduler;
@@ -42,6 +42,7 @@ public class GridScrollDetectorConnector extends AbstractExtensionConnector impl
 
 			@Override
 			public void execute() {
+				System.out.println("Detect");
 				int newscrollTop = (int) target.getScrollTop();
 				int newscrollLeft = (int) target.getScrollLeft();
 				if (newscrollTop != latestScrollTop || newscrollLeft != latestScrollLeft) {

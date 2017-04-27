@@ -1,6 +1,6 @@
 package bio.knowledge.web.view.concept;
 
-import com.vaadin.client.widgets.Grid;
+import com.vaadin.ui.Grid;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -15,6 +15,8 @@ import com.vaadin.ui.Panel;
 
 import bio.knowledge.model.Concept;
 import bio.knowledge.model.neo4j.Neo4jConcept;
+import bio.knowledge.scrollgrid.GridScrollDetector;
+import bio.knowledge.scrollgrid.ScrollGrid;
 import bio.knowledge.service.ConceptService;
 import bio.knowledge.service.core.TableSorter;
 import bio.knowledge.web.view.BaseView;
@@ -53,7 +55,7 @@ public class RelationsView extends BaseView {
 		GridScrollDetector gsd = new GridScrollDetector() {
 			@Override
 			public void endHasBeenReached() {
-				Notification.show("Reached Bottom");
+				System.out.println("Reached Bottom");
 			}	
 		};
 		gsd.extend(relationsGrid);
