@@ -47,7 +47,7 @@ public class RelationsView extends BaseView {
 		//conceptWindow.setContent(dataTable);
 		
 		VerticalLayout vLayout = new VerticalLayout();
-		LazyGrid relationsGrid = new LazyGrid();
+		Grid relationsGrid = new Grid();
 		relationsGrid.setHeightMode(HeightMode.ROW);
 		relationsGrid.setHeightByRows(10d);
 		GridScrollDetector gsd = new GridScrollDetector() {
@@ -56,6 +56,7 @@ public class RelationsView extends BaseView {
 				Notification.show("Reached Bottom");
 			}	
 		};
+		gsd.extend(relationsGrid);
 		
 //		BeanQueryFactory<ConceptBeanQuery> queryFactory = new 
 //				BeanQueryFactory<ConceptBeanQuery>(ConceptBeanQuery.class);
