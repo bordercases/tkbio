@@ -1,11 +1,13 @@
 package bio.knowledge.web.view.concept;
 
+import com.vaadin.client.widgets.Grid;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.spring.annotation.SpringView;
-import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
@@ -40,12 +42,21 @@ public class RelationsView extends BaseView {
 	public void enter(ViewChangeEvent event) {
 		removeAllComponents();
 		Panel relationsPane = new Panel();
+		
 		//Grid dataTable = DataTableBuilder.build(null, null);
 		//conceptWindow.setContent(dataTable);
 		
 		VerticalLayout vLayout = new VerticalLayout();
-		Grid relationGrid = new Grid();
-				
+		LazyGrid relationsGrid = new LazyGrid();
+		relationsGrid.setHeightMode(HeightMode.ROW);
+		relationsGrid.setHeightByRows(10d);
+		GridScrollDetector gsd = new GridScrollDetector() {
+			@Override
+			public void endHasBeenReached() {
+				Notification.show("Reached Bottom");
+			}	
+		};
+		
 //		BeanQueryFactory<ConceptBeanQuery> queryFactory = new 
 //				BeanQueryFactory<ConceptBeanQuery>(ConceptBeanQuery.class);
 //		queryFactory.setQueryConfiguration(serviceDirectory);
@@ -69,9 +80,9 @@ public class RelationsView extends BaseView {
 //		List<Concept> testList = new ArrayList<Concept>() {{
 //			add(new Neo4jConcept());
 //		}}; 
-		relationGrid.setContainerDataSource(lqc);
+		relationsGrid.setContainerDataSource(lqc);
 		
-		vLayout.addComponent(relationGrid);
+		vLayout.addComponent(relationsGrid);
 		relationsPane.setContent(vLayout);
 		addComponent(relationsPane);
 		

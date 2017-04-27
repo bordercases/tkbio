@@ -1,13 +1,13 @@
 package bio.knowledge.web.view.concept;
 
-import bio.knowledge.web.view.concept.PanelScrollDetectorRpc;
+import bio.knowledge.web.view.concept.GridScrollDetectorRpc;
 import com.vaadin.server.AbstractExtension;
 import com.vaadin.ui.Panel;
 
-public abstract class PanelScrollDetector extends AbstractExtension {
+public abstract class GridScrollDetector extends AbstractExtension {
 
-	public PanelScrollDetector() {
-		registerRpc(new PanelScrollDetectorRpc() {
+	public GridScrollDetector() {
+		registerRpc(new GridScrollDetectorRpc() {
 
 			@Override
 			public void thresholdReached() {

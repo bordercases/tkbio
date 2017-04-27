@@ -1,6 +1,9 @@
 package bio.knowledge.web.view.concept;
 
-import bio.knowledge.web.view.concept.PanelScrollDetector;
+import bio.knowledge.model.core.IdentifiedEntity;
+import bio.knowledge.web.view.concept.GridScrollDetector;
+import elemental.json.JsonObject;
+
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.ScrollEvent;
@@ -10,19 +13,20 @@ import com.google.gwt.user.client.DOM;
 import com.vaadin.client.ServerConnector;
 import com.vaadin.client.extensions.AbstractExtensionConnector;
 import com.vaadin.client.ui.VPanel;
-import com.vaadin.client.ui.panel.PanelConnector;
+import com.vaadin.client.widgets.Grid;
+import com.vaadin.client.connectors.GridConnector;
 import com.vaadin.shared.ui.Connect;
 
-@Connect(PanelScrollDetector.class)
-public class PanelScrollDetectorConnector extends AbstractExtensionConnector implements ScrollHandler {
-	private VPanel target;
+@Connect(GridScrollDetector.class)
+public class GridScrollDetectorConnector extends AbstractExtensionConnector implements ScrollHandler {
+	private Grid<JsonObject> target;
 	private HandlerRegistration scrollHandler;
 	private int latestScrollTop;
 	private int latestScrollLeft;
 
 	@Override
 	protected void extend(ServerConnector target) {
-		this.target = ((PanelConnector) target).getWidget();
+		this.target = ((GridConnector) target).getWidget();
 		scrollHandler = this.target.addHandler(this, ScrollEvent.getType());
 	}
 
@@ -38,16 +42,14 @@ public class PanelScrollDetectorConnector extends AbstractExtensionConnector imp
 
 			@Override
 			public void execute() {
-				int newscrollTop = DOM.getElementPropertyInt(target.contentNode, "scrollTop");
-				int newscrollLeft = DOM.getElementPropertyInt(target.contentNode, "scrollLeft");
+				int newscrollTop = (int) target.getScrollTop();
+				int newscrollLeft = (int) target.getScrollLeft();
 				if (newscrollTop != latestScrollTop || newscrollLeft != latestScrollLeft) {
-					int panelHeight = target.contentNode.getOffsetHeight();
-					int contentHeight = target.contentNode.getFirstChildElement().getOffsetHeight();
-					int maxScrollPoint = contentHeight - panelHeight;
+					int gridHeight = target.getOffsetHeight();
 					latestScrollTop = newscrollTop;
 					latestScrollLeft = newscrollLeft;
-					if (maxScrollPoint == latestScrollTop) {
-						getRpcProxy(PanelScrollDetectorRpc.class).thresholdReached();
+					if (gridHeight == latestScrollTop) {
+						getRpcProxy(GridScrollDetectorRpc.class).thresholdReached();
 					}
 				}
 			}
