@@ -208,89 +208,6 @@ public class ConceptService
 		}
 		
 		return (Page<Concept>) (Page) new PageImpl(new ArrayList<Concept>());
-		
-		
-//		String searchString = query.getCurrentQueryText();
-//		if ( 
-//				searchString == null 
-//				
-//				// Empty filter is problematic if used in a search so we don't allow it 
-//				|| searchString.isEmpty() 
-//
-//				/* DEPRECATED - we'll allow (helps user annotation discovery...)
-//				 * We don't let people search against 
-//				 * production with less than 
-//				 * 3 characters... Too slow!
-//				 */
-////				|| searchString.trim().length()<3  
-//			) {
-//			return null;
-//		} else {
-//			searchString = filter + SEPARATOR + searchString;
-//		}
-//
-//		// getting selected semanticSemanticGroups filter after initial concept seach 
-//		Optional<Set<SemanticGroup>> initialConceptTypesOpt = query.getInitialConceptTypes();
-//		ArrayList<String> conceptTypes = new ArrayList<String>();
-//		String conceptCodes = new String();
-//		if (initialConceptTypesOpt.isPresent()) {
-//			Set<SemanticGroup> initialConceptTypes = initialConceptTypesOpt.get();
-//			for (SemanticGroup type : initialConceptTypes) {
-//				conceptTypes.add(type.name());
-//				// appending all concept types for making cache key
-//				conceptCodes = conceptCodes + type.name();
-//			}
-//		}
-//		
-//		String pageKey = new Integer(pageable.hashCode()).toString();
-//		CacheLocation cacheLocation = 
-//				cache.searchForResultSet(
-//						"Concept", 
-//						searchString, 
-//						new String[] { searchString, conceptCodes, pageKey }
-//				);
-//		
-//		List<Neo4jConcept> searchedConceptResult = new ArrayList<>();
-//		// Is key present ? then fetch it from cache
-//		// List<Concept> cachedResult = (List<Concept>) cache.getResultSetCache().get(cacheKey);
-//		
-//		List<Neo4jConcept> cachedResult = (List<Neo4jConcept>) cacheLocation.getResultSet();
-//		
-//		// Is key present ? then fetch it from cache
-//		if (cachedResult == null) {
-//			String[] words = searchString.split(SEPARATOR);
-//			if(words.length==0) {
-//				searchedConceptResult = conceptRepository.findAllByPage(
-//						pageable,
-//						authenticationState.getUserId(),
-//						authenticationState.getGroupIds()
-//				);
-//			} else {
-//				if(filter.trim().isEmpty() && !initialConceptTypesOpt.isPresent()){
-//					searchedConceptResult = conceptRepository.findByInitialSearch(
-//							words,
-//							pageable,
-//							authenticationState.getUserId(),
-//							authenticationState.getGroupIds()
-//					);
-//				} else {
-//					searchedConceptResult = conceptRepository.findByNameLikeIgnoreCase(
-//							conceptTypes,
-//							words,
-//							pageable,
-//							authenticationState.getUserId(),
-//							authenticationState.getGroupIds()
-//					);
-//				}
-//			}
-//			
-//			//cache.getResultSetCache().put(cacheKey, searchedConceptResult);
-//			cacheLocation.setResultSet(searchedConceptResult);
-//			
-//		} else {
-//			searchedConceptResult = cachedResult;
-//		}
-//		return new PageImpl(searchedConceptResult);
 	}
 
 	/* (non-Javadoc)
@@ -934,10 +851,5 @@ public class ConceptService
 		
     	return concept ;
     }
-
-	public int size() {
-		// TODO Auto-generated method stub
-		return 55;
-	}
 
 }

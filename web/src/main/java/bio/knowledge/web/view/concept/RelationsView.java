@@ -1,6 +1,6 @@
 package bio.knowledge.web.view.concept;
 
-import com.vaadin.client.widgets.Grid;
+import com.vaadin.ui.Grid;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -47,15 +47,10 @@ public class RelationsView extends BaseView {
 		//conceptWindow.setContent(dataTable);
 		
 		VerticalLayout vLayout = new VerticalLayout();
-		LazyGrid relationsGrid = new LazyGrid();
+		Grid relationsGrid = new Grid();
 		relationsGrid.setHeightMode(HeightMode.ROW);
 		relationsGrid.setHeightByRows(10d);
-		GridScrollDetector gsd = new GridScrollDetector() {
-			@Override
-			public void endHasBeenReached() {
-				Notification.show("Reached Bottom");
-			}	
-		};
+		relationsGrid.setWidth("100%");
 		
 //		BeanQueryFactory<ConceptBeanQuery> queryFactory = new 
 //				BeanQueryFactory<ConceptBeanQuery>(ConceptBeanQuery.class);
@@ -72,7 +67,7 @@ public class RelationsView extends BaseView {
 
 		rlqd.setSortState(sortPropertyIds, sortPropertyAscendingStates);
 		
-		RelationsQueryFactory rqf = new RelationsQueryFactory(rlqd, conceptService);
+		RelationsQueryFactory rqf = new RelationsQueryFactory(rlqd, query, conceptService);
 		LazyQueryContainer lqc = new LazyQueryContainer(rlqd, rqf);
 		lqc.addContainerProperty("id", String.class, "", true, true);
 		lqc.addContainerProperty("name", String.class, "", true, true);

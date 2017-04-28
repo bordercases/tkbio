@@ -18,6 +18,7 @@ import bio.knowledge.service.core.TableSorter;
 import bio.knowledge.model.Concept;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.service.ConceptService;
+import bio.knowledge.service.KBQuery;
 
 public class RelationsItemQuery implements Query {
 	Map<String, Object> serviceDirectory;
@@ -25,11 +26,13 @@ public class RelationsItemQuery implements Query {
 	private Object[] sortPropertyIds;
 	private boolean[] sortStates;
 	private ConceptService conceptService;
+	private KBQuery query;
 
 	public RelationsItemQuery(RelationsQueryDefinition definition,
-							
+							KBQuery query,
 							ConceptService conceptService) {
 		this.definition = definition;
+		this.query = query;
 		this.conceptService = conceptService;
 		this.sortPropertyIds = definition.getSortPropertyIds();
 		this.sortStates = definition.getSortPropertyAscendingStates();
@@ -44,7 +47,8 @@ public class RelationsItemQuery implements Query {
 	@Override
 	public int size() {
 		// set to the size of the batch to load one batch at a time
-		return conceptService.size();
+		query.getCurrentQueryText();
+		return (int) conceptService.countEntries();
 	}
 
 	@Override

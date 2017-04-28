@@ -7,14 +7,17 @@ import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
 import org.vaadin.addons.lazyquerycontainer.QueryFactory;
 
 import bio.knowledge.service.ConceptService;
+import bio.knowledge.service.KBQuery;
 
 public class RelationsQueryFactory implements QueryFactory {
     
 	private RelationsQueryDefinition definition;
-    private ConceptService conceptService; 
+    private ConceptService conceptService;
+	private KBQuery query; 
 	
-	public RelationsQueryFactory(RelationsQueryDefinition definition, ConceptService conceptService) {
+	public RelationsQueryFactory(RelationsQueryDefinition definition, KBQuery query, ConceptService conceptService) {
 		this.definition = definition;
+		this.query = query;
 		this.conceptService = conceptService;
 	}
 	
@@ -24,7 +27,7 @@ public class RelationsQueryFactory implements QueryFactory {
 	
 	@Override
 	public Query constructQuery(QueryDefinition definition) {
-		return new RelationsItemQuery(((RelationsQueryDefinition) definition), conceptService);
+		return new RelationsItemQuery(((RelationsQueryDefinition) definition), query, conceptService);
 	}
 
 }
