@@ -1,4 +1,4 @@
-package bio.knowledge.grid;
+package bio.knowledge.grid.client.grid;
 
 import com.vaadin.shared.communication.ServerRpc;
 

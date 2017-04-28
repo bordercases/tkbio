@@ -4,8 +4,6 @@ import com.vaadin.client.widget.grid.events.ScrollEvent;
 import com.vaadin.client.widget.grid.events.ScrollHandler;
 import com.vaadin.shared.ui.Connect;
 
-import bio.knowledge.grid.GridRpc;
-
 //@Connect(bio.knowledge.renderer.ButtonRenderer.class)
 @Connect(bio.knowledge.grid.Grid.class)
 public class GridConnector extends com.vaadin.client.connectors.GridConnector {
