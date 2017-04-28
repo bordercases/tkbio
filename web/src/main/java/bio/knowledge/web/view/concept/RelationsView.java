@@ -61,12 +61,22 @@ public class RelationsView extends BaseView {
 
 		Grid relationsGrid = new Grid();
 		IndexedContainer container = new IndexedContainer();
+		container.addContainerProperty("id", String.class, "empty");
+		container.addContainerProperty("name", String.class, "empty");
+
 		relationsGrid.setContainerDataSource(container);
 		getMore.addClickListener(e -> {
 			int querySize = conceptService.size();
-			if(pageIncrement / batchSize < querySize) {
+			int currentDataSize = pageIncrement * batchSize;
+			if(currentDataSize < querySize) {
 				pageIncrement = pageIncrement + 1;
-				List<Concept> concepts = conceptService.findAllFiltered(query.getCurrentQueryText(), new PageRequest(pageIncrement, batchSize)).getContent();
+				List<Concept> concepts = conceptService.findAllFiltered("diabetes", new PageRequest(pageIncrement, batchSize)).getContent();
+				for(Concept concept : concepts) {
+					relationsGrid.getContainerDataSource().addItem(concept);
+				}
+			} else if(querySize < currentDataSize && currentDataSize < querySize + batchSize) {
+				int finalBatchSize = currentDataSize - querySize;
+				List<Concept> concepts = conceptService.findAllFiltered("diabetes", new PageRequest(pageIncrement, finalBatchSize)).getContent();
 				for(Concept concept : concepts) {
 					relationsGrid.getContainerDataSource().addItem(concept);
 				}

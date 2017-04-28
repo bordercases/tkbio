@@ -936,7 +936,7 @@ public class ConceptService
     }
 
 	public int size() {
-		return 50;
+		return (int) this.countEntries();
 	}
 
 }
