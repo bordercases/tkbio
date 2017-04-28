@@ -42,16 +42,8 @@ public class RelationsItemQuery implements Query {
 	
 	@Override
 	public int size() {
-//		if(noData) {
-//			return 0
-//		} else if(dataSize < pageSize) {
-//			return dataSize;
-//		} else {
-//			return pageSize;
-//		}
-//		return this.definition.getStartCount();
-		if(this.definition.getStartCount() >= conceptService.size()) {
-			this.definition.setStartCount(conceptService.size());
+		if(this.definition.getStartCount() >= 50) {
+			this.definition.setStartCount(50);
 		}
 		return this.definition.getStartCount();
 	}
