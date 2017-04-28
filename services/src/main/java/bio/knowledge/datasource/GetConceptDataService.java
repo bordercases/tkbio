@@ -111,7 +111,7 @@ public class GetConceptDataService {
 					List<ConceptImpl> concepts = new ArrayList<ConceptImpl>();
 					
 					for (InlineResponse2001DataPage dataPage : dataPages) {
-						ConceptImpl concept = new ConceptImpl(dataPage.getName(), Long.decode(dataPage.getId()));
+						ConceptImpl concept = new ConceptImpl(dataPage.getName(), dataPage.getId());
 						concepts.add(concept);
 					}
 					return concepts;
@@ -125,9 +125,13 @@ public class GetConceptDataService {
 	
 	public class ConceptImpl implements Concept {
 		private String name;
-		private Long id;
+		private String id;
 		
-		public ConceptImpl(String name, Long id) {
+		public String getCuryId() {
+			return this.id;
+		}
+		
+		public ConceptImpl(String name, String id) {
 			this.name = name;
 			this.id = id;
 		}
@@ -165,7 +169,7 @@ public class GetConceptDataService {
 		@Override
 		public Long getId() {
 			// TODO Auto-generated method stub
-			return id;
+			return null;
 		}
 
 		@Override
@@ -249,7 +253,7 @@ public class GetConceptDataService {
 		@Override
 		public Long getUsage() {
 			// TODO Auto-generated method stub
-			return this.id;
+			return null;
 		}
 
 		@Override
