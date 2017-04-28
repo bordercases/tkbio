@@ -936,8 +936,7 @@ public class ConceptService
     }
 
 	public int size() {
-		// TODO Auto-generated method stub
-		return 55;
+		return 50;
 	}
 
 }

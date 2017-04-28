@@ -42,19 +42,28 @@ public class RelationsItemQuery implements Query {
 	
 	@Override
 	public int size() {
-		// set to the size of the batch to load one batch at a time
+//		if(noData) {
+//			return 0
+//		} else if(dataSize < pageSize) {
+//			return dataSize;
+//		} else {
+//			return pageSize;
+//		}
+//		return this.definition.getStartCount();
+		if(this.definition.getStartCount() >= conceptService.size()) {
+			this.definition.setStartCount(conceptService.size());
+		}
 		return this.definition.getStartCount();
 	}
 
 	@Override
 	public List<Item> loadItems(int start, int count) {
 		// spoofing the start count
-		int page = (int) Math.ceil( (this.definition.getStartCount() - count) / count);
+		int page = (int) Math.ceil(this.definition.getStartCount() / count);
 		List<Concept> concepts = conceptService.findAllFiltered(definition.getSearchInput(), new PageRequest(page, count)).getContent();
         List<Item> items = (List<Item>) new ArrayList<Item>();
-        
         for(Concept concept : concepts) {
-                items.add(new BeanItem<Concept>(concept));
+    			items.add(new BeanItem<Concept>(concept));
         }
 	    return items;    
 	}
