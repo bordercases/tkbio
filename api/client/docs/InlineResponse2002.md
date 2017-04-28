@@ -5,7 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **String** |  |  [optional]
-**xrefs** | **List&lt;String&gt;** |  |  [optional]
+**exactMatches** | [**List&lt;ExactMatchesExactMatches&gt;**](ExactMatchesExactMatches.md) |  |  [optional]
 
 
 

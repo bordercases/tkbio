@@ -9,7 +9,7 @@ import javax.validation.constraints.*;
 /**
  * InlineResponse2004DataPage
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-04-21T13:55:25.453-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-04-27T09:43:12.446-07:00")
 
 public class InlineResponse2004DataPage   {
   @JsonProperty("id")
@@ -27,10 +27,10 @@ public class InlineResponse2004DataPage   {
   }
 
    /**
-   * qualified object evidence identifier for the cited reference 
+   * CURIE-encoded identifier for the cited reference 
    * @return id
   **/
-  @ApiModelProperty(value = "qualified object evidence identifier for the cited reference ")
+  @ApiModelProperty(value = "CURIE-encoded identifier for the cited reference ")
   public String getId() {
     return id;
   }

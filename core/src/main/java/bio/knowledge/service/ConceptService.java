@@ -182,19 +182,17 @@ public class ConceptService
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public
 	// TODO: I think this is where the refactoring faltered
- Page<Concept> findAllFiltered(String filter, Pageable pageable) {
-		KnowledgeSource ks1 = new KnowledgeSource("tkbio", "knowledge.bio", "http://localhost:8090/api/");
-		KnowledgeSource ks2 = new KnowledgeSource("broken", "broken server", "broken link");
-		KnowledgeSourcePool pool = new KnowledgeSourcePool("pool", "pool");
-		pool.addKnowledgeSource(ks1);
-		pool.addKnowledgeSource(ks2);
+	private Page<Concept> findAllFiltered(String filter, Pageable pageable) {
+		KnowledgeSource ks1 = new KnowledgeSource("http://localhost:8080/api/");
+		KnowledgeSource ks2 = new KnowledgeSource("broken link");
+		KnowledgeSourcePool pool = new KnowledgeSourcePool();
+		pool.add(ks1);
+		pool.add(ks2);
 		GetConceptDataService service = new GetConceptDataService(pool);
-		List<String> f = Arrays.asList(filter.split(" "));
 		CompletableFuture<List<ConceptImpl>> future = service.query(
-				f,
-				new ArrayList<String>(),
+				filter,
+				null,
 				pageable.getPageNumber(),
 				pageable.getPageSize()
 		);
@@ -419,6 +417,33 @@ public class ConceptService
 		if(features.isEmpty()) return null ;
 		return features.get(0) ;
 	}
+
+	/*
+	 *  Version deprecated in KB 3.0
+	 *  
+	 *  The UMLS Concept 'getCanonicalDescription()' may be called as a final
+	 *  resort to access the canonical definition for the Concept
+	 *  if there is no other available overriding source of such a 
+	 *  definition (e.g. MyGene.Info, WikiData, OpenPHACTS, etc.)
+	 *
+	 * @return String of canonical definition retrieved
+	 *
+	
+	public Feature getCanonicalDescription( Concept concept ) {
+		Feature feature = 
+				featureService.findFeatureByPrecedence( 
+						concept,
+						new String[]{
+								"NCI_NCI-GLOSS",
+								"NCI",
+								"MSH",
+								"CSP",
+								"MDR"
+						} 
+		) ;
+		return feature;
+	}
+	*/
 	
 	/**
 	 * KB 3.0 version of function to retrieve "best" Concept description
@@ -445,6 +470,30 @@ public class ConceptService
 	public Optional<Concept> getDetailsByConceptAccessionId(String accessionId) {
 		
 		Concept concept = conceptRepository.findByAccessionId(accessionId) ;
+		
+		/*  // deprecated complexity!
+		if(RdfUtil.getQualifier(conceptId).isEmpty()) {
+			/* 
+			 * No qualifier on CST Id: assume that this is a 
+			 * SemMedDb recorded Concept or Concept 
+			 * for look up in main database?
+			 * /
+			if(conceptId.startsWith("C")) {
+				// this is a root concept node CUI?
+				concept = conceptService.findByCui(conceptId) ;
+			} else {
+				concept = ConceptRepository.findByConceptId(conceptId);
+			}
+		} else {
+			/* 
+			 * This is a qualified URI identifying a non-SemMedDb node, 
+			 * which must be resolved elsewhere (i.e. in WikiData?)
+			 * Note that the system treats WikiData the same way as 'getDetails()'
+			 * /
+			concept = getQualifiedDataItem(conceptId) ;
+		}
+		*/
+		
 		if(concept==null) {
 			return Optional.empty();
 		} else {
@@ -934,10 +983,5 @@ public class ConceptService
 		
     	return concept ;
     }
-
-	public int size() {
-		// TODO Auto-generated method stub
-		return 55;
-	}
 
 }
