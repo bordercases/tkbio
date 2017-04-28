@@ -50,7 +50,7 @@ public class RelationsItemQuery implements Query {
 	public List<Item> loadItems(int start, int count) {
 		// spoofing the start count
 		int page = (int) Math.ceil( (this.definition.getStartCount() - count) / count);
-		List<Concept> concepts = conceptService.findAllFiltered(definition.getSearchInput(), new PageRequest(page, count)).getContent();
+		List<Concept> concepts = conceptService.findByNameLike(definition.getSearchInput(), new PageRequest(page, count)).getContent();
         List<Item> items = (List<Item>) new ArrayList<Item>();
         
         for(Concept concept : concepts) {
