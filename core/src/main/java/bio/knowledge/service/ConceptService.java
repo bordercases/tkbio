@@ -185,11 +185,11 @@ public class ConceptService
 	// TODO: I think this is where the refactoring faltered
 	private Page<Concept> findAllFiltered(String filter, Pageable pageable) {
 		KnowledgeSource ks1 = new KnowledgeSource("http://localhost:8080/api/");
-		KnowledgeSource ks2 = new KnowledgeSource("broken link");
+//		KnowledgeSource ks2 = new KnowledgeSource("broken link");
 		KnowledgeSourcePool pool = new KnowledgeSourcePool();
 		pool.add(ks1);
-		pool.add(ks2);
-		GetConceptDataService service = new GetConceptDataService(pool);
+//		pool.add(ks2);
+		GetConceptDataService service = new GetConceptDataService(ks1);
 		CompletableFuture<List<ConceptImpl>> future = service.query(
 				filter,
 				null,
