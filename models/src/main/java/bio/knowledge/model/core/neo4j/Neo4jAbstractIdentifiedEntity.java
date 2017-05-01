@@ -28,6 +28,7 @@ package bio.knowledge.model.core.neo4j;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 import bio.knowledge.model.RdfUtil;
+import bio.knowledge.model.core.Curie;
 import bio.knowledge.model.core.IdentifiedEntity;
 
 /**
@@ -60,6 +61,8 @@ public class Neo4jAbstractIdentifiedEntity
      * synonyms: a tab delimited string in the first iteration (for expediency)
      */
     private String synonyms = "" ;
+
+	private Curie curie;
     
 	public Neo4jAbstractIdentifiedEntity() {
         super();
@@ -84,6 +87,7 @@ public class Neo4jAbstractIdentifiedEntity
     /* (non-Javadoc)
 	 * @see bio.knowledge.model.core.IdentifiedEntity#setAccessionId(java.lang.String)
 	 */
+    @Deprecated
     @Override
 	public void setUri(String uri) {
         this.uri = uri;
@@ -92,6 +96,7 @@ public class Neo4jAbstractIdentifiedEntity
 	/* (non-Javadoc)
 	 * @see bio.knowledge.model.core.Identification#getAccessionId()
 	 */
+    @Deprecated
 	@Override
 	public String getUri() { 
 		return this.uri;
@@ -100,6 +105,7 @@ public class Neo4jAbstractIdentifiedEntity
     /* (non-Javadoc)
 	 * @see bio.knowledge.model.core.IdentifiedEntity#setAccessionId(java.lang.String)
 	 */
+    @Deprecated
     @Override
 	public void setAccessionId(String accessionId) {
         this.accessionId = accessionId;
@@ -108,6 +114,7 @@ public class Neo4jAbstractIdentifiedEntity
 	/* (non-Javadoc)
 	 * @see bio.knowledge.model.core.Identification#getAccessionId()
 	 */
+    @Deprecated
 	@Override
 	public String getAccessionId() { 
 		return accessionId;
@@ -192,4 +199,20 @@ public class Neo4jAbstractIdentifiedEntity
 	public void setSynonyms(String synonyms) {
 		this.synonyms = synonyms;
 	}
+
+	@Override
+	public void setCurie(Curie curie) {
+		this.curie = curie;
+	}
+	
+	@Override
+	public int getCurieId() {
+		return this.curie.getId();
+	}
+	
+	@Override
+	public String getCurieSourceTag() {
+		return this.curie.getSourceTag();
+	}
+	
 }

@@ -2,6 +2,7 @@ package bio.knowledge.server.api;
 
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.model.Concept;
+import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.server.model.InlineResponse200;
 import bio.knowledge.server.model.InlineResponse2001;
 import bio.knowledge.server.model.InlineResponse2001DataPage;
@@ -69,7 +70,7 @@ public class ConceptsApiController implements ConceptsApi {
 		}
 
 		String[] filter = q.toArray(new String[q.size()]);
-		List<Concept> concepts;
+		List<Neo4jConcept> concepts;
 		if (sg != null) {
 			String[] semanticGroups = sg.toArray(new String[sg.size()]);
 			concepts = conceptRepository.apiGetConceptsByType(filter, semanticGroups, pageNumber, pageSize);
