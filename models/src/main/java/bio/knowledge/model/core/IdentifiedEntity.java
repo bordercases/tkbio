@@ -36,13 +36,21 @@ public interface IdentifiedEntity
 	/**
 	 * @param uri is a machine readable Uniform Resource Identifier
 	 */
+	@Deprecated
 	void setUri(String uri);
 	
 	/**
 	 * Any prefix included in the Accession String should designate the Source ExternalDatabase namespace
 	 * @param accessionId is a human readable canonical accession identifier of the identified entity
 	 */
+	@Deprecated
 	void setAccessionId(String accessionId);
+	
+	/**
+	 * 
+	 * @param curie
+	 */
+	void setCurie(Curie curie);
 	
 	/**
 	 * 
@@ -62,4 +70,9 @@ public interface IdentifiedEntity
 	 */
 	void setSynonyms(String synonyms);
 
+
+	int getCurieId();
+	
+	String getCurieSourceTag();
+	
 }
