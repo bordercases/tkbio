@@ -72,16 +72,16 @@ public class Neo4jAbstractOntologyTerm
 
 	/**
 	 * Constructor accepting ontology and name.
-	 * Constructs an accessionId from the ontology AccessionId and provided Name
+	 * Constructs an curie from the ontology Curie and provided Name
 	 * @param ontology
 	 * @param name
 	 */
     public Neo4jAbstractOntologyTerm( Ontology ontology, String name ) {
         super(name);
         setOntology( ontology );
-        String ns = ontology.getAccessionId() ;
+        String ns = ontology.getCurie() ;
         if(ns==null) ns = "" ;
-        setAccessionId(ns+":"+name) ;
+        setCurie(ns+":"+name) ;
     }
     
     /**
@@ -98,12 +98,12 @@ public class Neo4jAbstractOntologyTerm
     /**
      * Constructor expecting a user provided accession id.
      * @param ontology
-     * @param accessionId
+     * @param curie
      * @param name
      * @param definition
      */
-    public Neo4jAbstractOntologyTerm(  Ontology ontology, String accessionId, String name, String definition ) {
-        super(accessionId,name,definition);
+    public Neo4jAbstractOntologyTerm(  Ontology ontology, String curie, String name, String definition ) {
+        super(curie,name,definition);
         setOntology( ontology );
     }
     

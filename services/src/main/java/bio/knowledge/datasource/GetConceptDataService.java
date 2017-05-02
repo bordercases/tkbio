@@ -139,7 +139,7 @@ public class GetConceptDataService {
 		}
 
 		@Override
-		public void setAccessionId(String accessionId) {
+		public void setCurie(String accessionId) {
 			// TODO Auto-generated method stub
 			
 		}
@@ -334,6 +334,30 @@ public class GetConceptDataService {
 		public String getName() {
 			// TODO Auto-generated method stub
 			return this.name;
+		}
+
+		@Override
+		public int getCurieId() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public String getCurieSourceTag() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public String getCurie() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void setAccessionId(String accessionId) {
+			// TODO Auto-generated method stub
+			
 		}
 
 		@Override

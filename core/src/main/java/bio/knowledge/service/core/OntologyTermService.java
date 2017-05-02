@@ -41,11 +41,11 @@ public interface OntologyTermService
 
 	/**
 	 * 
-	 * @param accessionId
+	 * @param curie
 	 * @return
 	 * @throws ModelException
 	 */
-	OntologyTerm getOntologyTermByAccessionId( String accessionId ) throws ModelException;
+	OntologyTerm getOntologyTermByCurie( String curie ) throws ModelException;
 
 	/**
 	 * 
@@ -78,13 +78,13 @@ public interface OntologyTermService
 	/**
 	 * 
 	 * @param ontology
-	 * @param accessionId
+	 * @param curie
 	 * @param termName
 	 * @param definition
 	 * @return
 	 * @throws ModelException
 	 */
-	OntologyTerm addOntologyTerm(Ontology ontology, String accessionId, String termName, String definition) throws ModelException;
+	OntologyTerm addOntologyTerm(Ontology ontology, String curie, String termName, String definition) throws ModelException;
 
 	/**
 	 * 

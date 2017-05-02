@@ -78,14 +78,14 @@ public abstract class Neo4jAbstractStatement extends Neo4jAbstractIdentifiedEnti
      * but defers setting of related concepts.
      * 
      * 
-     * @param accessionId
+     * @param curie
      * @param predicate
      */
     protected Neo4jAbstractStatement(
-    		String accessionId,
+    		String curie,
     		Predicate predicate
     ) {
-    	super(accessionId,predicate.getName(),"") ;
+    	super(curie,predicate.getName(),"") ;
     	setRelation(predicate);
     }
 	
@@ -94,17 +94,17 @@ public abstract class Neo4jAbstractStatement extends Neo4jAbstractIdentifiedEnti
      * but defers setting of related concepts.
      * 
      * 
-     * @param accessionId
+     * @param curie
      * @param type
      * @param predicate
      */
     protected Neo4jAbstractStatement(
-    		String accessionId,
+    		String curie,
     		Concept subject,
     		Predicate predicate,
     		Concept object
     ) {
-    	super(accessionId,subject.getName()+" - "+predicate.getName()+" -> "+object.getName(),"") ;
+    	super(curie,subject.getName()+" - "+predicate.getName()+" -> "+object.getName(),"") ;
     	setSubject(subject);
     	setObject(object);
     	setRelation(predicate);
@@ -115,15 +115,15 @@ public abstract class Neo4jAbstractStatement extends Neo4jAbstractIdentifiedEnti
      * Constructor creates a new Statement (by Predicate.name)
      * but defers setting of related concepts.
      * 
-     * @param accessionId
+     * @param curie
      * @param type
      * @param predicateName
      */
     protected Neo4jAbstractStatement(
-    		String accessionId,
+    		String curie,
     		String predicateName
     ) {
-    	super(accessionId,predicateName,"") ;
+    	super(curie,predicateName,"") ;
     }
 
 	/* (non-Javadoc)

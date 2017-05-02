@@ -70,23 +70,23 @@ public class Neo4jAbstractFeature
     
 	/**
 	 * @param owner2
-	 * @param accessionId
+	 * @param curie
 	 * @param tag2
 	 */
-	public Neo4jAbstractFeature( AnnotatedEntity owner, String accessionId, OntologyTerm tag ) {
-        this(owner, accessionId, tag, "") ;
+	public Neo4jAbstractFeature( AnnotatedEntity owner, String curie, OntologyTerm tag ) {
+        this(owner, curie, tag, "") ;
 	}
 
     /**
      * Note: this method does NOT automatically add the Feature to the owner. 
      * The feature should be added to the owner after it is first saved.
 	 * @param owner
-	 * @param accessionId
+	 * @param curie
 	 * @param tag OntologyTerm
 	 * @param value
 	 */
-	public Neo4jAbstractFeature( AnnotatedEntity owner, String accessionId, OntologyTerm tag, String value ) {
-        super( accessionId, tag.getName(), value );
+	public Neo4jAbstractFeature( AnnotatedEntity owner, String curie, OntologyTerm tag, String value ) {
+        super( curie, tag.getName(), value );
         setOwner( owner );
         setTag( tag );
     }

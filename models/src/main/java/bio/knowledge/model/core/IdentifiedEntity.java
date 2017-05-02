@@ -30,49 +30,106 @@ package bio.knowledge.model.core;
  * @author Richard
  *
  */
-public interface IdentifiedEntity 
-	extends DatabaseEntity, Identification, Comparable<IdentifiedEntity> {
+public interface IdentifiedEntity extends DatabaseEntity, Identification, Comparable<IdentifiedEntity> {
 
 	/**
-	 * @param uri is a machine readable Uniform Resource Identifier
+	 * @param uri
+	 *            is a machine readable Uniform Resource Identifier
 	 */
 	@Deprecated
+	// DEPRECATED: use getCurieSourceTag!
 	void setUri(String uri);
-	
+
 	/**
-	 * Any prefix included in the Accession String should designate the Source ExternalDatabase namespace
-	 * @param accessionId is a human readable canonical accession identifier of the identified entity
+	 * Any prefix included in the Accession String should designate the Source
+	 * ExternalDatabase namespace
+	 * 
+	 * @param accessionId
+	 *            is a human readable canonical accession identifier of the
+	 *            identified entity
 	 */
 	@Deprecated
+	// DEPRECATED: use rawCurie!
 	void setAccessionId(String accessionId);
-	
+
 	/**
 	 * 
-	 * @param curie
-	 */
-	void setCurie(Curie curie);
-	
-	/**
-	 * 
-	 * @param name is a human readable String name or title of the identified entity
+	 * @param name
+	 *            is a human readable String name or title of the identified
+	 *            entity
 	 */
 	void setName(String name);
 
 	/**
 	 * 
-	 * @param description is a String description of the identified entity
+	 * @param description
+	 *            is a String description of the identified entity
 	 */
 	void setDescription(String description);
-	
+
 	/**
 	 * 
-	 * @param synonyms is a String of (pipe delimited?) alias identifiers of the entity
+	 * @param synonyms
+	 *            is a String of (pipe delimited?) alias identifiers of the
+	 *            entity
 	 */
 	void setSynonyms(String synonyms);
 
+	//
+	// Do we need UUID's in Knowledge.Bio?
+	//
+	// https://en.wikipedia.org/wiki/Universally_unique_identifier
+	//
+	// String getUuid() ;
+
+	/**
+	 * 
+	 * @return a machine readable Uniform Resource Identifier of the identified
+	 *         entity
+	 */
+	//@Deprecated
+	// use getCurieSourceTag?
+	// TODO: Sometimes this is a browser-friendly URL, sometimes it is not?
+	String getUri();
+
+	/**
+	 * 
+	 * @return a human readable canonical accession identifier of the identified
+	 *         entity
+	 */
+	@Deprecated
+	// DEPRECATED: use rawCurie!
+	String getAccessionId();
+
+	/**
+	 * 
+	 * @return a human readable name or title of the identified entity
+	 */
+	String getName();
+
+	/**
+	 * 
+	 * @return a String description of the identified entity
+	 */
+	String getDescription();
+
+	/**
+	 * 
+	 * @return synonyms is a String of (pipe delimited?) alias identifiers of
+	 *         the entity
+	 */
+	String getSynonyms();
+
+	/**
+	 * 
+	 * @param curie
+	 */
+	void setCurie(String curie);
 
 	int getCurieId();
-	
+
 	String getCurieSourceTag();
-	
+
+	String getCurie();
+
 }

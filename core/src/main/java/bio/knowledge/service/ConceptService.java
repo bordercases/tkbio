@@ -125,7 +125,7 @@ public class ConceptService
 		else if (args.length == 3)
 			if (args[1] instanceof SemanticGroup) {
 				return new Neo4jConcept(
-						(String)        args[0], // Concept.accessionId
+						(String)        args[0], // Concept.curie
 						(SemanticGroup) args[1], // SemanticGroup
 						(String)        args[2]  // Concept.name
 				);
@@ -184,7 +184,7 @@ public class ConceptService
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	// TODO: I think this is where the refactoring faltered
 	private Page<Concept> findAllFiltered(String filter, Pageable pageable) {
-		KnowledgeSource ks1 = new KnowledgeSource("http://localhost:8080/api/");
+		KnowledgeSource ks1 = new KnowledgeSource("http://localhost:8090/api/");
 		KnowledgeSource ks2 = new KnowledgeSource("broken link");
 		KnowledgeSourcePool pool = new KnowledgeSourcePool();
 		pool.add(ks1);
@@ -459,17 +459,17 @@ public class ConceptService
 	 * @param cui of the Concept to match
 	 * @return
 	 */
-	public Concept findByAccessionId(String accessionId) {
-		return conceptRepository.findByAccessionId(accessionId);
+	public Concept findByCurie(String curie) {
+		return conceptRepository.findByCurie(curie);
 	}
 	
 	/**
 	 * @param ConceptId
 	 * @return Concept
 	 */
-	public Optional<Concept> getDetailsByConceptAccessionId(String accessionId) {
+	public Optional<Concept> getDetailsByConceptCurie(String curie) {
 		
-		Concept concept = conceptRepository.findByAccessionId(accessionId) ;
+		Concept concept = conceptRepository.findByCurie(curie) ;
 		
 		/*  // deprecated complexity!
 		if(RdfUtil.getQualifier(conceptId).isEmpty()) {
@@ -587,17 +587,17 @@ public class ConceptService
 	 * @param ConceptId
 	 * @return Concept
 	 */
-	public Optional<Concept> getDetailsByAccessionId(String accessionId) {
+	public Optional<Concept> getDetailsByCurie(String curie) {
 		
 		// Try first to find this item in the local database(?)
-		Concept concept = conceptRepository.findByAccessionId(accessionId);
+		Concept concept = conceptRepository.findByCurie(curie);
 		if(concept==null) {
 			/* 
 			 * This is a qualified URI identifying a local data item, 
 			 * which must be resolved elsewhere (i.e. in WikiData?)
 			 * Note that the system treats WikiData the same way as 'getDetails()'
 			 */
-			concept = getQualifiedDataItem(accessionId) ;
+			concept = getQualifiedDataItem(curie) ;
 		}
 		
 		if(concept==null) {
@@ -725,7 +725,7 @@ public class ConceptService
 			case GENE:
 			
 				if(geneId == null) { // not already set above?
-					geneId = concept.getAccessionId() ;
+					geneId = concept.getCurie() ;
 				}
 				
 				// otherwise, get the full gene annotation requested
@@ -744,15 +744,15 @@ public class ConceptService
 	
 			default:
 				// TODO: Concept will likely be WikiData item 100% of the time in KB 3.0?
-				if( concept.getAccessionId().startsWith("wd:") ) {
+				if( concept.getCurie().startsWith("wd:") ) {
 					
 					// WikiData item (most of the time!) - try to retrieve details
 
-					args.put("wikiDataId", concept.getAccessionId());
+					args.put("wikiDataId", concept.getCurie());
 					getWikiData( args, handler ) ;
 					
 					// for article_uri, wikipedia link of concept
-					getWikiArticle(concept.getAccessionId(), handler);
+					getWikiArticle(concept.getCurie(), handler);
 					
 				} else {
 					
@@ -802,7 +802,7 @@ public class ConceptService
 				// is an Gene (formerly Entrez) id)
 				// Details are to be remotely retrieved, 
 				// e.g. hard coded DataService accessing MyGene.info? 
-				args.put("geneid", concept.getAccessionId());
+				args.put("geneid", concept.getCurie());
 				
 				getGeneData( args, handler ) ;
 				
@@ -810,11 +810,11 @@ public class ConceptService
 				
 			default:
 				
-				if( concept.getAccessionId().startsWith("wd:") ) {
+				if( concept.getCurie().startsWith("wd:") ) {
 					
 					// WikiData item (most of the time!) - try to retrieve details
 
-					args.put("wikiDataId", concept.getAccessionId());
+					args.put("wikiDataId", concept.getCurie());
 					getWikiData( args, handler ) ;
 					
 				} else {
@@ -856,9 +856,9 @@ public class ConceptService
      * @param predicate
      * @return
      */
-    public Concept annotate(String accessionId) {
+    public Concept annotate(String curie) {
 
-    	if(accessionId.isEmpty()) {
+    	if(curie.isEmpty()) {
     		_logger.warn(
     				"ConceptService.annotate() warning: cannot return "
     				+ "an annotated Concept without an Accession Id!?"
@@ -867,7 +867,7 @@ public class ConceptService
     	}    
 	    
     	// check first for a cached (presumed annotated) version of the Predicate
-		String[] idPart  = accessionId.split("\\:") ;
+		String[] idPart  = curie.split("\\:") ;
 		String nameSpace = idPart[0];
 		String objectId  = idPart[1];
 		
@@ -882,7 +882,7 @@ public class ConceptService
 			
 			// Not cached... then first, attempt to retrieve it from the local database
 			Optional<Concept> databaseConceptOpt = 
-						getDetailsByConceptAccessionId(accessionId);
+						getDetailsByConceptCurie(curie);
 			
 			if(databaseConceptOpt.isPresent()) {
 				concept = databaseConceptOpt.get();
@@ -911,7 +911,7 @@ public class ConceptService
 				@SuppressWarnings("unchecked")
 				SimpleDataService<String> sds = (SimpleDataService<String>)ds ;
 				
-				CompletableFuture<ResultSet> futureMyGeneResultSet = sds.query(accessionId);
+				CompletableFuture<ResultSet> futureMyGeneResultSet = sds.query(curie);
 				try {
 					ResultSet resultSet = 
 							futureMyGeneResultSet.get(DataService.TIMEOUT_DURATION, DataService.TIMEOUT_UNIT);
@@ -925,7 +925,7 @@ public class ConceptService
 							 * with a default SemanticGroup "Concepts & Ideas"
 							 * and an empty name field 
 							 */
-							concept = createInstance( accessionId, SemanticGroup.CONC, "" );
+							concept = createInstance( curie, SemanticGroup.CONC, "" );
 						}
 						
 						for(Result result:resultSet) {

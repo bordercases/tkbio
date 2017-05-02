@@ -61,7 +61,7 @@ public class Neo4jOntologyService
 		
 		if(args.length==3)
 			return new Neo4jAbstractOntology(
-							(String)args[0], // Source 'accessionId'
+							(String)args[0], // Source 'curie'
 							(String)args[1], // Name
 							(String)args[2]	 // Description
 						);
@@ -91,7 +91,7 @@ public class Neo4jOntologyService
     }
     
     public Ontology addOntology(
-    		String source, // Ontology Source database stored in the AccessionId field
+    		String source, // Ontology Source database stored in the Curie field
     		String name, 
     		String description
     ) throws ModelException {

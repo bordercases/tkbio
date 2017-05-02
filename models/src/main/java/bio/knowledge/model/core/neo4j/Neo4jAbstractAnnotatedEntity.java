@@ -56,8 +56,8 @@ public class Neo4jAbstractAnnotatedEntity
     	super(name,description) ;
     }
 	
-    public Neo4jAbstractAnnotatedEntity(String accessionId, String name, String description) {
-    	super(accessionId,name,description) ;
+    public Neo4jAbstractAnnotatedEntity(String curie, String name, String description) {
+    	super(curie,name,description) ;
     }
 	
     @Relationship(type="FEATURE")

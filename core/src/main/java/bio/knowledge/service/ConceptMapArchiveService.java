@@ -95,9 +95,9 @@ public class ConceptMapArchiveService extends IdentifiedEntityServiceImpl<Concep
 			conceptMapArchive.setParents(parentMaps);
 		}
 		ConceptMapArchive savedConceptMap = archiveRepository.save(conceptMapArchive);
-		Set<String> conceptAccessionIds = query.getNodeIdsfromConceptMap();
-		for (String accessionId : conceptAccessionIds) {
-			archiveRepository.attachLibraryToConcept( savedConceptMap.getId(), accessionId );
+		Set<String> conceptCuries = query.getNodeIdsfromConceptMap();
+		for (String curie : conceptCuries) {
+			archiveRepository.attachLibraryToConcept( savedConceptMap.getId(), curie );
 		}
 		return true;
 	}

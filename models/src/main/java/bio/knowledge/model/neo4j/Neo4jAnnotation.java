@@ -69,11 +69,11 @@ public class Neo4jAnnotation extends Neo4jAbstractIdentifiedEntity implements An
      * @param annotation
      */
     public Neo4jAnnotation( 
-    		String accessionId, 
+    		String curie, 
     		String annotation,
     		Reference reference 
     ) {
-    	super( accessionId, annotation, Type.Remark.name()+":"+EvidenceCode.ND.getLabel() );
+    	super( curie, annotation, Type.Remark.name()+":"+EvidenceCode.ND.getLabel() );
     	setType(type);
     	setEvidenceCode(evidenceCode);
     	setReference(reference) ;
@@ -86,13 +86,13 @@ public class Neo4jAnnotation extends Neo4jAbstractIdentifiedEntity implements An
      * @param type could be 'title' or 'ab
      */
     public Neo4jAnnotation( 
-    		String accessionId, 
+    		String curie, 
     		String annotation, 
     		Type type, 
     		EvidenceCode code, 
     		Reference reference 
     ) {
-    	super( accessionId, annotation, type.name()+":"+code.getLabel() );
+    	super( curie, annotation, type.name()+":"+code.getLabel() );
     	setType(type);
     	setEvidenceCode(code);
     	setReference(reference) ;

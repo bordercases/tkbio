@@ -83,13 +83,13 @@ public class RdfUtil {
 	
 	/**
 	 * 
-	 * @param accessionId
+	 * @param curie
 	 * @return
 	 */
-	static public String getQualifier(String accessionId) {
-		int colonIdx = accessionId.indexOf(':') ;
+	static public String getQualifier(String curie) {
+		int colonIdx = curie.indexOf(':') ;
 		if(colonIdx>-1) {
-			String qualifier = accessionId.substring(0, colonIdx) ;
+			String qualifier = curie.substring(0, colonIdx) ;
 			return qualifier;
 		} else
 			return "" ;
@@ -97,14 +97,14 @@ public class RdfUtil {
 	
 	/**
 	 * 
-	 * @param accessionId
+	 * @param curie
 	 * @return
 	 */
-	static public String getQualifiedObjectId(String accessionId) {
-		int colonIdx = accessionId.indexOf(':') ;
-		String objectId = accessionId; // default
+	static public String getQualifiedObjectId(String curie) {
+		int colonIdx = curie.indexOf(':') ;
+		String objectId = curie; // default
 		if(colonIdx>-1) {
-			objectId = accessionId.substring(colonIdx+1) ;
+			objectId = curie.substring(colonIdx+1) ;
 		}
 		return objectId ;
 	}
@@ -147,11 +147,11 @@ public class RdfUtil {
 	
 	/**
 	 * 
-	 * @param accessionId
+	 * @param curie
 	 * @return
 	 */
-	static public String resolveBaseUri(String accessionId) {
-		String qualifier = getQualifier(accessionId);
+	static public String resolveBaseUri(String curie) {
+		String qualifier = getQualifier(curie);
 		qualifier = qualifier.toUpperCase();
 		if(!mapQualifier2URI.containsKey(qualifier)) 
 			qualifier = DEFAULT_QUALIFIER;
@@ -160,15 +160,15 @@ public class RdfUtil {
 	
 	/**
 	 * 
-	 * @param accessionId
+	 * @param curie
 	 * @return
 	 */
-	static public String resolveUri(String accessionId) {
-		String qualifier = getQualifier(accessionId);
+	static public String resolveUri(String curie) {
+		String qualifier = getQualifier(curie);
 		qualifier = qualifier.toUpperCase();
 		if(!mapQualifier2URI.containsKey(qualifier)) 
 			qualifier = DEFAULT_QUALIFIER;
-		return mapQualifier2URI.get(qualifier)+getQualifiedObjectId(accessionId);
+		return mapQualifier2URI.get(qualifier)+getQualifiedObjectId(curie);
 	}
 	
 	/**

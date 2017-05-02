@@ -36,7 +36,7 @@ package bio.knowledge.model.core;
  * and the 'description' is equivalent 
  * to the Feature value.
  * 
- * Thus, some Features may now have an accessionId
+ * Thus, some Features may now have an curie
  */
 public interface Feature extends IdentifiedEntity {
 

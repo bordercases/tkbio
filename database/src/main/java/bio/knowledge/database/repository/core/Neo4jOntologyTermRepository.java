@@ -48,10 +48,10 @@ public interface Neo4jOntologyTermRepository
 	Iterable<Neo4jAbstractOntologyTerm> getOntologyTerms() ;
 
 	/**
-	 * @param accessionId
+	 * @param curie
 	 * @return Neo4jOntologyTerm
 	 */
-	Neo4jAbstractOntologyTerm findByAccessionIdEquals(String accessionId);
+	Neo4jAbstractOntologyTerm findByCurieEquals(String curie);
 
 	/**
 	 * @param termName

@@ -92,15 +92,15 @@ public class Neo4jOntologyTermService
 	}
 
 	/* (non-Javadoc)
-	 * @see bio.knowledge.service.core.OntologyTermService#getOntologyTermByAccessionId(java.lang.String)
+	 * @see bio.knowledge.service.core.OntologyTermService#getOntologyTermByCurie(java.lang.String)
 	 */
 	@Override
-	public OntologyTerm getOntologyTermByAccessionId( String accessionId ) throws ModelException {
+	public OntologyTerm getOntologyTermByCurie( String curie ) throws ModelException {
 		
-    	if(accessionId==null || accessionId.isEmpty())
-    		throw new ModelException("Null or empty accessionId argument given to getOntologyTermByAccessionId()?!") ;
+    	if(curie==null || curie.isEmpty())
+    		throw new ModelException("Null or empty curie argument given to getOntologyTermByCurie()?!") ;
 		
-		return (OntologyTerm)ontologyTermRepository.findByAccessionIdEquals( accessionId );
+		return (OntologyTerm)ontologyTermRepository.findByCurieEquals( curie );
 	}
 
     /* (non-Javadoc)
@@ -182,7 +182,7 @@ public class Neo4jOntologyTermService
     @Override
 	public OntologyTerm addOntologyTerm(
     		Ontology ontology,
-    		String accessionId, // obligatory field for unique indexing of ontology terms now!
+    		String curie, // obligatory field for unique indexing of ontology terms now!
     		String termName, 
     		String definition
     ) throws ModelException {
@@ -199,7 +199,7 @@ public class Neo4jOntologyTermService
 		
 		// Retrieve existing external ontology term 
 		// (by name) if it exists, otherwise, create and cache it
-		OntologyTerm ontologyTerm = getOntologyTermByAccessionId( accessionId ) ;
+		OntologyTerm ontologyTerm = getOntologyTermByCurie( curie ) ;
 		if( ontologyTerm == null ) {
 			ontologyTerm = new Neo4jAbstractOntologyTerm( ontology, termName, definition ) ;
 			ontologyTerm = ontologyTermRepository.save( (Neo4jAbstractOntologyTerm)ontologyTerm ) ;

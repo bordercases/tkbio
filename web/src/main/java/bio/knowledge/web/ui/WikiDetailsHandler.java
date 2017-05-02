@@ -104,7 +104,7 @@ public class WikiDetailsHandler {
 		typeLabel.setCaption("Semantic Group:");
 
 		if (selectedConcept != null) {
-			accessionLabel.setValue(selectedConcept.getAccessionId());
+			accessionLabel.setValue(selectedConcept.getCurie());
 			nameLabel.setValue(selectedConcept.getName());
 			typeLabel.setValue(selectedConcept.getSemanticGroup().getDescription());
 		} else {
@@ -184,15 +184,15 @@ public class WikiDetailsHandler {
 
 	/**
 	 * 
-	 * @param accessionId
+	 * @param curie
 	 * @param name
 	 */
-	public void displayDataPage(String accessionId, String name) {
+	public void displayDataPage(String curie, String name) {
 
 		// get Formatted URL here?
 		String[] parameters = new String[1];
 		parameters[0] = name;
-		String propertyInfoUrl = wikiDataService.getFormattedUrl(accessionId, parameters);
+		String propertyInfoUrl = wikiDataService.getFormattedUrl(curie, parameters);
 
 		// no such URL?
 		if (propertyInfoUrl == null || propertyInfoUrl.isEmpty())
@@ -366,10 +366,10 @@ public class WikiDetailsHandler {
 		}
 	}
 
-	private void displayItemFromList(String accessionId, ComboBox source, Map<String, String> itemMap) {
+	private void displayItemFromList(String curie, ComboBox source, Map<String, String> itemMap) {
 		String id = (String) source.getValue();
 		if (itemMap.containsKey(id))
-			displayDataPage(accessionId, itemMap.get(id));
+			displayDataPage(curie, itemMap.get(id));
 	}
 
 	// L'il hack to ignore xmlschema languages

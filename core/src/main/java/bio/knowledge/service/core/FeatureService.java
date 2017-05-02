@@ -50,19 +50,19 @@ public interface FeatureService {
 
 	/**
 	 * @param owner
-	 * @param accessionId
+	 * @param curie
 	 * @param tagName
 	 * @param value
 	 */
-	public Feature createFeature( AnnotatedEntity owner, String accessionId, String tagName, String value );
+	public Feature createFeature( AnnotatedEntity owner, String curie, String tagName, String value );
 
 	/**
 	 * @param owner
-	 * @param accessionId
+	 * @param curie
 	 * @param tagTerm
 	 * @param value
 	 */
-	public Feature createFeature( AnnotatedEntity owner, String accessionId, OntologyTerm tagTerm, String value );
+	public Feature createFeature( AnnotatedEntity owner, String curie, OntologyTerm tagTerm, String value );
 
 	/**
 	 * 

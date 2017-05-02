@@ -41,18 +41,18 @@ public class Neo4jUserStatement extends Neo4jAbstractStatement {
 		setUserId(userId);	
 	}
 
-	public Neo4jUserStatement(String accessionId, Neo4jPredicate predicate, String userId) {
-		super(accessionId, predicate);
+	public Neo4jUserStatement(String curie, Neo4jPredicate predicate, String userId) {
+		super(curie, predicate);
 		setUserId(userId);	
 	}
 
-	public Neo4jUserStatement(String accessionId, Neo4jConcept subject, Neo4jPredicate predicate, Neo4jConcept object, String userId) {
-		super(accessionId, subject, predicate, object);
+	public Neo4jUserStatement(String curie, Neo4jConcept subject, Neo4jPredicate predicate, Neo4jConcept object, String userId) {
+		super(curie, subject, predicate, object);
 		setUserId(userId);	
 	}
 
-	public Neo4jUserStatement(String accessionId, String predicateName, String userId) {
-		super(accessionId, predicateName);
+	public Neo4jUserStatement(String curie, String predicateName, String userId) {
+		super(curie, predicateName);
 		setUserId(userId);	
 	}
 	

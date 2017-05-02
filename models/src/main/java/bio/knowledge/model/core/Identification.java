@@ -35,41 +35,4 @@ package bio.knowledge.model.core;
  */
 public interface Identification {
 
-	//
-	// Do we need UUID's in Knowledge.Bio?
-	//
-	// https://en.wikipedia.org/wiki/Universally_unique_identifier
-	//
-	// String getUuid() ;
-	
-	/**
-	 * 
-	 * @return a machine readable Uniform Resource Identifier of the identified entity
-	 */
-	String getUri();
-
-	/**
-	 * 
-	 * @return a human readable canonical accession identifier of the identified entity
-	 */
-	String getAccessionId();
-
-	/**
-	 * 
-	 * @return a human readable name or title of the identified entity
-	 */
-	String getName();
-
-	/**
-	 * 
-	 * @return a String description of the identified entity
-	 */
-	String getDescription();
-	
-	/**
-	 * 
-	 * @return synonyms is a String of (pipe delimited?) alias identifiers of the entity
-	 */
-	String getSynonyms();
-
 }

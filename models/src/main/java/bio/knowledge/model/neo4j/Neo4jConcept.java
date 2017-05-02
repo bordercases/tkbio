@@ -89,8 +89,8 @@ public class Neo4jConcept extends Neo4jAbstractAnnotatedEntity implements Concep
     	this.semanticGroup = semgroup ;
     }
 
-    public Neo4jConcept( String accessionId, SemanticGroup semgroup, String name ) {
-    	super(accessionId,name,"") ;
+    public Neo4jConcept( String curie, SemanticGroup semgroup, String name ) {
+    	super(curie,name,"") ;
     	this.semanticGroup = semgroup ;
     }
 

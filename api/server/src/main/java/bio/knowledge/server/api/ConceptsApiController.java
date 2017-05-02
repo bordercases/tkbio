@@ -104,4 +104,11 @@ public class ConceptsApiController implements ConceptsApi {
 		return ResponseEntity.ok(response);
     }
 
+	@Override
+	public ResponseEntity<InlineResponse2001> getConcepts(String keywords, String sg, Integer pageNumber,
+			Integer pageSize) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

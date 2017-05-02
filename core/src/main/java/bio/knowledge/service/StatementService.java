@@ -106,17 +106,17 @@ public class StatementService
 
 		if (args.length == 1)
 			return new Neo4jGeneralStatement(
-					(String) args[0]  		  // Statement AccessionId
+					(String) args[0]  		  // Statement Curie
 			);
 		else if (args.length == 2)
 			if (args[1] instanceof Neo4jPredicate) {
 				return new Neo4jGeneralStatement(
-						(String) args[0],   // Statement AccessionId
+						(String) args[0],   // Statement Curie
 						(Neo4jPredicate) args[1] // Predicate by object
 				);
 			} else if (args[1] instanceof String) {
 				return new Neo4jGeneralStatement(
-						(String) args[0],   // Statement AccessionId
+						(String) args[0],   // Statement Curie
 						(Neo4jPredicate) args[1] // Predicate by object
 				);
 			} else
@@ -124,7 +124,7 @@ public class StatementService
 		
 		else if (args.length == 4)
 			return new Neo4jGeneralStatement(
-					(String) args[0],  		  // Statement AccessionId
+					(String) args[0],  		  // Statement Curie
 					(Concept) args[1],        // Subject
 					(Neo4jPredicate) args[2],      // Predicate
 					(Concept) args[3]         // Object
@@ -207,16 +207,16 @@ public class StatementService
 		}
 
 		Concept concept = currentConceptOpt.get() ;
-		String accessionId = concept.getAccessionId() ;
+		String curie = concept.getCurie() ;
 		
 		// this is key used for caching purpose,(conceptId + Selected SemanticType + textFilter + pageable)
 
-		//String cacheKey = accessionId + "#" + conceptTypeCodes + "#" + filter + "#" + pageable.hashCode();
+		//String cacheKey = curie + "#" + conceptTypeCodes + "#" + filter + "#" + pageable.hashCode();
 		//cacheKey = Base64.getEncoder().encodeToString(cacheKey.getBytes());
 		
 		String pageKey = new Integer(pageable.hashCode()).toString();
 		CacheLocation cacheLocation = 
-				cache.searchForResultSet("Statement", accessionId, new String[] { conceptTypeCodes, filter, pageKey });
+				cache.searchForResultSet("Statement", curie, new String[] { conceptTypeCodes, filter, pageKey });
 
 		// Is key present ? then fetch it from cache
 		//List<Statement> cachedResult = (List<Statement>) cache.getResultSetCache().get(cacheKey);
@@ -364,11 +364,11 @@ public class StatementService
 		} 
 	}
 
-	public Neo4jGeneralStatement findbySourceAndTargetAccessionId(String sourceAccessionId, String targetAccessionId, String relationName){
+	public Neo4jGeneralStatement findbySourceAndTargetCurie(String sourceCurie, String targetCurie, String relationName){
 
 		List<Map<String, Object>> result = null ;
 		result = statementRepository.
-					findBySourceTargetAndRelation(sourceAccessionId,targetAccessionId,relationName);
+					findBySourceTargetAndRelation(sourceCurie,targetCurie,relationName);
 	
 		if(result==null || result.isEmpty()) return null ;
 		
@@ -415,7 +415,7 @@ public class StatementService
 		if (!currentConceptOpt.isPresent()) return 0L;
 		
 		Concept concept = currentConceptOpt.get() ;
-		String accessionId = concept.getAccessionId();
+		String curie = concept.getCurie();
 		
 		Optional<Set<SemanticGroup>> currentConceptTypes = query.getConceptTypes();
 		ArrayList<String> conceptTypeFilter = new ArrayList<>();
@@ -432,13 +432,13 @@ public class StatementService
 
 		// creating cache key using (conceptId + Selected SemanticType + textFilter)
 		
-		//String cacheKey = ( accessionId + "#" + conceptTypeCodes + "#" + filter );
+		//String cacheKey = ( curie + "#" + conceptTypeCodes + "#" + filter );
 		//cacheKey = Base64.getEncoder().encodeToString(cacheKey.getBytes());
 
 		CacheLocation cacheLocation = 
 				cache.searchForCounter(
 						"Statement", 
-						accessionId, 
+						curie, 
 						new String[] { conceptTypeCodes, filter }
 				);
 		
@@ -743,7 +743,7 @@ public class StatementService
 				Neo4jPredicate property = new Neo4jPredicate( propUri, plPart[0], pdPart[0] ) ;
 				String propValue = (String) r.get("propValue") ;
 								
-				String statementId = subject.getAccessionId()+"-"+propId+"-"+propValue ;
+				String statementId = subject.getCurie()+"-"+propId+"-"+propValue ;
 				Neo4jGeneralStatement p = new Neo4jGeneralStatement( 
 						statementId, // not yet sure what unique id to put here...
 			    		property 
@@ -775,13 +775,13 @@ public class StatementService
 								propValueId 
 						) ;
 				
-				wikiItem.setAccessionId(qualifiedPropValueId);
+				wikiItem.setCurie(qualifiedPropValueId);
 				
 				// Important: non-SemMedDb, WikiData or other CST's must have
 				// a XML namespace qualifier prefix added to their identifiers
 				// which are, by default, the propValue
 				// TODO: What about propValues that are already full URI's?
-				wikiItem.setAccessionId(qualifiedPropValueId);
+				wikiItem.setCurie(qualifiedPropValueId);
 				
 				p.addObject(wikiItem);
 				
@@ -826,15 +826,15 @@ public class StatementService
 
 		if(concept!=null) {
 
-			String accessionId = concept.getAccessionId();
+			String curie = concept.getCurie();
 			
 			// this is key used for caching purpose,("WikiData" + conceptId + textFilter + pageable)
-			//String cacheKey = ("WikiData" + "#" + accessionId + "#" + filter + "#" + pageable.hashCode());
+			//String cacheKey = ("WikiData" + "#" + curie + "#" + filter + "#" + pageable.hashCode());
 			//cacheKey = Base64.getEncoder().encodeToString(cacheKey.getBytes());
 			
 			String pageKey = new Integer(pageable.hashCode()).toString();
 			CacheLocation cacheLocation = 
-					cache.searchForResultSet("WikiData", accessionId, new String[] { filter, pageKey });
+					cache.searchForResultSet("WikiData", curie, new String[] { filter, pageKey });
 			
 			// Is key present ? then fetch it from cache
 			//List<Statement> cachedResult = (List<Statement>) cache.getResultSetCache().get(cacheKey);

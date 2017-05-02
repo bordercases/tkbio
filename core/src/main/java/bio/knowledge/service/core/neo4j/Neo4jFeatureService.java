@@ -67,9 +67,9 @@ public class Neo4jFeatureService implements FeatureService {
 	 * @see bio.knowledge.service.core.FeatureService#createFeature(bio.knowledge.model.core.AnnotatedEntity, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public Feature createFeature( AnnotatedEntity owner, String accessionId, String tag, String value ) {
+	public Feature createFeature( AnnotatedEntity owner, String curie, String tag, String value ) {
 		OntologyTerm tagTerm = ontologyTermService.getOntologyTermByName(tag) ;
-		Feature feature = createFeature( owner, accessionId, tagTerm, value ) ;
+		Feature feature = createFeature( owner, curie, tagTerm, value ) ;
 		return feature ;
 	}
 
@@ -77,11 +77,11 @@ public class Neo4jFeatureService implements FeatureService {
 	 * @see bio.knowledge.service.core.FeatureService#createFeature(bio.knowledge.model.core.AnnotatedEntity, java.lang.String, bio.knowledge.model.core.OntologyTerm, java.lang.String)
 	 */
 	@Override
-	public Feature createFeature( AnnotatedEntity owner, String accessionId, OntologyTerm tagTerm, String value ) {
+	public Feature createFeature( AnnotatedEntity owner, String curie, OntologyTerm tagTerm, String value ) {
 		Feature feature = 
 				new Neo4jAbstractFeature(
 						owner,
-						accessionId,
+						curie,
 						tagTerm,
 						value
 				) ;

@@ -244,7 +244,7 @@ public class StatementTests {
 		 */
 		TestData geneTestdata = new TestData() ;
 		Neo4jConcept ngly1 = conceptRepository.save(geneTestdata.NGLY1) ;
-		Neo4jConcept ngly1_saved = conceptRepository.findByAccessionId(geneTestdata.NGLY1.getAccessionId()) ;
+		Neo4jConcept ngly1_saved = conceptRepository.findByCurie(geneTestdata.NGLY1.getAccessionId()) ;
 		assertEquals("Finding what I saved:",ngly1.getId(),ngly1_saved.getId());
 	}
 	

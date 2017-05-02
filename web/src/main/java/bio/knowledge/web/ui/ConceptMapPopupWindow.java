@@ -173,10 +173,10 @@ public class ConceptMapPopupWindow {
 
 	}
 
-	public void conceptMapNodePopUp(String accessionId, String name, int x, int y) {
+	public void conceptMapNodePopUp(String curie, String name, int x, int y) {
 
 		// Generate popup content from passed data
-		Optional<Concept> conceptOpt = conceptService.getDetailsByAccessionId(accessionId);
+		Optional<Concept> conceptOpt = conceptService.getDetailsByCurie(curie);
 
 		if (!conceptOpt.isPresent())
 			return;
@@ -210,7 +210,7 @@ public class ConceptMapPopupWindow {
 				if (dialog.isConfirmed()) {
 
 					// Confirmed to continue
-					parentUi.getConceptMap().deleteNodefromConceptMap(accessionId);
+					parentUi.getConceptMap().deleteNodefromConceptMap(curie);
 					conceptDetailsWindowOnGraph.close();
 					
 				} else {
@@ -237,13 +237,13 @@ public class ConceptMapPopupWindow {
 			String uri) {
 
 		// Generate popup content from passed data
-		Optional<Concept> sourceOpt = conceptService.getDetailsByAccessionId(sourceId);
+		Optional<Concept> sourceOpt = conceptService.getDetailsByCurie(sourceId);
 		if (!sourceOpt.isPresent())
 			return;
 		Concept sourceConcept = sourceOpt.get();
 		String sourceName = sourceConcept.getName();
 
-		Optional<Concept> targetOpt = conceptService.getDetailsByAccessionId(targetId);
+		Optional<Concept> targetOpt = conceptService.getDetailsByCurie(targetId);
 		if (!targetOpt.isPresent())
 			return;
 		Concept targetConcept = targetOpt.get();
@@ -251,7 +251,7 @@ public class ConceptMapPopupWindow {
 
 		// TODO: How to handle the User's Annotation case here?
 		Statement selectedStatement = 
-				statementService.findbySourceAndTargetAccessionId(sourceId, targetId, label);
+				statementService.findbySourceAndTargetCurie(sourceId, targetId, label);
 
 		// Create buttons related to node popup
 		// Okay -> no
@@ -320,8 +320,8 @@ public class ConceptMapPopupWindow {
 
 		ComboBox comboBoxPredicate = new ComboBox("Predicate", predicateCollection);
 
-		comboBoxSource.setValue(selectedConcept.getAccessionId());
-		comboBoxTarget.setValue(selectedConcept.getAccessionId());
+		comboBoxSource.setValue(selectedConcept.getCurie());
+		comboBoxTarget.setValue(selectedConcept.getCurie());
 
 		comboBoxSource.addValueChangeListener(sourceData -> {
 			System.out.println( ((NodeData) comboBoxSource.getValue()));
@@ -356,7 +356,7 @@ public class ConceptMapPopupWindow {
 		// set box settings
 		comboBoxSource.setItemCaptionPropertyId("name");
 		comboBoxTarget.setItemCaptionPropertyId("name");
-		comboBoxSource.select(selectedConcept.getAccessionId());
+		comboBoxSource.select(selectedConcept.getCurie());
 
 		details.addComponents(comboBoxSource, comboBoxPredicate, comboBoxTarget, descriptionText, uriEvidenceText, visibilityBox);
 
@@ -411,19 +411,19 @@ public class ConceptMapPopupWindow {
 
 			// assert the Statement
 			Statement statement = 
-					statementService.findbySourceAndTargetAccessionId(sourceId, targetId, relationLabel);
+					statementService.findbySourceAndTargetCurie(sourceId, targetId, relationLabel);
 
 			// statement doesn't exist in database
 			if (statement == null) {
 				// find subject
-				Concept subject = conceptService.findByAccessionId(sourceId);
+				Concept subject = conceptService.findByCurie(sourceId);
 				if (subject == null) {
 					// subject = new Concept();
 					return;
 				}
 
 				// find object
-				Concept object = conceptService.findByAccessionId(targetId);
+				Concept object = conceptService.findByCurie(targetId);
 				if (object == null) {
 					// object = new Concept();
 					return;
@@ -431,9 +431,9 @@ public class ConceptMapPopupWindow {
 
 				// add this to the database
 				statement = new Neo4jGeneralStatement(statementId,
-						conceptService.getDetailsByAccessionId(sourceId).get(), 
+						conceptService.getDetailsByCurie(sourceId).get(), 
 						relation,
-						conceptService.getDetailsByAccessionId(targetId).get());
+						conceptService.getDetailsByCurie(targetId).get());
 
 				Evidence evidence = evidenceService.createByEvidenceId(evidenceId);
 				statement.setEvidence(evidence);
@@ -463,7 +463,7 @@ public class ConceptMapPopupWindow {
 
 				// Wonder how the annotationId should be consistently computed?
 				String annotationId = "kba:" + String.valueOf((description + uri).hashCode());
-				Annotation annotation = annotationService.findByAccessionId(annotationId);
+				Annotation annotation = annotationService.findByCurie(annotationId);
 				
 				if (annotation == null) {
 					annotation = new Neo4jAnnotation(annotationId, description, Type.Remark, EvidenceCode.IC, reference);

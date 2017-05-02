@@ -524,7 +524,7 @@ public class ConceptMapDisplay extends AbstractJavaScriptComponent implements Gr
 	public void addNodeToConceptMap(Concept concept) {
 	
 		// create the new node from the passed-in data
-		Node newNode = new Node(concept.getAccessionId(), concept.getName(), concept.getSemanticGroup().name(), "add");
+		Node newNode = new Node(concept.getCurie(), concept.getName(), concept.getSemanticGroup().name(), "add");
 		
 		this.addNodeToConceptMap(newNode);
 	
@@ -552,69 +552,7 @@ public class ConceptMapDisplay extends AbstractJavaScriptComponent implements Gr
 		
 	};
 	
-	private void updateNodeTracker(HashMap<String, HashMap<String, HashMap<String,String>>> currentNodeTracker, String groupId, String nodeId, String nodeName) {
-		String sharedNodePropertyKey;
-		String sharedNodePropertyValue;
-		String groupType = groupId.split("_")[0];
-		
-		// initialize groupId hash
-		currentNodeTracker.put(groupId, (currentNodeTracker.get(groupId) == null
-				? new HashMap<String, HashMap<String, String>>() : currentNodeTracker.get(groupId)));
-		// initialize node's tracking hash, which gets passed to the client-side to update the graphical representation of the compound node
-		currentNodeTracker.get(groupId).put(nodeId, currentNodeTracker.get(groupId).get(nodeId) == null 
-				? new HashMap<String, String>() : currentNodeTracker.get(groupId).get(nodeId));
-		
-		if(groupType.equals("GENE")) {
-			sharedNodePropertyKey = "name";
-			sharedNodePropertyValue = nodeName;
-		} else if (groupType.equals("CUI")) {
-			sharedNodePropertyKey = "cui";
-			sharedNodePropertyValue = groupId.split("_")[1];
-		} else {
-			return;
-		}
-		
-		// set the tracker data
-			// shareNodePropertyKey => Key for cytoscape selector
-			// shareNodePropertyValue => Value for cytoscape selector
-		currentNodeTracker.get(groupId).get(nodeId)
-			.put("sharedNodePropertyKey", sharedNodePropertyKey);
-		currentNodeTracker.get(groupId).get(nodeId)
-			.put("sharedNodePropertyValue",  sharedNodePropertyValue);
-	}
-	
-	private String generateGroupName(String groupId, String nodeName) {
-		String groupName;
-		String groupType = groupId.split("_")[0];
-		
-		if(groupType.equals("GENE")) {
-			groupName = getGeneSymbol(nodeName);
-		} else if (groupType.equals("CUI")) {
-			groupName = nodeName;
-		} else {
-			return null;
-		}		
-		return groupName;
-	}
-	
-	private String generateGroupId(String conceptName, String accessionId) {
-		// create groupId
-		// by default search for a geneSymbol. If it doesn't have a valid geneSymbol, it must be sharing a CUI with another concept.
-		// since nodes could potentially satisfy either case, we set the dominating groupId to be that of the geneSymbol.
-		String groupId = getGeneSymbol(conceptName);		
-		if (!groupId.isEmpty()) { 
-			groupId = "GENE_"+accessionId;
-		}
-
-		return groupId;
-	};
-
-	/**
-	 * 
-	 * @param subject
-	 * @param object
-	 * @param relationLabel
-	 */
+	// EDGE METHODS
 	
 	public void addEdgeToConceptMap(Statement statement) {
 		// any statement pre-processing goes here
@@ -632,7 +570,7 @@ public class ConceptMapDisplay extends AbstractJavaScriptComponent implements Gr
 	}
 	
 	public void addEdgeToConceptMap(Concept subject, Concept object, String relationLabel, String description, String uri) {
-		Edge newEdge = new Edge( subject.getAccessionId(), object.getAccessionId(), relationLabel );
+		Edge newEdge = new Edge( subject.getCurie(), object.getCurie(), relationLabel );
 		// any edge pre-processing would go here.
 		newEdge.getData().setDescription(description);
 		newEdge.getData().setUri(uri);
@@ -672,6 +610,73 @@ public class ConceptMapDisplay extends AbstractJavaScriptComponent implements Gr
 	public void deleteEdgefromConceptMap(String sourceId, String targetId, String label) {
 		getElements().getEdges().deleteEdge(sourceId, targetId, label);
 	}
+	
+	// NODE TRACKER CODE
+	
+	private void updateNodeTracker(HashMap<String, HashMap<String, HashMap<String,String>>> currentNodeTracker, String groupId, String nodeId, String nodeName) {
+		// NodeTracker
+		// we want a fast way of figuring out what's on the graph so that we can create node clustering visualizations as we go
+		
+		String sharedNodePropertyKey;
+		String sharedNodePropertyValue;
+		String groupType = groupId.split("_")[0];
+		
+		// initialize groupId hash
+		currentNodeTracker.put(groupId, (currentNodeTracker.get(groupId) == null
+				? new HashMap<String, HashMap<String, String>>() : currentNodeTracker.get(groupId)));
+		// initialize node's tracking hash, which gets passed to the client-side to update the graphical representation of the compound node
+		currentNodeTracker.get(groupId).put(nodeId, currentNodeTracker.get(groupId).get(nodeId) == null 
+				? new HashMap<String, String>() : currentNodeTracker.get(groupId).get(nodeId));
+		
+		// Gene refers to MyGene.info datasource; CUI means wikidata datasource
+		// We've standardized this format
+		// TODO:
+		if(groupType.equals("GENE")) {
+			sharedNodePropertyKey = "name";
+			sharedNodePropertyValue = nodeName;
+		} else if (groupType.equals("CUI")) {
+			sharedNodePropertyKey = "cui";
+			sharedNodePropertyValue = groupId.split("_")[1];
+		} else {
+			return;
+		}
+		
+		// set the tracker data
+			// shareNodePropertyKey => Key for cytoscape selector
+			// shareNodePropertyValue => Value for cytoscape selector
+		currentNodeTracker.get(groupId).get(nodeId)
+			.put("sharedNodePropertyKey", sharedNodePropertyKey);
+		currentNodeTracker.get(groupId).get(nodeId)
+			.put("sharedNodePropertyValue",  sharedNodePropertyValue);
+	}
+	
+	private String generateGroupName(String groupId, String nodeName) {
+		String groupName;
+		String groupType = groupId.split("_")[0];
+		
+		if(groupType.equals("GENE")) {
+			groupName = getGeneSymbol(nodeName);
+		} else if (groupType.equals("CUI")) {
+			groupName = nodeName;
+		} else {
+			return null;
+		}		
+		return groupName;
+	}
+	
+	private String generateGroupId(String conceptName, String curie) {
+		// create groupId
+		// by default search for a geneSymbol. If it doesn't have a valid geneSymbol, it must be sharing a CUI with another concept.
+		// since nodes could potentially satisfy either case, we set the dominating groupId to be that of the geneSymbol.
+		String groupId = getGeneSymbol(conceptName);		
+		if (!groupId.isEmpty()) { 
+			groupId = "GENE_"+curie;
+		}
+
+		return groupId;
+	};
+	
+	// Auxiliary Tuple class
 
 	class Tuple<T> {
 		T l;

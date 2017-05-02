@@ -36,8 +36,8 @@ public interface Neo4jAnnotatedEntityRepository
 	extends GraphRepository<Neo4jAbstractAnnotatedEntity> {
 
 	/**
-	 * @param accessionId
+	 * @param curie
 	 * @return
 	 */
-	AnnotatedEntity findByAccessionId(String accessionId);
+	AnnotatedEntity findByCurie(String curie);
 }

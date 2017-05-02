@@ -28,7 +28,6 @@ package bio.knowledge.model.core.neo4j;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 import bio.knowledge.model.RdfUtil;
-import bio.knowledge.model.core.Curie;
 import bio.knowledge.model.core.IdentifiedEntity;
 
 /**
@@ -47,7 +46,8 @@ public class Neo4jAbstractIdentifiedEntity
 
     /**
      */
-	private String accessionId = "";
+	// previously 'accessionId'
+	private String curie = "";
 
     /**
      */
@@ -61,8 +61,6 @@ public class Neo4jAbstractIdentifiedEntity
      * synonyms: a tab delimited string in the first iteration (for expediency)
      */
     private String synonyms = "" ;
-
-	private Curie curie;
     
 	public Neo4jAbstractIdentifiedEntity() {
         super();
@@ -80,7 +78,7 @@ public class Neo4jAbstractIdentifiedEntity
     
     public Neo4jAbstractIdentifiedEntity( String accessionId, String name, String description ) {
     	this(name,description) ;
-        this.accessionId = accessionId ;
+        this.curie = accessionId ;
         this.uri = RdfUtil.resolveUri(accessionId);
     }
 
@@ -105,19 +103,17 @@ public class Neo4jAbstractIdentifiedEntity
     /* (non-Javadoc)
 	 * @see bio.knowledge.model.core.IdentifiedEntity#setAccessionId(java.lang.String)
 	 */
-    @Deprecated
     @Override
 	public void setAccessionId(String accessionId) {
-        this.accessionId = accessionId;
+        this.curie = accessionId;
     }
 
 	/* (non-Javadoc)
 	 * @see bio.knowledge.model.core.Identification#getAccessionId()
 	 */
-    @Deprecated
-	@Override
+    @Override
 	public String getAccessionId() { 
-		return accessionId;
+		return curie;
 	}
 	
     /* (non-Javadoc)
@@ -152,8 +148,6 @@ public class Neo4jAbstractIdentifiedEntity
         return this.description;
     }
 	
-	
-	
 	/* (non-Javadoc)
 	 * @see bio.knowledge.model.core.IdentifiedEntity#toString()
 	 */
@@ -174,12 +168,12 @@ public class Neo4jAbstractIdentifiedEntity
 	@Override
 	public int compareTo(IdentifiedEntity other) {
 		if(!( 
-				accessionId==null || 
-				accessionId.isEmpty() ||
+				curie==null || 
+				curie.isEmpty() ||
 				other.getAccessionId()==null ||
 				other.getAccessionId().isEmpty())
 		)
-			return accessionId.compareTo(other.getAccessionId());
+			return curie.compareTo(other.getAccessionId());
 		else
 			return name.compareTo(other.getName());
 	}
@@ -201,18 +195,24 @@ public class Neo4jAbstractIdentifiedEntity
 	}
 
 	@Override
-	public void setCurie(Curie curie) {
+	public void setCurie(String curie) {
 		this.curie = curie;
 	}
-	
+
 	@Override
 	public int getCurieId() {
-		return this.curie.getId();
+		// TODO Auto-generated method stub
+		return Integer.parseInt(this.curie.replace("]", "").replace("[", "").split(":")[1]);
 	}
-	
+
 	@Override
 	public String getCurieSourceTag() {
-		return this.curie.getSourceTag();
+		return this.curie.replace("]", "").replace("[", "").split(":")[0];
+	}
+
+	@Override
+	public String getCurie() {
+		return this.curie;
 	}
 	
 }
