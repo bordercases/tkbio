@@ -42,7 +42,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 import bio.knowledge.model.Annotation;
-import bio.knowledge.model.RdfUtil;
+import bio.knowledge.model.CurieUtil;
 import bio.knowledge.model.Reference;
 import bio.knowledge.service.AnnotationService;
 import bio.knowledge.service.KBQuery;
@@ -50,8 +50,8 @@ import bio.knowledge.web.design.ReferenceDesign;
 import bio.knowledge.web.ui.DesktopUI;
 
 /**
- * ReferenceView displays the specific content of a 
- * Reference URI treated as a REST call or plain URL
+ * ReferenceView displays the specific content of a Reference URI treated as a
+ * REST call or plain URL
  */
 @SpringView(name = ReferenceView.NAME)
 public class ReferenceView extends ReferenceDesign implements View {
@@ -59,142 +59,147 @@ public class ReferenceView extends ReferenceDesign implements View {
 	public static final String NAME = "references";
 
 	private static final long serialVersionUID = -827840039603594744L;
-	
-	@Autowired
-	private KBQuery query ;
 
 	@Autowired
-	private AnnotationService annotationService ;
-	
-	public ReferenceView() { }
-	
+	private KBQuery query;
+
+	@Autowired
+	private AnnotationService annotationService;
+
+	public ReferenceView() {
+	}
+
 	private TextField refIdSearchField = new TextField();
-	private String    baseUri = "";
-	
-	private Boolean IS_PUBMED_ARTICLE = false ;
-	
+	private String baseUri = "";
+
+	private Boolean IS_PUBMED_ARTICLE = false;
+
 	@Override
 	public void enter(ViewChangeEvent event) {
 
 		removeAllComponents();
-		
+
 		Optional<Annotation> annotationOpt = query.getCurrentAnnotation();
-		
-		Reference reference = null ;
-		final String[] uri = new String[1] ;
+
+		Reference reference;
+		final String[] uri = new String[1];
 		if (annotationOpt.isPresent()) {
-			
 			Annotation annotation = annotationOpt.get();
 			reference = annotationService.getReference(annotation);
-			
+
 			String accId = reference.getCurie();
-			
-			if(!accId.isEmpty()) {
-				baseUri  = RdfUtil.resolveBaseUri(accId);
-				
-				String objectId = RdfUtil.getQualifiedObjectId(accId);
-				
+
+			if (!accId.isEmpty()) {
+				baseUri = CurieUtil.resolveBaseUri(accId);
+
+				String objectId = CurieUtil.getQualifiedObjectId(accId);
+
 				// display the qualified identifier to the end user
 				refIdSearchField.setValue(accId);
-				
-				String qualifier = RdfUtil.getQualifier(accId);
-				if(qualifier.equals(RdfUtil.PUBMED_QUALIFIER)) 
-					IS_PUBMED_ARTICLE = true ;
-				
-				uri[0] = baseUri+objectId ;
-				
+
+				String qualifier = CurieUtil.getQualifier(accId);
+				if (qualifier.equals(CurieUtil.PUBMED_QUALIFIER))
+					IS_PUBMED_ARTICLE = true;
+
+				uri[0] = baseUri + objectId;
+
 			} else {
-				
 				uri[0] = reference.getUri().trim();
-				if(uri[0].isEmpty()) return ;
+				if (uri[0].isEmpty()) {
+					return;
+				}
 			}
-			
+
 		} else {
 			return;
 		}
-		
-		VerticalLayout localAbstractLayout = new VerticalLayout() ;	
+
+		VerticalLayout localAbstractLayout = new VerticalLayout();
 		localAbstractLayout.setMargin(true);
 		localAbstractLayout.setSpacing(true);
-		
+
 		HorizontalLayout abstractMenu = new HorizontalLayout();
 		abstractMenu.setSpacing(true);
-		
+
 		refIdSearchField.setInputPrompt("Search Reference ID");
-		
+
 		Button referenceSearchBtn = new Button("GO");
 		referenceSearchBtn.setClickShortcut(KeyCode.ENTER);
-		
-		Button showInNewWindowBtn        = new Button("Show Abstract in New Window");
+
+		Button showInNewWindowBtn = new Button("Show Abstract in New Window");
 		Button showReferenceRelationsBtn = new Button("Show Associated Concept Relations");
 
 		HorizontalLayout searchLayout = new HorizontalLayout();
-		searchLayout.addComponents( refIdSearchField, referenceSearchBtn );
-		
+		searchLayout.addComponents(refIdSearchField, referenceSearchBtn);
+
 		abstractMenu.addComponents(searchLayout, showInNewWindowBtn);
-		
-		// TODO: For now, don't give the user a 'pubmed relations' button unless they have such a beast!
-		if(IS_PUBMED_ARTICLE) abstractMenu.addComponent(showReferenceRelationsBtn);
-		
+
+		// TODO: For now, don't give the user a 'pubmed relations' button unless
+		// they have such a beast!
+		if (IS_PUBMED_ARTICLE)
+			abstractMenu.addComponent(showReferenceRelationsBtn);
+
 		VerticalLayout articleLayout = new VerticalLayout();
 		articleLayout.setHeight("100%");
-		
+
 		setHeightUndefined();
 
 		openReferenceLink(articleLayout, uri[0]);
-		
+
 		localAbstractLayout.addComponents(abstractMenu, articleLayout);
 		localAbstractLayout.setHeight("100%");
-		
+
 		addComponent(localAbstractLayout);
-		
-		referenceSearchBtn.addClickListener(e-> {
-			String accId    = refIdSearchField.getValue().trim();
-			baseUri         = RdfUtil.resolveBaseUri(accId);
-			String objectId = RdfUtil.getQualifiedObjectId(accId);
-			openReferenceLink(articleLayout, baseUri+objectId);
-		});
-		
-		showInNewWindowBtn.addClickListener(e -> {
-			getUI().getPage().open( uri[0], "_blank", false );
+
+		referenceSearchBtn.addClickListener(e -> {
+			String accId = refIdSearchField.getValue().trim();
+			baseUri = CurieUtil.resolveBaseUri(accId);
+			String objectId = CurieUtil.getQualifiedObjectId(accId);
+			openReferenceLink(articleLayout, baseUri + objectId);
 		});
 
-		DesktopUI ui = (DesktopUI) UI.getCurrent() ;
-		
-		// TODO: This button event should only be visible if Pubmed entry is displayed?
+		showInNewWindowBtn.addClickListener(e -> {
+			getUI().getPage().open(uri[0], "_blank", false);
+		});
+
+		DesktopUI ui = (DesktopUI) UI.getCurrent();
+
+		// TODO: This button event should only be visible if Pubmed entry is
+		// displayed?
 		showReferenceRelationsBtn.addClickListener(e -> {
-			
+
 			String accId = refIdSearchField.getValue().trim();
-			String pmid  = RdfUtil.getQualifiedObjectId(accId);
+			String pmid = CurieUtil.getQualifiedObjectId(accId);
 
 			query.setCurrentPmid(pmid);
-			
-			ui.gotoStatementsTable() ;
-			
+
+			ui.gotoStatementsTable();
+
 		});
 	}
-	
-	public void openReferenceLink(VerticalLayout pageLayout, String uri){
-		
+
+	public void openReferenceLink(VerticalLayout pageLayout, String uri) {
+
 		pageLayout.removeAllComponents();
 
 		if (uri != null && !uri.isEmpty()) {
-			String URL =  "<iframe src=\"" + uri + "\" width=\"100%\" height=\"100%\"></iframe>";
-			
+			String URL = "<iframe src=\"" + uri + "\" width=\"100%\" height=\"100%\"></iframe>";
+
 			Label page = new Label(URL, ContentMode.HTML);
-//			page.setHeight("100%");
+			// page.setHeight("100%");
 			page.setHeight(500, Unit.PIXELS);
-			
+
 			pageLayout.addComponent(page);
-			
+
 		} else {
-			
+
 			refIdSearchField.setValue("");
-			
-			Label errorLabel = new Label("<span>" + "<b>" + "Cannot resolve the Reference '" + uri + "'</b>" + "</span>");
+
+			Label errorLabel = new Label(
+					"<span>" + "<b>" + "Cannot resolve the Reference '" + uri + "'</b>" + "</span>");
 			errorLabel.setContentMode(ContentMode.HTML);
 			errorLabel.addStyleName("pubmed-article-label");
-			
+
 			pageLayout.setMargin(true);
 			pageLayout.addComponent(errorLabel);
 		}

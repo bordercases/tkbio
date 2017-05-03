@@ -55,7 +55,7 @@ import bio.knowledge.datasource.wikidata.WikiDataDataSource;
 import bio.knowledge.model.Concept;
 import bio.knowledge.model.Evidence;
 import bio.knowledge.model.Predicate;
-import bio.knowledge.model.RdfUtil;
+import bio.knowledge.model.CurieUtil;
 import bio.knowledge.model.SemanticGroup;
 import bio.knowledge.model.Statement;
 import bio.knowledge.model.datasource.Result;
@@ -738,7 +738,7 @@ public class StatementService
 
 				String propId ;
 				
-				propId = RdfUtil.getObjectId(propUri) ;
+				propId = CurieUtil.getObjectId(propUri) ;
 				
 				Neo4jPredicate property = new Neo4jPredicate( propUri, plPart[0], pdPart[0] ) ;
 				String propValue = (String) r.get("propValue") ;
@@ -756,7 +756,7 @@ public class StatementService
 				WikiDataPropertySemanticType wikiDataType = 
 						WikiDataPropertySemanticType.lookUpByPropertyId(propId);
 
-				String propValueId = RdfUtil.getObjectId(propValue) ;
+				String propValueId = CurieUtil.getObjectId(propValue) ;
 				String qualifiedPropValueId = wikiDataType.getDefaultQualifier()+propValueId ;
 
 				Optional<Class<? extends Neo4jConcept>> nodeTypeOpt = 

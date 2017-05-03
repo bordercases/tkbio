@@ -50,7 +50,7 @@ import com.vaadin.ui.VerticalLayout;
 import bio.knowledge.datasource.DataSourceException;
 import bio.knowledge.datasource.wikidata.ConceptDescriptor;
 import bio.knowledge.model.Concept;
-import bio.knowledge.model.RdfUtil;
+import bio.knowledge.model.CurieUtil;
 import bio.knowledge.model.datasource.ResultSet;
 import bio.knowledge.service.ConceptService;
 import bio.knowledge.service.KBQuery;
@@ -250,7 +250,7 @@ public class WikiDetailsHandler {
 				idList.add(label);
 				if (idPart.length > 1) {
 					// Map object ID if URI is available
-					itemMap.put(label, RdfUtil.getObjectId(idPart[1]));
+					itemMap.put(label, CurieUtil.getObjectId(idPart[1]));
 				}
 			}
 
@@ -297,7 +297,7 @@ public class WikiDetailsHandler {
 				 */
 				if (fieldId.equals("wd:P692") || fieldId.equals("wd:P18")) {
 					// get the file name (only)
-					valueLabel = RdfUtil.getObjectId(valueLabel);
+					valueLabel = CurieUtil.getObjectId(valueLabel);
 					// translate HTTP Encoding of spaces
 					valueLabel = valueLabel.replaceAll("\\%20", " ");
 					// remove file extension
@@ -308,7 +308,7 @@ public class WikiDetailsHandler {
 
 				String uri = idPart[1]; // second half may be the URI
 
-				final String valueObjectId = RdfUtil.getObjectId(uri);
+				final String valueObjectId = CurieUtil.getObjectId(uri);
 
 				Component valueDisplay;
 				if (isRetrievable) {

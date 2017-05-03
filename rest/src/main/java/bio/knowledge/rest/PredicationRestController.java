@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import bio.knowledge.model.RdfUtil;
+import bio.knowledge.model.CurieUtil;
 import bio.knowledge.model.Statement;
 import bio.knowledge.service.ConceptService;
 import bio.knowledge.service.KBQuery;
@@ -85,7 +85,7 @@ public class PredicationRestController {
 		/*
 		 *  TODO: need to discriminate here between SemMedDb and non-SemMedDb conceptId's?
 		 */
-		if(RdfUtil.getQualifier(conceptId).isEmpty())
+		if(CurieUtil.getQualifier(conceptId).isEmpty())
 			/*
 			 *  Assume that non-URI qualified id's are are a Long Neo4j id
 			 *  of a SemMedDb recorded CST, for look up in main database?

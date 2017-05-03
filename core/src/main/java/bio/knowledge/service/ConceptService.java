@@ -61,7 +61,7 @@ import bio.knowledge.datasource.KnowledgeSourcePool;
 import bio.knowledge.datasource.SimpleDataService;
 import bio.knowledge.datasource.wikidata.WikiDataDataSource;
 import bio.knowledge.model.Concept;
-import bio.knowledge.model.RdfUtil;
+import bio.knowledge.model.CurieUtil;
 import bio.knowledge.model.SemanticGroup;
 import bio.knowledge.model.core.Feature;
 import bio.knowledge.model.datasource.Result;
@@ -934,7 +934,7 @@ public class ConceptService
 							String[] nameLiteralPart = nameLiteral.split("\\@");
 							
 							String valueUri = (String)result.get("value");
-							String valueObjectId = RdfUtil.getObjectId(valueUri);
+							String valueObjectId = CurieUtil.getObjectId(valueUri);
 							
 							String valueLabelLiteral = (String)result.get("valueLabel");
 							String[] valueLabelPart = valueLabelLiteral.split("\\@");

@@ -100,7 +100,7 @@ public class Neo4jOntologyTermService
     	if(curie==null || curie.isEmpty())
     		throw new ModelException("Null or empty curie argument given to getOntologyTermByCurie()?!") ;
 		
-		return (OntologyTerm)ontologyTermRepository.findByCurieEquals( curie );
+		return (OntologyTerm) ontologyTermRepository.findByCurieEquals( curie );
 	}
 
     /* (non-Javadoc)

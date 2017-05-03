@@ -46,7 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import bio.knowledge.datasource.DataSourceException;
-import bio.knowledge.model.RdfUtil;
+import bio.knowledge.model.CurieUtil;
 
 public class SPARQLDataService {
 	
@@ -138,7 +138,7 @@ public class SPARQLDataService {
 			
 			_logger.debug("Replacing '?"+key+"' with '"+query+"' in queryTemplate") ;
 
-			String parameter = RdfUtil.encodeResource(query) ;
+			String parameter = CurieUtil.encodeResource(query) ;
 
 			if(!parameter.isEmpty())
 				queryString = queryString.replaceAll("\\?"+key, parameter ) ;

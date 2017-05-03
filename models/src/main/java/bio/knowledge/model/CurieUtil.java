@@ -33,7 +33,7 @@ import java.util.Map;
  * @author Richard
  *
  */
-public class RdfUtil {
+public class CurieUtil {
 
 	/**
 	 * 
