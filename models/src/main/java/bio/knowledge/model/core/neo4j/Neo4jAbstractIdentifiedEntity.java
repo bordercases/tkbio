@@ -48,7 +48,7 @@ public class Neo4jAbstractIdentifiedEntity
     /**
      */
 	@Property(name="accessionId")
-	private String id = "";
+	private String accessionId = "";
 
     /**
      */
@@ -79,7 +79,7 @@ public class Neo4jAbstractIdentifiedEntity
     
     public Neo4jAbstractIdentifiedEntity( String id, String name, String description ) {
     	this(name,description) ;
-        this.id = id ;
+        this.accessionId = id ;
         this.uri = RdfUtil.resolveUri(id);
     }
 
@@ -104,7 +104,7 @@ public class Neo4jAbstractIdentifiedEntity
 	 */
     @Override
 	public void setId(String id) {
-        this.id = id;
+        this.accessionId = id;
     }
 
 	/* (non-Javadoc)
@@ -112,7 +112,7 @@ public class Neo4jAbstractIdentifiedEntity
 	 */
 	@Override
 	public String getId() { 
-		return id;
+		return accessionId;
 	}
 	
     /* (non-Javadoc)
@@ -169,12 +169,12 @@ public class Neo4jAbstractIdentifiedEntity
 	@Override
 	public int compareTo(IdentifiedEntity other) {
 		if(!( 
-				id==null || 
-				id.isEmpty() ||
+				accessionId==null || 
+				accessionId.isEmpty() ||
 				other.getId()==null ||
 				other.getId().isEmpty())
 		)
-			return id.compareTo(other.getId());
+			return accessionId.compareTo(other.getId());
 		else
 			return name.compareTo(other.getName());
 	}
