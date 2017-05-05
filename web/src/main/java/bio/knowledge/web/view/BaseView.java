@@ -55,6 +55,7 @@ import bio.knowledge.service.core.MessageService;
 import bio.knowledge.service.core.OntologyTermService;
 import bio.knowledge.service.organization.ContactFormService;
 import bio.knowledge.web.ui.DesktopUI;
+import bio.knowledge.web.ui.WikiDetailsHandler;
 
 /**
  * @author Richard
@@ -98,6 +99,9 @@ public abstract class BaseView extends VerticalLayout implements View, MessageSe
 	
 	@Autowired
 	protected AuthenticationState authenticationState;
+	
+	@Autowired
+	protected WikiDetailsHandler wd_handler;
 
 	protected static final String COL_ID_NAME      = "name";
 	protected static final String COL_ID_SUPPORTING_TEXT = "supportingText";

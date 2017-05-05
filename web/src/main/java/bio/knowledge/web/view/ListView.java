@@ -1668,9 +1668,6 @@ public class ListView extends BaseView {
     ui.gotoStatementsTable();
   }
 
-  @Autowired
-  WikiDetailsHandler wd_handler;
-
   private HorizontalLayout buttonsLayout;
 
   // Handler for Concept details in various data tables
