@@ -24,7 +24,7 @@ import bio.knowledge.model.Statement;
 import bio.knowledge.service.beacon.KnowledgeBeaconService;
 
 @SpringView(name = RelationsView.NAME)
-public class RelationsView extends BaseView {
+public class RelationsView extends NewBaseView {
 
 	public static final String NAME = "relations";
 	private static final int ROWS_TO_DISPLAY = 11;
@@ -32,6 +32,8 @@ public class RelationsView extends BaseView {
 	private static final int DATAPAGE_SIZE = 100;
 	private static final long TIME_OUT = 60;
 	private static final TimeUnit TIME_UNIT = TimeUnit.SECONDS;
+	
+	private String[] columns = new String[] { "subject", COL_ID_RELATION, "object", "evidence" };
 	
 	@Autowired
 	KnowledgeBeaconService kbService;
@@ -61,12 +63,16 @@ public class RelationsView extends BaseView {
 			
 		});
 		
+		for (String column : columns) {
+			dataTable.addColumn(column);
+		}
+		
 		dataTable.setWidth("100%");
 		dataTable.setHeightMode(HeightMode.ROW);
 		dataTable.setHeightByRows(ROWS_TO_DISPLAY);
 		dataTable.setImmediate(true);
 		dataTable.addStyleName(STYLE);
-//		dataTable.setCellStyleGenerator(cellRef -> getStyle(cellRef));
+		dataTable.setCellStyleGenerator(cellRef -> getStyle(cellRef));
 		dataTable.setSelectionMode(SelectionMode.MULTI);
 		
 		dataTable.setContainerDataSource(gpContainer);
