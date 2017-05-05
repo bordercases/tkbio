@@ -271,7 +271,7 @@ public class ConceptMapPopupWindow {
 
 			showRelations = new Button("Show Evidence", e -> {
 				conceptDetailsWindowOnGraph.close();
-				parentUi.displayEvidence();
+				parentUi.displayEvidence(selectedStatement);
 			});
 
 			buttonsLayout.addComponent(showRelations);

@@ -99,6 +99,14 @@ public abstract class BaseView extends VerticalLayout implements View, MessageSe
 	@Autowired
 	protected AuthenticationState authenticationState;
 
+	protected static final String COL_ID_NAME      = "name";
+	protected static final String COL_ID_SUPPORTING_TEXT = "supportingText";
+	protected static final String COL_ID_EVIDENCE  = "evidence";
+	protected static final String COL_ID_RELATION  = "relation";
+	protected static final String COL_ID_OBJECT    = "object";
+	protected static final String COL_ID_SUBJECT   = "subject";
+	protected static final String COL_ID_REFERENCE = "reference";
+	protected static final String COL_ID_PUBLICATION_DATE = "publicationDate";
 	
 	@Autowired
 	private MessageSource messageSource ;

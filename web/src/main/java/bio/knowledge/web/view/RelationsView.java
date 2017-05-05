@@ -8,20 +8,25 @@ import java.util.concurrent.TimeoutException;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.jena.sparql.pfunction.library.container;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.GeneratedPropertyContainer;
+import com.vaadin.event.SelectionEvent.SelectionListener;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Grid.SelectionMode;
+import com.vaadin.ui.UI;
 
 import bio.knowledge.grid.Grid;
 import bio.knowledge.grid.Grid.ScrollListener;
 import bio.knowledge.model.Statement;
+import bio.knowledge.renderer.ButtonRenderer;
 import bio.knowledge.service.beacon.KnowledgeBeaconService;
+import bio.knowledge.web.ui.DesktopUI;
 
 @SpringView(name = RelationsView.NAME)
 public class RelationsView extends BaseView {
@@ -32,56 +37,73 @@ public class RelationsView extends BaseView {
 	private static final int DATAPAGE_SIZE = 100;
 	private static final long TIME_OUT = 60;
 	private static final TimeUnit TIME_UNIT = TimeUnit.SECONDS;
-	
+
 	@Autowired
 	KnowledgeBeaconService kbService;
-	
+
 	private BeanItemContainer<Statement> container = new BeanItemContainer<Statement>(Statement.class);
 	private GeneratedPropertyContainer gpContainer = new GeneratedPropertyContainer(container);
-	
+
 	private Grid dataTable;
-	
+
 	int numberOfPages = 1;
-	
+
 	@PostConstruct
 	protected void initialize() {
 		setSizeFull();
 	}
-	
+
 	@Override
 	public void enter(ViewChangeEvent event) {
 		removeAllComponents();
-		
-		dataTable = new Grid(new ScrollListener(){
+
+		dataTable = new Grid(new ScrollListener() {
 
 			@Override
 			public void scrolledToBottom() {
 				loadDataPage(numberOfPages);
 			}
-			
+
 		});
+		String[] columns = new String[] { COL_ID_SUBJECT, COL_ID_RELATION, COL_ID_OBJECT, COL_ID_EVIDENCE };
+		for(String column : columns) {
+			dataTable.addColumn(column);	
+		}
+		
+		dataTable.getColumn(COL_ID_EVIDENCE).setRenderer(new ButtonRenderer(clicked -> {
+			DesktopUI ui = (DesktopUI) UI.getCurrent();
+			Statement selectedStatement = (Statement) clicked.getItemId();
+			ui.displayEvidence(selectedStatement);
+		}));
+		
+//		registry.addSelectionHandler(ViewName.RELATIONS_VIEW, COL_ID_SUBJECT,
+//				e -> onConceptDetailsSelection(e, ConceptRole.SUBJECT));
+
+//		registry.addSelectionHandler(ViewName.RELATIONS_VIEW, COL_ID_OBJECT,
+//				e -> onConceptDetailsSelection(e, ConceptRole.OBJECT));
+
+		
 		
 		dataTable.setWidth("100%");
 		dataTable.setHeightMode(HeightMode.ROW);
 		dataTable.setHeightByRows(ROWS_TO_DISPLAY);
 		dataTable.setImmediate(true);
 		dataTable.addStyleName(STYLE);
-//		dataTable.setCellStyleGenerator(cellRef -> getStyle(cellRef));
+		// dataTable.setCellStyleGenerator(cellRef -> getStyle(cellRef));
 		dataTable.setSelectionMode(SelectionMode.MULTI);
-		
+
 		dataTable.setContainerDataSource(gpContainer);
-		
+
 		this.addComponent(dataTable);
-		
+
 		loadDataPage(0);
-		
+
 	}
-	
+
 	private void loadDataPage(int pageNumber) {
-		CompletableFuture<List<Statement>> future = kbService.getStatements(
-				"wd:Q126691", null, null, pageNumber, DATAPAGE_SIZE
-		);
-		
+		CompletableFuture<List<Statement>> future = kbService.getStatements("wd:Q126691", null, null, pageNumber,
+				DATAPAGE_SIZE);
+
 		try {
 			List<Statement> statements = future.get(TIME_OUT, TIME_UNIT);
 			container.addAll(statements);
@@ -91,4 +113,6 @@ public class RelationsView extends BaseView {
 		}
 	}
 
+	
+	
 }
