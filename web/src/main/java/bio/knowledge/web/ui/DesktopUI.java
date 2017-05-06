@@ -550,7 +550,7 @@ public class DesktopUI extends UI implements MessageService {
 
 		Navigator navigator = new Navigator(this, referenceTab);
 		navigator.addProvider(viewProvider);
-		navigator.navigateTo(ViewName.EVIDENCE_VIEW);
+		navigator.navigateTo(ViewName.LIST_VIEW+'/'+ViewName.EVIDENCE_VIEW);
 
 		TabSheet tabsheet = desktopView.getDataTabSheet();
 		tabsheet.setSelectedTab(referenceTab);

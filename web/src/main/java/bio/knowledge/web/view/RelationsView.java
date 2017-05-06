@@ -1,6 +1,7 @@
 package bio.knowledge.web.view;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -66,6 +67,7 @@ public class RelationsView extends BaseView {
 	@Override
 	public void enter(ViewChangeEvent event) {
 		removeAllComponents();
+		numberOfPages = 1;
 
 		dataTable = new Grid(new ScrollListener() {
 
@@ -75,6 +77,7 @@ public class RelationsView extends BaseView {
 			}
 
 		});
+
 		String[] columns = new String[] { COL_ID_SUBJECT, COL_ID_RELATION, COL_ID_OBJECT, COL_ID_EVIDENCE };
 		for (String column : columns) {
 			dataTable.addColumn(column);
@@ -86,11 +89,11 @@ public class RelationsView extends BaseView {
 			ui.displayEvidence(selectedStatement);
 		}));
 
-//		dataTable.getColumn(COL_ID_SUBJECT).setRenderer(new ButtonRenderer(
-//				clicked -> onConceptDetailsSelection(clicked, ConceptRole.SUBJECT)));
-//
-//		dataTable.getColumn(COL_ID_OBJECT).setRenderer(new ButtonRenderer(
-//				clicked -> onConceptDetailsSelection(clicked, ConceptRole.OBJECT)));
+		// dataTable.getColumn(COL_ID_SUBJECT).setRenderer(new ButtonRenderer(
+		// clicked -> onConceptDetailsSelection(clicked, ConceptRole.SUBJECT)));
+		//
+		// dataTable.getColumn(COL_ID_OBJECT).setRenderer(new ButtonRenderer(
+		// clicked -> onConceptDetailsSelection(clicked, ConceptRole.OBJECT)));
 
 		dataTable.setWidth("100%");
 		dataTable.setHeightMode(HeightMode.ROW);
@@ -109,10 +112,13 @@ public class RelationsView extends BaseView {
 	}
 
 	private void loadDataPage(int pageNumber) {
-		CompletableFuture<List<Statement>> future = kbService.getStatements("wd:Q126691", null, null, pageNumber,
-				DATAPAGE_SIZE);
 
+		Optional<Concept> currentStatementOpt = query.getCurrentQueryConcept();
 		try {
+			Concept currentStatement = currentStatementOpt.get();
+			CompletableFuture<List<Statement>> future = kbService.getStatements(currentStatementOpt.get().getId(), null,
+					null, pageNumber, DATAPAGE_SIZE);
+
 			List<Statement> statements = future.get(TIME_OUT, TIME_UNIT);
 			container.addAll(statements);
 			numberOfPages++;
