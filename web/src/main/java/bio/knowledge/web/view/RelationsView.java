@@ -1,7 +1,6 @@
 package bio.knowledge.web.view;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -9,35 +8,25 @@ import java.util.concurrent.TimeoutException;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.jena.sparql.pfunction.library.container;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.vaadin.data.Container;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.GeneratedPropertyContainer;
-import com.vaadin.event.SelectionEvent.SelectionListener;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Grid.SelectionMode;
-import com.vaadin.ui.renderers.ClickableRenderer.RendererClickEvent;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
 
 import bio.knowledge.grid.Grid;
 import bio.knowledge.grid.Grid.ScrollListener;
 import bio.knowledge.model.Concept;
-import bio.knowledge.model.Predicate;
 import bio.knowledge.model.Statement;
 import bio.knowledge.renderer.ButtonRenderer;
 import bio.knowledge.service.KBQuery.RelationSearchMode;
 import bio.knowledge.service.beacon.KnowledgeBeaconService;
 import bio.knowledge.web.ui.DesktopUI;
 import bio.knowledge.web.ui.PopupWindow;
-import bio.knowledge.web.view.ListView.ConceptRole;
 
 @SpringView(name = RelationsView.NAME)
 public class RelationsView extends NewBaseView {
