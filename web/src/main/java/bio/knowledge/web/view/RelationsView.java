@@ -57,7 +57,7 @@ public class RelationsView extends NewBaseView {
 
 	private Grid dataTable;
 
-	int numberOfPages = 1;
+	private int numberOfPages;
 
 	@PostConstruct
 	protected void initialize() {
@@ -68,23 +68,26 @@ public class RelationsView extends NewBaseView {
 	public void enter(ViewChangeEvent event) {
 		if (event.getParameters() != null) {
 			String[] parameters = event.getParameters().split("/");
-			for (String parameter : parameters) {
-				System.out.println(parameter);
-			}
+			String curies = String.join(" ", parameters);
+			setupDataTable(curies);
+			refresh(curies);
 		}
-		
-		removeAllComponents();
-		numberOfPages = 1;
+	}
 
-		dataTable = new Grid(new ScrollListener() {
+	private void setupDataTable(String curies) {
+		this.removeAllComponents();
+		
+		ScrollListener scrollListener = new ScrollListener() {
 
 			@Override
 			public void scrolledToBottom() {
-//				loadDataPage(numberOfPages);
+				addDataPage(curies);
 			}
-
-		});
-
+			
+		};
+		
+		dataTable = new Grid(scrollListener);
+		
 		String[] columns = new String[] { COL_ID_SUBJECT, COL_ID_RELATION, COL_ID_OBJECT, COL_ID_EVIDENCE };
 		for (String column : columns) {
 			dataTable.addColumn(column);
@@ -113,26 +116,27 @@ public class RelationsView extends NewBaseView {
 		dataTable.setContainerDataSource(gpContainer);
 
 		this.addComponent(dataTable);
-
-//		loadDataPage(0);
-
 	}
 
-//	private void loadDataPage(int pageNumber) {
-//
-//		Optional<Concept> currentStatementOpt = query.getCurrentQueryConcept();
-//		try {
-//			Concept currentStatement = currentStatementOpt.get();
-//			CompletableFuture<List<Statement>> future = kbService.getStatements(currentStatementOpt.get().getId(), null,
-//					null, pageNumber, DATAPAGE_SIZE);
-//
-//			List<Statement> statements = future.get(TIME_OUT, TIME_UNIT);
-//			container.addAll(statements);
-//			numberOfPages++;
-//		} catch (InterruptedException | ExecutionException | TimeoutException e) {
-//			e.printStackTrace();
-//		}
-//	}
+	private void refresh(String conceptId) {
+		if (container.removeAllItems()) {
+			numberOfPages = 0;
+			addDataPage(conceptId);
+		}
+	}
+	
+	private void addDataPage(String conceptId) {
+		CompletableFuture<List<Statement>> future = 
+				kbService.getStatements(conceptId, null, null, numberOfPages, DATAPAGE_SIZE);
+
+		try {
+			List<Statement> statements = future.get(TIME_OUT, TIME_UNIT);
+			container.addAll(statements);
+			numberOfPages++;
+		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+			e.printStackTrace();
+		}
+	}
 
 //	private void onConceptDetailsSelection(RendererClickEvent event, ConceptRole role) {
 //		Statement statement = (Statement) event.getItemId();
