@@ -11,7 +11,7 @@ public class ConceptsView extends BaseView {
 	@Override
 	public void enter(ViewChangeEvent event) {
 		// TODO Auto-generated method stub
-
+		throw new RuntimeException("You're so dumb");
 	}
 
 }

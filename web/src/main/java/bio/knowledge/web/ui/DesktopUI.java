@@ -413,8 +413,15 @@ public class DesktopUI extends UI implements MessageService {
 			relationsTabNavigator.addProvider(viewProvider);
 
 		}
-
-		relationsTabNavigator.navigateTo(ViewName.RELATIONS_VIEW);
+		
+		Optional<Concept> concept = query.getCurrentQueryConcept();
+		if (concept.isPresent()) {
+			relationsTabNavigator.navigateTo(
+					ViewName.RELATIONS_VIEW + "/" + concept.get().getId()
+			);
+		} else {
+			relationsTabNavigator.navigateTo(ViewName.RELATIONS_VIEW);
+		}
 
 		TabSheet tabsheet = desktopView.getDataTabSheet();
 		tabsheet.setSelectedTab(relationsTab);
