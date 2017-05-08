@@ -881,7 +881,7 @@ public class ListView extends BaseView {
         Optional<Concept> selectedConceptOpt = query.getCurrentSelectedConcept();
         if (selectedConceptOpt.isPresent()) {
           Concept concept = selectedConceptOpt.get();
-          ui.setHighlightedNode(concept) ;
+          ui.setHighlightedNode(concept.getId()) ;
         }
       }
       // https://dev.vaadin.com/ticket/16345

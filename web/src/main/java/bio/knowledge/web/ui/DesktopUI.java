@@ -474,7 +474,7 @@ public class DesktopUI extends UI implements MessageService {
 	 * 
 	 * @param currentConcept
 	 */
-	public void setHighlightedNode(Concept currentConcept) {
+	public void setHighlightedNode(String conceptId) {
 		// Removing highlights from previous concept node
 		if (lastHighlightNodeId != null) {
 			highlightNode(HighlightStatus.NO);
@@ -484,7 +484,7 @@ public class DesktopUI extends UI implements MessageService {
 		// point
 
 		// Highlighting new current concept node
-		lastHighlightNodeId = currentConcept.getId();
+		lastHighlightNodeId = conceptId;
 		highlightNode(HighlightStatus.YES);
 	}
 
@@ -496,7 +496,7 @@ public class DesktopUI extends UI implements MessageService {
 	 */
 	private void setConceptInSession(Concept currentConcept) {
 		setCurrentConceptTitle(currentConcept.getName());
-		setHighlightedNode(currentConcept);
+		setHighlightedNode(currentConcept.getId());
 	}
 
 	// private void setConceptInSession( Boolean concept ) {
