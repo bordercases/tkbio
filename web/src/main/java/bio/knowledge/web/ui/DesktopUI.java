@@ -539,29 +539,21 @@ public class DesktopUI extends UI implements MessageService {
 	/**
 	 * 
 	 */
-	public void displayEvidence() {
+	public void displayEvidence(Statement statement) {
 
 		query.setRelationSearchMode(RelationSearchMode.RELATIONS);
 
-		Optional<Statement> stmtOpt = query.getCurrentStatement();
+		// highlight the edge according to the predication
+		setHighlightedEdge(statement.getSubject(), statement.getObject(), statement.getRelation().getName());
 
-		if (stmtOpt.isPresent()) {
+		VerticalLayout referenceTab = desktopView.getEvidenceTab();
 
-			Statement statement = stmtOpt.get();
-			// query.setCurrentStatement(statement);
+		Navigator navigator = new Navigator(this, referenceTab);
+		navigator.addProvider(viewProvider);
+		navigator.navigateTo(ViewName.LIST_VIEW+'/'+ViewName.EVIDENCE_VIEW);
 
-			// highlight the edge according to the predication
-			setHighlightedEdge(statement.getSubject(), statement.getObject(), statement.getRelation().getName());
-
-			VerticalLayout referenceTab = desktopView.getEvidenceTab();
-
-			Navigator navigator = new Navigator(this, referenceTab);
-			navigator.addProvider(viewProvider);
-			navigator.navigateTo(ViewName.EVIDENCE_VIEW);
-
-			TabSheet tabsheet = desktopView.getDataTabSheet();
-			tabsheet.setSelectedTab(referenceTab);
-		}
+		TabSheet tabsheet = desktopView.getDataTabSheet();
+		tabsheet.setSelectedTab(referenceTab);
 	}
 
 	/**
