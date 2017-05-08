@@ -158,19 +158,27 @@ public class RelationsView extends NewBaseView {
 		if (container.removeAllItems()) {
 			numberOfPages = 0;
 			addDataPage(conceptId);
+			isAllDataLoaded = false;
 		}
 	}
 
+	private boolean isAllDataLoaded = false;
 	private void addDataPage(String conceptId) {
-		CompletableFuture<List<Statement>> future = kbService.getStatements(conceptId, null, null, numberOfPages,
-				DATAPAGE_SIZE);
-
-		try {
-			List<Statement> statements = future.get(TIME_OUT, TIME_UNIT);
-			container.addAll(statements);
-			numberOfPages++;
-		} catch (InterruptedException | ExecutionException | TimeoutException e) {
-			e.printStackTrace();
+		if (! isAllDataLoaded) {
+			CompletableFuture<List<Statement>> future =
+					kbService.getStatements(conceptId, null, null, numberOfPages, DATAPAGE_SIZE);
+	
+			try {
+				List<Statement> statements = future.get(TIME_OUT, TIME_UNIT);
+				container.addAll(statements);
+				numberOfPages++;
+				if (statements.size() < DATAPAGE_SIZE) {
+					isAllDataLoaded = true;
+				}
+				
+			} catch (InterruptedException | ExecutionException | TimeoutException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
