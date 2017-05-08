@@ -6,11 +6,11 @@ import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
-//import springfox.documentation.service.Contact;
+import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-05-02T16:41:12.704-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-05-05T22:03:23.165-07:00")
 
 @Configuration
 public class SwaggerDocumentationConfig {
@@ -22,8 +22,8 @@ public class SwaggerDocumentationConfig {
             .license("")
             .licenseUrl("http://unlicense.org")
             .termsOfServiceUrl("http://starinformatics.com")
-            .version("1.0.10")
-//            .contact(new Contact("","", "richard@starinformatics.com"))
+            .version("1.0.11")
+            .contact(new Contact("","", "richard@starinformatics.com"))
             .build();
     }
 

@@ -29,6 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -37,11 +40,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.database.repository.AnnotationRepository;
+import bio.knowledge.datasource.DataService;
 import bio.knowledge.model.Annotation;
+import bio.knowledge.model.AnnotationImpl;
 import bio.knowledge.model.Evidence;
 import bio.knowledge.model.Reference;
+import bio.knowledge.model.Statement;
 import bio.knowledge.service.Cache.CacheLocation;
+import bio.knowledge.service.beacon.KnowledgeBeaconService;
 import bio.knowledge.service.core.IdentifiedEntityServiceImpl;
+import bio.knowledge.service.core.TableSorter;
 
 /**
  * @author Richard
@@ -58,6 +66,34 @@ public class AnnotationService extends IdentifiedEntityServiceImpl<Annotation> {
 
     @Autowired
 	private AnnotationRepository annotationRepository ;
+    
+    @Autowired
+    private KnowledgeBeaconService kbService;
+    
+    @Override
+    public List<Annotation> getDataPage(
+    		int pageIndex,
+    		int pageSize,
+    		String filter,
+    		TableSorter sorter,
+    		boolean isAscending
+    ) {
+    	Optional<Statement> statementOpt = query.getCurrentStatement();
+		if( !statementOpt.isPresent() ) return new ArrayList<Annotation>() ;
+		Statement statement = statementOpt.get();
+		String statementId = statement.getId();
+		
+    	CompletableFuture<List<Annotation>> future =
+    			kbService.getEvidences(statementId, null, pageIndex, pageSize);
+    	
+    	try {
+			List<Annotation> annotations =
+					future.get(DataService.TIMEOUT_DURATION, DataService.TIMEOUT_UNIT);
+			return annotations;
+		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+			return new ArrayList<Annotation>();
+		}
+    }
 
     /* (non-Javadoc)
 	 * @see bio.knowledge.service.core.IdentifiedEntityService#getIdentifiers()
@@ -234,18 +270,23 @@ public class AnnotationService extends IdentifiedEntityServiceImpl<Annotation> {
 		// Long count = cache.getCountCache().get(cacheKey);
 		Long count = cacheLocation.getCounter();
 		
-		if (count == null) {
-			if (filter.trim().isEmpty()) {
-				count = annotationRepository.countByEvidence(evidence);
-			} else {
-				count = annotationRepository.countByEvidenceFiltered(evidence, filter);
-			}
-			// put fetched result to map before returning
-			//cache.getCountCache().put(cacheKey, count);
-			cacheLocation.setCounter(count);
-		}
 		
-		return count;
+		return 0;
+		// TODO: Figure out why this code was not working??? But it's being phased out anyway...
+		
+//		if (count == null && evidence != null) {
+//			
+//			if (filter.trim().isEmpty()) {
+//				count = annotationRepository.countByEvidence(evidence);
+//			} else {
+//				count = annotationRepository.countByEvidenceFiltered(evidence, filter);
+//			}
+//			// put fetched result to map before returning
+//			//cache.getCountCache().put(cacheKey, count);
+//			cacheLocation.setCounter(count);
+//		}
+//		
+//		return count;
 	}
 
 	private Page<Annotation> findHelperByPMID(String filter, Pageable pageable){
