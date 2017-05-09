@@ -25,12 +25,6 @@
  */
 package bio.knowledge.model;
 
-import org.neo4j.ogm.annotation.Relationship;
-import org.neo4j.ogm.annotation.Transient;
-
-import bio.knowledge.model.Annotation;
-import bio.knowledge.model.Reference;
-import bio.knowledge.model.EvidenceCode;
 import bio.knowledge.model.core.AbstractIdentifiedEntity;
 
 /**
@@ -55,7 +49,6 @@ public class AnnotationImpl extends AbstractIdentifiedEntity implements Annotati
 	
 	private EvidenceCode evidenceCode = EvidenceCode.ND ;
 	
-	@Relationship(type="REFERENCE")
     private Reference reference ;
     
     public AnnotationImpl() {}
@@ -132,7 +125,6 @@ public class AnnotationImpl extends AbstractIdentifiedEntity implements Annotati
 	 *  transferring data to the "Reference Evidence" table.
 	 */
 
-	@Transient
 	private String publicationDate = "" ;
 	
 	/* (non-Javadoc)
@@ -158,7 +150,6 @@ public class AnnotationImpl extends AbstractIdentifiedEntity implements Annotati
 		return publicationDate ;
 	}
 	
-	@Transient
 	private String supportingText = "" ;
 	
 	/* (non-Javadoc)

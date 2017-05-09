@@ -1754,7 +1754,7 @@ public class ListView extends BaseView {
       buttonsLayout.setComponentAlignment(operationsLayout, Alignment.MIDDLE_LEFT);
       buttonsLayout.setComponentAlignment(closeButton, Alignment.MIDDLE_RIGHT);
 
-      VerticalLayout wd_details = wd_handler.getDetails(selectedConcept);
+      VerticalLayout wd_details = wd_handler.getDetails(selectedConcept.getId());
       wd_details.addComponent(buttonsLayout);
 
       conceptDetailsWindow.setCaption(conceptName);

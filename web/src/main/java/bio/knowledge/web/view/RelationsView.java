@@ -29,12 +29,14 @@ import com.vaadin.ui.VerticalLayout;
 import bio.knowledge.grid.Grid;
 import bio.knowledge.grid.Grid.ScrollListener;
 import bio.knowledge.model.Concept;
+import bio.knowledge.model.Predicate;
 import bio.knowledge.model.Statement;
 import bio.knowledge.renderer.ButtonRenderer;
 import bio.knowledge.service.KBQuery.RelationSearchMode;
 import bio.knowledge.service.beacon.KnowledgeBeaconService;
 import bio.knowledge.web.ui.DesktopUI;
 import bio.knowledge.web.ui.PopupWindow;
+import bio.knowledge.web.ui.WikiDetailsHandler;
 
 @SpringView(name = RelationsView.NAME)
 public class RelationsView extends NewBaseView {
@@ -48,12 +50,15 @@ public class RelationsView extends NewBaseView {
 
 	@Autowired
 	KnowledgeBeaconService kbService;
+	
+	@Autowired
+	protected WikiDetailsHandler wd_handler;
 
 	private BeanItemContainer<Statement> container = new BeanItemContainer<Statement>(Statement.class);
 	private GeneratedPropertyContainer gpContainer = new GeneratedPropertyContainer(container);
 
 	private Grid dataTable;
-
+	String curies;
 	private int numberOfPages;
 
 	@PostConstruct
@@ -65,7 +70,9 @@ public class RelationsView extends NewBaseView {
 	public void enter(ViewChangeEvent event) {
 		if (event.getParameters() != null) {
 			String[] parameters = event.getParameters().split("/");
-			String curies = String.join(" ", parameters);
+			if(parameters[0] != "") {
+				curies = String.join(" ", parameters);
+			}
 			setupDataTable(curies);
 			refresh(curies);
 		}
@@ -163,11 +170,12 @@ public class RelationsView extends NewBaseView {
 	}
 
 	private boolean isAllDataLoaded = false;
+
 	private void addDataPage(String conceptId) {
-		if (! isAllDataLoaded) {
-			CompletableFuture<List<Statement>> future =
-					kbService.getStatements(conceptId, null, null, numberOfPages, DATAPAGE_SIZE);
-	
+		if (!isAllDataLoaded) {
+			CompletableFuture<List<Statement>> future = kbService.getStatements(conceptId, null, null, numberOfPages,
+					DATAPAGE_SIZE);
+
 			try {
 				List<Statement> statements = future.get(TIME_OUT, TIME_UNIT);
 				container.addAll(statements);
@@ -175,119 +183,106 @@ public class RelationsView extends NewBaseView {
 				if (statements.size() < DATAPAGE_SIZE) {
 					isAllDataLoaded = true;
 				}
-				
+
 			} catch (InterruptedException | ExecutionException | TimeoutException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 
-	// private void onConceptDetailsSelection(RendererClickEvent event,
-	// ConceptRole role) {
-	// Statement statement = (Statement) event.getItemId();
-	// Concept subject = statement.getSubject();
-	// Predicate predicate = statement.getRelation();
-	// Concept object = statement.getObject();
-	//
-	// RelationSearchMode searchMode = query.getRelationSearchMode();
-	// if (searchMode.equals(RelationSearchMode.WIKIDATA) &&
-	// role.equals(ConceptRole.OBJECT)) {
-	//
-	// // This is a WikiData item property value...
-	// wd_handler.displayDataPage(predicate.getId(), object.getName());
-	//
-	// } else {
-	//
-	// DesktopUI ui = (DesktopUI) UI.getCurrent();
-	//
-	// PopupWindow conceptDetailsWindow = new PopupWindow();
-	// conceptDetailsWindow.addStyleName("concept-details-window");
-	// conceptDetailsWindow.center();
-	// conceptDetailsWindow.setSizeUndefined();
-	// conceptDetailsWindow.setResizable(true);
-	//
-	// // int x = 100, y = 400 ;
-	//
-	// String predicateLabel;
-	//
-	// Concept selectedConcept;
-	//
-	// if (role.equals(ConceptRole.SUBJECT)) {
-	// selectedConcept = subject;
-	// } else if (role.equals(ConceptRole.OBJECT)) {
-	// selectedConcept = object;
-	// // x+=400 ;
-	// } else
-	// throw new RuntimeException("Unsupported Relationship Concept Role?");
-	//
-	// String conceptName;
-	//
-	// if (selectedConcept != null) {
-	// conceptName = selectedConcept.getName();
-	// } else {
-	// conceptName = "Unknown concept";
-	// }
-	//
-	// predicateLabel = predicate.getName();
-	//
-	// Button showRelations = new Button("Show Relations");
-	// showRelations.addClickListener(e -> selectionContext(ui,
-	// conceptDetailsWindow, selectedConcept));
-	//
-	// // RMB: 9 September 2016 - deprecating relation table display of
-	// // WikiData
-	// /*
-	// * Button showData = new Button("Find Data") ;
-	// * showData.addClickListener( e -> dataSelectionContext( ui,
-	// * conceptDetailsWindow, selectedConcept ) );
-	// */
-	//
-	// Button addToMap = new Button("Add to Map");
-	// addToMap.addClickListener(e -> {
-	//
-	// ui.addNodeToConceptMap(subject);
-	// ui.addNodeToConceptMap(object);
-	// ui.addEdgeToConceptMap(subject, object, predicateLabel);
-	//
-	// conceptDetailsWindow.close();
-	// });
-	//
-	// Button closeButton = new Button("Close");
-	// closeButton.addClickListener(e -> {
-	// conceptDetailsWindow.close();
-	// });
-	//
-	// HorizontalLayout operationsLayout = new HorizontalLayout();
-	// operationsLayout.addComponent(showRelations);
-	//
-	// // RMB: 9 September 2016 - deprecating relation table display of
-	// // WikiData
-	// // operationsLayout.addComponent(showData);
-	//
-	// operationsLayout.addComponent(addToMap);
-	// operationsLayout.setSpacing(true);
-	//
-	// HorizontalLayout buttonsLayout = new HorizontalLayout();
-	// buttonsLayout.addComponents(operationsLayout, closeButton);
-	//
-	// buttonsLayout.setSpacing(true);
-	// buttonsLayout.setMargin(true);
-	// buttonsLayout.setWidth("100%");
-	//
-	// buttonsLayout.setComponentAlignment(operationsLayout,
-	// Alignment.MIDDLE_LEFT);
-	// buttonsLayout.setComponentAlignment(closeButton, Alignment.MIDDLE_RIGHT);
-	//
-	// VerticalLayout wd_details = wd_handler.getDetails(selectedConcept);
-	// wd_details.addComponent(buttonsLayout);
-	//
-	// conceptDetailsWindow.setCaption(conceptName);
-	// conceptDetailsWindow.setId("introPanel");
-	// conceptDetailsWindow.setContent(wd_details);
-	//
-	// ui.addWindow(conceptDetailsWindow);
-	// }
-	// }
+	private void onConceptDetailsSelection(RendererClickEvent event, ConceptRole role) {
+		Statement statement = (Statement) event.getItemId();
+		Concept subject = statement.getSubject();
+		Predicate predicate = statement.getRelation();
+		Concept object = statement.getObject();
+
+		DesktopUI ui = (DesktopUI) UI.getCurrent();
+
+		PopupWindow conceptDetailsWindow = new PopupWindow();
+		conceptDetailsWindow.addStyleName("concept-details-window");
+		conceptDetailsWindow.center();
+		conceptDetailsWindow.setSizeUndefined();
+		conceptDetailsWindow.setResizable(true);
+
+		// int x = 100, y = 400 ;
+
+		String predicateLabel;
+
+		Concept selectedConcept;
+
+		if (role.equals(ConceptRole.SUBJECT)) {
+			selectedConcept = subject;
+		} else if (role.equals(ConceptRole.OBJECT)) {
+			selectedConcept = object;
+			// x+=400 ;
+		} else
+			throw new RuntimeException("Unsupported Relationship Concept Role?");
+
+		String conceptName;
+
+		if (selectedConcept != null) {
+			conceptName = selectedConcept.getName();
+		} else {
+			conceptName = "Unknown concept";
+		}
+
+		predicateLabel = predicate.getName();
+
+		Button showRelations = new Button("Show Relations");
+		showRelations.addClickListener(e -> selectionContext(ui, conceptDetailsWindow, selectedConcept));
+
+		// RMB: 9 September 2016 - deprecating relation table display of
+		// WikiData
+		/*
+		 * Button showData = new Button("Find Data") ;
+		 * showData.addClickListener( e -> dataSelectionContext( ui,
+		 * conceptDetailsWindow, selectedConcept ) );
+		 */
+
+		Button addToMap = new Button("Add to Map");
+		addToMap.addClickListener(e -> {
+
+			ui.addNodeToConceptMap(subject);
+			ui.addNodeToConceptMap(object);
+			ui.addEdgeToConceptMap(subject, object, predicateLabel);
+
+			conceptDetailsWindow.close();
+		});
+
+		Button closeButton = new Button("Close");
+		closeButton.addClickListener(e -> {
+			conceptDetailsWindow.close();
+		});
+
+		HorizontalLayout operationsLayout = new HorizontalLayout();
+		operationsLayout.addComponent(showRelations);
+
+		// RMB: 9 September 2016 - deprecating relation table display of
+		// WikiData
+		// operationsLayout.addComponent(showData);
+
+		operationsLayout.addComponent(addToMap);
+		operationsLayout.setSpacing(true);
+
+		HorizontalLayout buttonsLayout = new HorizontalLayout();
+		buttonsLayout.addComponents(operationsLayout, closeButton);
+
+		buttonsLayout.setSpacing(true);
+		buttonsLayout.setMargin(true);
+		buttonsLayout.setWidth("100%");
+
+		buttonsLayout.setComponentAlignment(operationsLayout, Alignment.MIDDLE_LEFT);
+		buttonsLayout.setComponentAlignment(closeButton, Alignment.MIDDLE_RIGHT);
+
+		VerticalLayout wd_details = wd_handler.getDetails(curies);
+		wd_details.addComponent(buttonsLayout);
+
+		conceptDetailsWindow.setCaption(conceptName);
+		conceptDetailsWindow.setId("introPanel");
+		conceptDetailsWindow.setContent(wd_details);
+
+		ui.addWindow(conceptDetailsWindow);
+	}
 
 	private void selectionContext(DesktopUI ui, PopupWindow conceptDetailsWindow, Concept selectedConcept) {
 		ui.queryUpdate(selectedConcept, RelationSearchMode.RELATIONS);

@@ -70,9 +70,6 @@ public class WikiDetailsHandler {
 		this.parentUi = ui;
 	}
 
-	@Autowired
-	private KBQuery query;
-
 	private DescriptionBuilder descriptionBuilder = null;
 
 	@Autowired
@@ -81,8 +78,8 @@ public class WikiDetailsHandler {
 	@Autowired
 	private WikiDataService wikiDataService;
 
-	public VerticalLayout getDetails(Concept selectedConcept) {
-		query.setCurrentSelectedConcept(selectedConcept);
+	public VerticalLayout getDetails(String selectedConceptId) {
+		Concept selectedConcept = conceptService.findById(selectedConceptId);
 		try {
 			descriptionBuilder = null; // resetting descriptionBuilder
 			conceptService.getDescription(this::updateDescription);
