@@ -533,7 +533,8 @@ public class ListView extends BaseView {
 
 	private void loadDataTable(VerticalLayout dataTableLayout) {
 
-		BeanItemContainer container = (BeanItemContainer) listContainer.getContainer();
+		BeanItemContainer<IdentifiedEntity> container = 
+				(BeanItemContainer<IdentifiedEntity>) listContainer.getContainer();
 
 		gpcontainer = new GeneratedPropertyContainer(container);
 		

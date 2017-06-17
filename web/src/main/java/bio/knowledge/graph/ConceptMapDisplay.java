@@ -38,6 +38,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.vaadin.annotations.JavaScript;
@@ -54,7 +55,6 @@ import bio.knowledge.graph.jsonmodels.Node;
 import bio.knowledge.graph.jsonmodels.Nodes;
 import bio.knowledge.model.Annotation;
 import bio.knowledge.model.Concept;
-import bio.knowledge.model.GeneralStatement;
 import bio.knowledge.model.Statement;
 import bio.knowledge.web.ui.DesktopUI;
 
@@ -360,8 +360,8 @@ public class ConceptMapDisplay extends AbstractJavaScriptComponent implements Gr
 		// text contains the full text that you want to extract data
 		Matcher matcher = pattern.matcher(content);
 		if (matcher.find()) {
-			String textInBetween = matcher.group(1); // Since (.*?) is
-														// capturing group 1
+			String textInBetween = matcher.group(1); // Since (.*?) is capturing group 1
+			try {
 			JSONObject obj = new JSONObject(textInBetween);
 			JSONObject elements = obj.getJSONObject("elements");
 			if (elements.has("nodes")) {
@@ -406,7 +406,10 @@ public class ConceptMapDisplay extends AbstractJavaScriptComponent implements Gr
 					this.addEdgeToConceptMap(newEdge);
 				}
 			}
-
+			} catch (JSONException jse) {
+				new Notification("kb File JSON error, Could not able to parse concept map details: "+jse.getMessage(),
+						Notification.Type.ERROR_MESSAGE).show(Page.getCurrent());
+			}
 		} else {
 			new Notification("Invalid kb File, Could not able to parse concept map details.",
 					Notification.Type.ERROR_MESSAGE).show(Page.getCurrent());
