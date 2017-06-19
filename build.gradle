@@ -32,7 +32,7 @@ allprojects {
 
 	// Version 4.0 now uses the new Translator Knowledge Beacon API
 	
-	version = '4.0.19' // General upgrade of Gradle and SpringFramework dependencies, with some code fixes
+	version = '4.0.20' // General upgrade of Gradle and SpringFramework dependencies, with some code fixes
 	
     apply plugin: 'maven'
     apply plugin: 'java'
