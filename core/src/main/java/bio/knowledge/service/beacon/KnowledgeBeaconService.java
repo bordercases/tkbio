@@ -80,23 +80,27 @@ public class KnowledgeBeaconService {
 		conceptsApi = new ConceptsApi(apiClient);
 		statementsApi = new StatementsApi(apiClient);
 		evidenceApi = new EvidenceApi(apiClient);
-		aggregatorApi = new AggregatorApi(apiClient);		
+		aggregatorApi = new AggregatorApi(apiClient);
+		refreshBeaconList();
+	}
+	
+	private void refreshBeaconList() {
+		try {
+			beaconIdMap = new HashMap<String, String>();
+			List<bio.knowledge.client.model.KnowledgeBeacon> beacons = aggregatorApi.getBeacons(null);
+			for (bio.knowledge.client.model.KnowledgeBeacon b : beacons) {
+				beaconIdMap.put(b.getId(), b.getName());
+			}
+		} catch (ApiException e) {
+			beaconIdMap = null;
+			throw new RuntimeException(e);
+		}
 	}
 	
 	private String getBeaconNameFromId(String id) {
 		if (beaconIdMap == null) {
-			try {
-				beaconIdMap = new HashMap<String, String>();
-				List<bio.knowledge.client.model.KnowledgeBeacon> beacons = aggregatorApi.getBeacons(null);
-				for (bio.knowledge.client.model.KnowledgeBeacon b : beacons) {
-					beaconIdMap.put(b.getId(), b.getName());
-				}
-			} catch (ApiException e) {
-				beaconIdMap = null;
-				throw new RuntimeException(e);
-			}
+			refreshBeaconList();
 		}
-		
 		return beaconIdMap.get(id);
 	}
 	
