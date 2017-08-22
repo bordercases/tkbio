@@ -14,10 +14,14 @@
   <vaadin-vertical-layout primary-style-name="v-vertical-layout" spacing responsive size-full _id="verticalLayout"> 
    <vaadin-horizontal-split-panel responsive split-position="51.980198%" _id="desktopSplitPanel" :expand> 
     <vaadin-vertical-layout spacing responsive id="relations-layout" size-full margin> 
-     <vaadin-horizontal-layout primary-style-name="v-viewConcepts" responsive width-full _id="viewingConcepts"> 
-      <vaadin-text-field description="Type Concept To Search" input-prompt="Search Concepts" style-name="no-border-radius-right huge main-search-field borderless" width-full _id="search" :expand></vaadin-text-field> 
-      <vaadin-button description="Search" icon="fonticon://FontAwesome/f002" style-name="icon-only no-border-radius-left borderless huge" plain-text _id="searchBtn"></vaadin-button> 
-     </vaadin-horizontal-layout> 
+     <vaadin-vertical-layout>
+      <vaadin-horizontal-layout primary-style-name="v-viewConcepts" responsive width-full _id="viewingConcepts"> 
+       <vaadin-text-field description="Type Concept To Search" input-prompt="Search Concepts" style-name="no-border-radius-right huge main-search-field borderless" width-full _id="search" :expand></vaadin-text-field> 
+        <vaadin-button description="Search" icon="fonticon://FontAwesome/f002" style-name="icon-only no-border-radius-left borderless huge" plain-text _id="searchBtn"></vaadin-button> 
+      </vaadin-horizontal-layout>
+      <vaadin-horizontal-layout _id="searchSettings">
+      </vaadin-horizontal-layout>
+     </vaadin-vertical-layout>
      <vaadin-vertical-layout visible="false" _id="popUpLayout"></vaadin-vertical-layout> 
      <vaadin-tab-sheet style-name="framed padded-tabbar" responsive size-full _id="dataTabSheet" :expand> 
       <tab caption="Relations" selected> 

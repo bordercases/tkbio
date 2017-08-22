@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -79,6 +80,7 @@ import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.PopupView.Content;
 import com.vaadin.ui.Slider;
@@ -101,6 +103,7 @@ import bio.knowledge.model.Annotation;
 import bio.knowledge.model.Concept;
 import bio.knowledge.model.ConceptMapArchive;
 import bio.knowledge.model.GeneralStatement;
+import bio.knowledge.model.QueryType;
 import bio.knowledge.model.SemanticGroup;
 import bio.knowledge.model.Statement;
 import bio.knowledge.model.datasource.ResultSet;
@@ -848,6 +851,15 @@ public class DesktopUI extends UI implements MessageService {
 		desktopView.getSearchBtn().addClickListener(e -> {
 			searchBtnClickListener(searchField, e);
 		});
+		
+		OptionGroup radioGroup = new OptionGroup();
+		radioGroup.addItem(QueryType.KEYWORD);
+		radioGroup.addItem(QueryType.ENGLISH);
+		radioGroup.setItemCaption(QueryType.KEYWORD, "Basic");
+		radioGroup.setItemCaption(QueryType.ENGLISH, "Query");
+		radioGroup.select(QueryType.KEYWORD);
+		radioGroup.addStyleName("horizontal");
+		desktopView.setSearchTypeChooser(radioGroup);
 
 		// Button to reinitialize the query and map
 		desktopView.getClearMapBtn().addClickListener(e -> newQueryConfirmation(e));
@@ -1056,6 +1068,7 @@ public class DesktopUI extends UI implements MessageService {
 		searchBtn.setEnabled(false);
 
 		String queryText = desktopView.getSearch().getValue();
+		QueryType queryType = (QueryType) desktopView.getSearchOptions().getValue();
 
 		// RMB: March 1, 2017 - empty queries seem too problematic now
 		// so we ignore them again!
@@ -1074,36 +1087,42 @@ public class DesktopUI extends UI implements MessageService {
 		queryText = queryText.trim();
 
 		query.setCurrentQueryText(queryText);
+		query.setCurrentQueryType(queryType);
 
 		// Semantic type constraint in Concept-by-text results listing should
 		// initial be empty
 		query.setInitialConceptTypes(new HashSet<SemanticGroup>());
 
-		ConceptSearchResults currentSearchResults = new ConceptSearchResults(viewProvider, ViewName.CONCEPTS_VIEW);
-		conceptSearchWindow = new Window();
-		conceptSearchWindow.setCaption("Concepts Matched by Key Words");
-		conceptSearchWindow.addStyleName("concept-search-window");
-		conceptSearchWindow.center();
-		conceptSearchWindow.setModal(true);
-		conceptSearchWindow.setResizable(true);
+		switch (queryType) {
+		
+		case KEYWORD:
+		
+			ConceptSearchResults currentSearchResults = new ConceptSearchResults(viewProvider, ViewName.CONCEPTS_VIEW);
+			conceptSearchWindow = new Window();
+			conceptSearchWindow.setCaption("Concepts Matched by Key Words");
+			conceptSearchWindow.addStyleName("concept-search-window");
+			conceptSearchWindow.center();
+			conceptSearchWindow.setModal(true);
+			conceptSearchWindow.setResizable(true);
+	
+			// setWindowSize(conceptSearchWindow);
+			conceptSearchWindow.setWidth(120.0f, Unit.EM);
+	
+			conceptSearchWindow.setContent(currentSearchResults);
+	
+			conceptSearchWindow.addCloseListener(event -> {
+				searchBtn.setEnabled(true);
+				gotoStatementsTable();
+			});
 
-		// setWindowSize(conceptSearchWindow);
-		conceptSearchWindow.setWidth(120.0f, Unit.EM);
-
-		conceptSearchWindow.setContent(currentSearchResults);
-
-		conceptSearchWindow.addCloseListener(event -> {
+			UI.getCurrent().addWindow(conceptSearchWindow);
+			break;
+			
+		case ENGLISH:
 			searchBtn.setEnabled(true);
 			gotoStatementsTable();
-		});
-
-		// Attempting dynamic resize - not really working
-
-		// conceptSearchWindow.addResizeListener(
-		// event -> windowSizeHandler(event)
-		// );
-
-		UI.getCurrent().addWindow(conceptSearchWindow);
+			break;
+		}
 	}
 
 	/**

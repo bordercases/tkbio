@@ -39,6 +39,7 @@ import bio.knowledge.model.Concept;
 import bio.knowledge.model.ConceptMapArchive;
 import bio.knowledge.model.Evidence;
 import bio.knowledge.model.Library;
+import bio.knowledge.model.QueryType;
 import bio.knowledge.model.SemanticGroup;
 import bio.knowledge.model.Statement;
 
@@ -52,6 +53,7 @@ import bio.knowledge.model.Statement;
 public class KBQueryImpl implements KBQuery {
 	
 	private String currentQueryText = "" ; 
+	private QueryType currentQueryType;
 
 	/* (non-Javadoc)
 	 * @see bio.knowledge.service.KBQuery#setCurrentQueryText(java.lang.String)
@@ -68,6 +70,17 @@ public class KBQueryImpl implements KBQuery {
 	public String getCurrentQueryText() {
 		return currentQueryText ;
 	}
+	
+	@Override
+	public void setCurrentQueryType(QueryType queryType) {
+		this.currentQueryType = queryType ;
+	}
+	
+	@Override	
+	public QueryType getCurrentQueryType() {
+		return currentQueryType ;
+	}
+	
 	
 	@Autowired
 	private ConceptService conceptService ;

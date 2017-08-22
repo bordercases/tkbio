@@ -55,6 +55,7 @@ import bio.knowledge.datasource.DataSourceRegistry;
 import bio.knowledge.datasource.SimpleDataService;
 import bio.knowledge.datasource.wikidata.WikiDataDataSource;
 import bio.knowledge.model.Concept;
+import bio.knowledge.model.QueryType;
 import bio.knowledge.model.RdfUtil;
 import bio.knowledge.model.SemanticGroup;
 import bio.knowledge.model.Statement;
@@ -68,6 +69,7 @@ import bio.knowledge.service.Cache.CacheLocation;
 import bio.knowledge.service.beacon.KnowledgeBeaconService;
 import bio.knowledge.service.core.IdentifiedEntityServiceImpl;
 import bio.knowledge.service.core.TableSorter;
+import bio.knowledge.service.lang.NaturalQuery;
 
 /**
  * StatementService evolved from KB2 PredicationService
@@ -112,17 +114,30 @@ public class StatementService
 			semgroups = semgroups.trim();
 		}
 		
-		CompletableFuture<List<Statement>> future = kbService.getStatements(emci, extraFilter, semgroups, pageIndex, pageSize);
-		
-		try {
-			List<Statement> statements = future.get(DataService.TIMEOUT_DURATION, DataService.TIMEOUT_UNIT);
+		QueryType queryType = query.getCurrentQueryType();
+		switch (queryType) {
 			
+		case ENGLISH:
 			
+			NaturalQuery query = new NaturalQuery(kbService);
+			query.addConcept("OMIM:603903", "sickle cell anemia");
+			query.addConcept("MESH:D008288", "malaria");
+			return query.getDataPage(pageIndex, pageSize, extraFilter, sorter, isAscending);
 			
-			return statements;
-		} catch (InterruptedException | ExecutionException | TimeoutException e) {
-			e.printStackTrace();
-			return new ArrayList<Statement>();
+		default:
+		case KEYWORD:
+			
+			CompletableFuture<List<Statement>> future = kbService.getStatements(emci, extraFilter, semgroups, pageIndex, pageSize);
+			
+			try {
+				List<Statement> statements = future.get(DataService.TIMEOUT_DURATION, DataService.TIMEOUT_UNIT);
+				
+				return statements;
+			} catch (InterruptedException | ExecutionException | TimeoutException e) {
+				e.printStackTrace();
+				return new ArrayList<Statement>();
+			}	
+			
 		}
 	}
 

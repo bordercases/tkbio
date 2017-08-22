@@ -8,6 +8,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import bio.knowledge.model.Statement;
 import bio.knowledge.model.lang.Concept;
@@ -16,15 +18,17 @@ import bio.knowledge.service.beacon.KnowledgeBeaconService;
 import bio.knowledge.service.core.ListTablePager;
 import bio.knowledge.service.core.TableSorter;
 
-public class Query implements ListTablePager<Statement> {
+public class NaturalQuery implements ListTablePager<Statement> {
 	
 	// todo: add ability to question?
+	// todo: find paths and make sure relevant
+	// todo: relationships (or delete)
 	
 	private Map<String, Concept> concepts = new HashMap<>();
 	private List<Relationship> relationships = new ArrayList<>();
 	private KnowledgeBeaconService kbService;
 	
-	public Query(KnowledgeBeaconService kbService) {
+	public NaturalQuery(KnowledgeBeaconService kbService) {
 		this.kbService = kbService;
 	}
 	
@@ -33,7 +37,6 @@ public class Query implements ListTablePager<Statement> {
 		concepts.put(conceptId, concept);
 	}
 	
-	// todo: delete?
 //	public void addRelationship(String subjectId, String objectId, String text) {
 //		
 //		Concept subject = concepts.get(subjectId);
@@ -43,7 +46,7 @@ public class Query implements ListTablePager<Statement> {
 //		Relationship relationship = new Relationship(subject, object, text);
 //		relationships.add(relationship);
 //	}
-	
+		
 	@Override
 	public List<Statement> getDataPage(int pageNo, int pageSize, String filter, TableSorter sorter, boolean direction) {
 		
@@ -57,12 +60,20 @@ public class Query implements ListTablePager<Statement> {
 		for (Concept subject : concepts.values()) {
 			for (Concept object : concepts.values()) {
 				if (subject != object) {
+					
 					CompletableFuture<List<Statement>> future = kbService.getStatements(subject.getId(), object.getText(), "", pageNo, 5);
+					future = future.thenApply(list -> {
+						Predicate<Statement> isRelevant = s -> (s.getSubject().getName() + s.getRelation().getName() + s.getObject().getName()).contains(object.getText());
+						return list.stream()
+							.filter(isRelevant)
+							.collect(Collectors.toList());
+					});
+					futures.add(future);
 				}
 			}
 		}
 		
-		for (int i = 0, t = 8; i < futures.size(); i++, t /= 2) {
+		for (int i = 0, t = 20; i < futures.size(); i++, t /= 2) {
 			try {
 				statements.addAll(futures.get(i).get(t, TimeUnit.SECONDS));
 			} catch (InterruptedException | ExecutionException | TimeoutException e) {
@@ -70,6 +81,6 @@ public class Query implements ListTablePager<Statement> {
 			}
 		}
 		
-		return null;
+		return statements;
 	}
 }

@@ -33,6 +33,7 @@ import bio.knowledge.model.Concept;
 import bio.knowledge.model.ConceptMapArchive;
 import bio.knowledge.model.Evidence;
 import bio.knowledge.model.Library;
+import bio.knowledge.model.QueryType;
 import bio.knowledge.model.SemanticGroup;
 import bio.knowledge.model.Statement;
 
@@ -53,6 +54,18 @@ public interface KBQuery {
 	 * @return user's current query text
 	 */
 	public String getCurrentQueryText() ;
+	
+	/**
+	 * 
+	 * @param query user's current query type
+	 */
+	public void setCurrentQueryType(QueryType queryType);
+	
+	/**
+	 * 
+	 * @return user's current query type
+	 */
+	public QueryType getCurrentQueryType() ;
 
 	/**
 	 * @param identifier of the user's current query ConceptSemanticType

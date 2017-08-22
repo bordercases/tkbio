@@ -33,6 +33,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.NativeSelect;
+import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Slider;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TextField;
@@ -54,6 +55,8 @@ public class DesktopView extends DesktopDesign implements View {
 	private static final long serialVersionUID = -3941787763184092605L;
 
 	public static final String NAME = "desktop";
+	
+	private OptionGroup searchChooser;
 	
 	public DesktopView() { }
 	
@@ -85,6 +88,26 @@ public class DesktopView extends DesktopDesign implements View {
 	public void setSearchBtn(Button searchBtn) {
 		this.searchBtn = searchBtn;
 	}
+	
+	/**
+	 * @return the searchTypeChooser
+	 */
+	public OptionGroup getSearchOptions() {
+		return searchChooser;
+	}
+
+	/**
+	 * @param optionGroup the OptionGroup to set
+	 */
+	public void setSearchTypeChooser(OptionGroup optionGroup) {
+		if (searchChooser == null) {
+			searchSettings.addComponent(optionGroup);
+		} else {
+			searchSettings.replaceComponent(searchChooser, optionGroup);
+		}
+		searchChooser = optionGroup;
+	}
+
 
 	/**
 	 * @return the demoMapBtn
