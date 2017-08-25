@@ -107,6 +107,7 @@ import bio.knowledge.model.QueryType;
 import bio.knowledge.model.SemanticGroup;
 import bio.knowledge.model.Statement;
 import bio.knowledge.model.datasource.ResultSet;
+import bio.knowledge.model.lang.Entity;
 import bio.knowledge.model.umls.SemanticType;
 import bio.knowledge.model.user.User;
 import bio.knowledge.service.AuthenticationState;
@@ -119,6 +120,9 @@ import bio.knowledge.service.KBQuery.RelationSearchMode;
 import bio.knowledge.service.beacon.KnowledgeBeaconRegistry;
 import bio.knowledge.service.beacon.KnowledgeBeaconService;
 import bio.knowledge.service.core.MessageService;
+import bio.knowledge.service.lang.MonarchScigraphClient;
+import bio.knowledge.service.lang.EntityService;
+import bio.knowledge.service.lang.NaturalQuery;
 import bio.knowledge.service.user.UserService;
 import bio.knowledge.web.KBUploader;
 import bio.knowledge.web.view.AboutView;
@@ -134,6 +138,7 @@ import bio.knowledge.web.view.PasswordResetView;
 import bio.knowledge.web.view.ReferenceView;
 import bio.knowledge.web.view.Registry;
 import bio.knowledge.web.view.ViewName;
+import bio.knowledge.web.view.components.AnnotatedQuery;
 import bio.knowledge.web.view.components.KnowledgeBeaconWindow;
 import bio.knowledge.web.view.components.LibraryDetails;
 import bio.knowledge.web.view.components.SaveWindow;
@@ -171,6 +176,9 @@ public class DesktopUI extends UI implements MessageService {
 	
 	@Autowired
 	KnowledgeBeaconService knowledgeBeaconService;
+	
+	@Autowired
+	MonarchScigraphClient entityClient;
 
 	@Autowired
 	Registry registry;
@@ -859,7 +867,10 @@ public class DesktopUI extends UI implements MessageService {
 		radioGroup.setItemCaption(QueryType.ENGLISH, "Query");
 		radioGroup.select(QueryType.KEYWORD);
 		radioGroup.addStyleName("horizontal");
-		desktopView.setSearchTypeChooser(radioGroup);
+		desktopView.setSearchOptions(radioGroup);
+		
+		AnnotatedQuery annotatedQuery = new AnnotatedQuery("", new ArrayList<>()); // todo: just use setter after this?
+		desktopView.setAnnotatedQuery(annotatedQuery);
 
 		// Button to reinitialize the query and map
 		desktopView.getClearMapBtn().addClickListener(e -> newQueryConfirmation(e));
@@ -1056,6 +1067,16 @@ public class DesktopUI extends UI implements MessageService {
 			}
 		}
 	}
+	
+	private void disableSearch() {
+		desktopView.getSearchBtn().setEnabled(false);
+		desktopView.getAnnotatedQuery().setVisible(false);
+	}
+	
+	private void enableSearch(boolean successful) {
+		desktopView.getSearchBtn().setEnabled(true);
+		desktopView.getAnnotatedQuery().setVisible(successful);
+	}
 
 	/**
 	 * 
@@ -1063,9 +1084,7 @@ public class DesktopUI extends UI implements MessageService {
 	 * @param e
 	 */
 	private void searchBtnClickListener(TextField searchField, ClickEvent e) {
-		// only allows the user to click once
-		Button searchBtn = e.getButton();
-		searchBtn.setEnabled(false);
+		disableSearch();
 
 		String queryText = desktopView.getSearch().getValue();
 		QueryType queryType = (QueryType) desktopView.getSearchOptions().getValue();
@@ -1079,7 +1098,7 @@ public class DesktopUI extends UI implements MessageService {
 					cd -> {
 					}).setContentMode(ConfirmDialog.ContentMode.HTML);
 
-			searchBtn.setEnabled(true);
+			enableSearch(false);
 			searchField.clear();
 			return;
 		}
@@ -1095,6 +1114,7 @@ public class DesktopUI extends UI implements MessageService {
 
 		switch (queryType) {
 		
+		default:
 		case KEYWORD:
 		
 			ConceptSearchResults currentSearchResults = new ConceptSearchResults(viewProvider, ViewName.CONCEPTS_VIEW);
@@ -1111,7 +1131,7 @@ public class DesktopUI extends UI implements MessageService {
 			conceptSearchWindow.setContent(currentSearchResults);
 	
 			conceptSearchWindow.addCloseListener(event -> {
-				searchBtn.setEnabled(true);
+				enableSearch(true);
 				gotoStatementsTable();
 			});
 
@@ -1119,7 +1139,13 @@ public class DesktopUI extends UI implements MessageService {
 			break;
 			
 		case ENGLISH:
-			searchBtn.setEnabled(true);
+			
+			List<Entity> entities = entityClient.getEntities(queryText);
+			AnnotatedQuery annotatedQuery = new AnnotatedQuery(queryText, entities);
+			NaturalQuery natQuery = new NaturalQuery(annotatedQuery.getDefaultEntities());
+			query.setCurrentNaturalQuery(natQuery);
+			desktopView.setAnnotatedQuery(annotatedQuery);
+			enableSearch(true);
 			gotoStatementsTable();
 			break;
 		}

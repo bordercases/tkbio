@@ -42,6 +42,7 @@ import bio.knowledge.model.Library;
 import bio.knowledge.model.QueryType;
 import bio.knowledge.model.SemanticGroup;
 import bio.knowledge.model.Statement;
+import bio.knowledge.service.lang.NaturalQuery;
 
 /**
  * @author Richard
@@ -53,7 +54,6 @@ import bio.knowledge.model.Statement;
 public class KBQueryImpl implements KBQuery {
 	
 	private String currentQueryText = "" ; 
-	private QueryType currentQueryType;
 
 	/* (non-Javadoc)
 	 * @see bio.knowledge.service.KBQuery#setCurrentQueryText(java.lang.String)
@@ -71,6 +71,8 @@ public class KBQueryImpl implements KBQuery {
 		return currentQueryText ;
 	}
 	
+	private QueryType currentQueryType = QueryType.KEYWORD;
+	
 	@Override
 	public void setCurrentQueryType(QueryType queryType) {
 		this.currentQueryType = queryType ;
@@ -79,6 +81,21 @@ public class KBQueryImpl implements KBQuery {
 	@Override	
 	public QueryType getCurrentQueryType() {
 		return currentQueryType ;
+	}
+	
+	private NaturalQuery natQuery;
+	
+	@Override
+	public void setCurrentNaturalQuery(NaturalQuery natQuery) {
+		this.natQuery = natQuery;
+	}
+	
+	/**
+	 * 
+	 * @return user's current disambiguated query object
+	 */
+	public NaturalQuery getCurrentNaturalQuery() {
+		return natQuery;
 	}
 	
 	

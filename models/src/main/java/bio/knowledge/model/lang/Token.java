@@ -2,7 +2,8 @@ package bio.knowledge.model.lang;
 
 import java.util.List;
 
-public class Token {
+public class Token { // todo: use this instead of concept in natquery
+	// todo: rename this and entity
 	
 	private String id;
 	private List<String> categories;

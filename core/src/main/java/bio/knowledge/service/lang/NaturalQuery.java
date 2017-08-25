@@ -13,12 +13,12 @@ import java.util.stream.Collectors;
 
 import bio.knowledge.model.Statement;
 import bio.knowledge.model.lang.Concept;
+import bio.knowledge.model.lang.Entity;
 import bio.knowledge.model.lang.Relationship;
+import bio.knowledge.model.lang.Token;
 import bio.knowledge.service.beacon.KnowledgeBeaconService;
-import bio.knowledge.service.core.ListTablePager;
-import bio.knowledge.service.core.TableSorter;
 
-public class NaturalQuery implements ListTablePager<Statement> {
+public class NaturalQuery {
 	
 	// todo: add ability to question?
 	// todo: find paths and make sure relevant
@@ -26,13 +26,17 @@ public class NaturalQuery implements ListTablePager<Statement> {
 	
 	private Map<String, Concept> concepts = new HashMap<>();
 	private List<Relationship> relationships = new ArrayList<>();
-	private KnowledgeBeaconService kbService;
 	
-	public NaturalQuery(KnowledgeBeaconService kbService) {
-		this.kbService = kbService;
+	public NaturalQuery(List<Entity> entities) {
+		entities.forEach(e -> addConcept(e.getToken()));
 	}
 	
-	public void addConcept(String conceptId, String text) {
+	public void addConcept(Token token) {
+		
+		String conceptId = token.getId();
+		List<String> terms = token.getTerms();
+		String text = terms.size() > 0? terms.get(0) : "";
+		
 		Concept concept = new Concept(conceptId, text);
 		concepts.put(conceptId, concept);
 	}
@@ -47,8 +51,7 @@ public class NaturalQuery implements ListTablePager<Statement> {
 //		relationships.add(relationship);
 //	}
 		
-	@Override
-	public List<Statement> getDataPage(int pageNo, int pageSize, String filter, TableSorter sorter, boolean direction) {
+	public List<Statement> getDataPage(KnowledgeBeaconService kbService, int pageNo, int pageSize, String filter) { // todo: use filter or not
 		
 		int n = concepts.size();
 		int pairs = n * (n - 1) / 2; // see: Triangular Number Sequence
@@ -56,31 +59,32 @@ public class NaturalQuery implements ListTablePager<Statement> {
 		
 		List<CompletableFuture<List<Statement>>> futures = new ArrayList<>();
 		List<Statement> statements = new ArrayList<>();
-		
-		for (Concept subject : concepts.values()) {
-			for (Concept object : concepts.values()) {
-				if (subject != object) {
-					
-					CompletableFuture<List<Statement>> future = kbService.getStatements(subject.getId(), object.getText(), "", pageNo, 5);
-					future = future.thenApply(list -> {
-						Predicate<Statement> isRelevant = s -> (s.getSubject().getName() + s.getRelation().getName() + s.getObject().getName()).contains(object.getText());
-						return list.stream()
-							.filter(isRelevant)
-							.collect(Collectors.toList());
-					});
-					futures.add(future);
-				}
-			}
-		}
-		
-		for (int i = 0, t = 20; i < futures.size(); i++, t /= 2) {
-			try {
-				statements.addAll(futures.get(i).get(t, TimeUnit.SECONDS));
-			} catch (InterruptedException | ExecutionException | TimeoutException e) {
-				// todo: error log?
-			}
-		}
-		
 		return statements;
+		
+//		for (Concept subject : concepts.values()) {
+//			for (Concept object : concepts.values()) {
+//				if (subject != object) {
+//					
+//					CompletableFuture<List<Statement>> future = kbService.getStatements(subject.getId(), object.getText(), "", pageNo, 5);
+//					future = future.thenApply(list -> {
+//						Predicate<Statement> isRelevant = s -> (s.getSubject().getName() + s.getRelation().getName() + s.getObject().getName()).contains(object.getText());
+//						return list.stream()
+//							.filter(isRelevant)
+//							.collect(Collectors.toList());
+//					});
+//					futures.add(future);
+//				}
+//			}
+//		}
+//		
+//		for (int i = 0, t = 20; i < futures.size(); i++, t /= 2) {
+//			try {
+//				statements.addAll(futures.get(i).get(t, TimeUnit.SECONDS));
+//			} catch (InterruptedException | ExecutionException | TimeoutException e) {
+//				// todo: error log?
+//			}
+//		}
+//		
+//		return statements;
 	}
 }

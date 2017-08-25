@@ -30,7 +30,7 @@ public class DesktopDesign extends VerticalLayout {
 	protected HorizontalLayout viewingConcepts;
 	protected TextField search;
 	protected Button searchBtn;
-	protected HorizontalLayout searchSettings;
+	protected VerticalLayout searchSettings;
 	protected VerticalLayout popUpLayout;
 	protected TabSheet dataTabSheet;
 	protected VerticalLayout relationsTab;

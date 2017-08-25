@@ -43,6 +43,7 @@ import com.vaadin.ui.VerticalLayout;
 
 import bio.knowledge.web.design.DesktopDesign;
 import bio.knowledge.web.ui.DesktopUI;
+import bio.knowledge.web.view.components.AnnotatedQuery;
 
 /**
  * @author Richard
@@ -56,7 +57,8 @@ public class DesktopView extends DesktopDesign implements View {
 
 	public static final String NAME = "desktop";
 	
-	private OptionGroup searchChooser;
+	private OptionGroup searchChooser; // todo: move this somewhere
+	private AnnotatedQuery annotatedQuery;
 	
 	public DesktopView() { }
 	
@@ -90,22 +92,35 @@ public class DesktopView extends DesktopDesign implements View {
 	}
 	
 	/**
-	 * @return the searchTypeChooser
+	 * @return the searchOptions
 	 */
 	public OptionGroup getSearchOptions() {
 		return searchChooser;
 	}
 
 	/**
-	 * @param optionGroup the OptionGroup to set
+	 * @param radioGroup the OptionGroup to set
 	 */
-	public void setSearchTypeChooser(OptionGroup optionGroup) {
+	public void setSearchOptions(OptionGroup radioGroup) {
 		if (searchChooser == null) {
-			searchSettings.addComponent(optionGroup);
+			searchSettings.addComponentAsFirst(radioGroup);
 		} else {
-			searchSettings.replaceComponent(searchChooser, optionGroup);
+			searchSettings.replaceComponent(searchChooser, radioGroup);
 		}
-		searchChooser = optionGroup;
+		searchChooser = radioGroup;
+	}
+	
+	public AnnotatedQuery getAnnotatedQuery() {
+		return annotatedQuery;
+	}
+	
+	public void setAnnotatedQuery(AnnotatedQuery queryComponent) {
+		if (annotatedQuery == null) {
+			searchSettings.addComponent(queryComponent);
+		} else {
+			searchSettings.replaceComponent(annotatedQuery, queryComponent);
+		}
+		annotatedQuery = queryComponent;
 	}
 
 

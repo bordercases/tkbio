@@ -36,6 +36,7 @@ import bio.knowledge.model.Library;
 import bio.knowledge.model.QueryType;
 import bio.knowledge.model.SemanticGroup;
 import bio.knowledge.model.Statement;
+import bio.knowledge.service.lang.NaturalQuery;
 
 /**
  * @author Richard
@@ -66,6 +67,18 @@ public interface KBQuery {
 	 * @return user's current query type
 	 */
 	public QueryType getCurrentQueryType() ;
+	
+	/**
+	 * 
+	 * @param query user's current disambiguated query object
+	 */
+	public void setCurrentNaturalQuery(NaturalQuery natQuery);
+	
+	/**
+	 * 
+	 * @return user's current disambiguated query object
+	 */
+	public NaturalQuery getCurrentNaturalQuery() ;
 
 	/**
 	 * @param identifier of the user's current query ConceptSemanticType

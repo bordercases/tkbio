@@ -117,13 +117,6 @@ public class StatementService
 		QueryType queryType = query.getCurrentQueryType();
 		switch (queryType) {
 			
-		case ENGLISH:
-			
-			NaturalQuery query = new NaturalQuery(kbService);
-			query.addConcept("OMIM:603903", "sickle cell anemia");
-			query.addConcept("MESH:D008288", "malaria");
-			return query.getDataPage(pageIndex, pageSize, extraFilter, sorter, isAscending);
-			
 		default:
 		case KEYWORD:
 			
@@ -136,8 +129,11 @@ public class StatementService
 			} catch (InterruptedException | ExecutionException | TimeoutException e) {
 				e.printStackTrace();
 				return new ArrayList<Statement>();
-			}	
+			}
 			
+		case ENGLISH:
+			
+			return query.getCurrentNaturalQuery().getDataPage(kbService, pageIndex, pageSize, extraFilter);
 		}
 	}
 
