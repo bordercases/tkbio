@@ -120,9 +120,10 @@ import bio.knowledge.service.KBQuery.RelationSearchMode;
 import bio.knowledge.service.beacon.KnowledgeBeaconRegistry;
 import bio.knowledge.service.beacon.KnowledgeBeaconService;
 import bio.knowledge.service.core.MessageService;
-import bio.knowledge.service.lang.MonarchScigraphClient;
+import bio.knowledge.service.lang.EntityService;
 import bio.knowledge.service.lang.EntityService;
 import bio.knowledge.service.lang.NaturalQuery;
+import bio.knowledge.service.lang.ParserService;
 import bio.knowledge.service.user.UserService;
 import bio.knowledge.web.KBUploader;
 import bio.knowledge.web.view.AboutView;
@@ -178,7 +179,10 @@ public class DesktopUI extends UI implements MessageService {
 	KnowledgeBeaconService knowledgeBeaconService;
 	
 	@Autowired
-	MonarchScigraphClient entityClient;
+	EntityService entityService;
+	
+	@Autowired
+	ParserService parserService;
 
 	@Autowired
 	Registry registry;
@@ -1140,8 +1144,9 @@ public class DesktopUI extends UI implements MessageService {
 			
 		case ENGLISH:
 			
-			List<Entity> entities = entityClient.getEntities(queryText);
+			List<Entity> entities = entityService.getEntities(queryText);
 			AnnotatedQuery annotatedQuery = new AnnotatedQuery(queryText, entities);
+			parserService.parse(queryText, annotatedQuery.getEntitySpans(), annotatedQuery.getTextSpans());
 			NaturalQuery natQuery = new NaturalQuery(annotatedQuery.getDefaultEntities());
 			query.setCurrentNaturalQuery(natQuery);
 			desktopView.setAnnotatedQuery(annotatedQuery);

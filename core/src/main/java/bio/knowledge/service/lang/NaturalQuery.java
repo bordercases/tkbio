@@ -51,7 +51,7 @@ public class NaturalQuery {
 //		relationships.add(relationship);
 //	}
 		
-	public List<Statement> getDataPage(KnowledgeBeaconService kbService, int pageNo, int pageSize, String filter) { // todo: use filter or not
+	public List<Statement> getDataPage(KnowledgeBeaconService kbService, int pageNumber, int pageSize, String filter) { // todo: use filter or not
 		
 		int n = concepts.size();
 		int pairs = n * (n - 1) / 2; // see: Triangular Number Sequence
@@ -59,32 +59,35 @@ public class NaturalQuery {
 		
 		List<CompletableFuture<List<Statement>>> futures = new ArrayList<>();
 		List<Statement> statements = new ArrayList<>();
-		return statements;
 		
-//		for (Concept subject : concepts.values()) {
-//			for (Concept object : concepts.values()) {
-//				if (subject != object) {
-//					
-//					CompletableFuture<List<Statement>> future = kbService.getStatements(subject.getId(), object.getText(), "", pageNo, 5);
-//					future = future.thenApply(list -> {
-//						Predicate<Statement> isRelevant = s -> (s.getSubject().getName() + s.getRelation().getName() + s.getObject().getName()).contains(object.getText());
-//						return list.stream()
-//							.filter(isRelevant)
-//							.collect(Collectors.toList());
-//					});
-//					futures.add(future);
-//				}
-//			}
-//		}
-//		
-//		for (int i = 0, t = 20; i < futures.size(); i++, t /= 2) {
-//			try {
-//				statements.addAll(futures.get(i).get(t, TimeUnit.SECONDS));
-//			} catch (InterruptedException | ExecutionException | TimeoutException e) {
-//				// todo: error log?
-//			}
-//		}
-//		
-//		return statements;
+		int j = 0;
+		for (Concept subject : concepts.values()) {
+			for (Concept object : concepts.values()) {
+				if (subject != object) {
+					j++;
+					if (j != pageNumber) break;
+					
+					CompletableFuture<List<Statement>> future = kbService.getStatements(subject.getId(), object.getText(), "", pageNumber, 5);
+					future = future.thenApply(list -> {
+						Predicate<Statement> isRelevant = s -> (s.getSubject().getName() + s.getRelation().getName() + s.getObject().getName()).contains(object.getText());
+						return list.stream()
+							.filter(isRelevant)
+							.collect(Collectors.toList());
+					});
+					futures.add(future);
+				}
+			}
+		}
+		
+		for (int i = 0, t = 20; i < futures.size(); i++, t /= 2) {
+			try {
+				statements.addAll(futures.get(i).get(t, TimeUnit.SECONDS));
+			} catch (InterruptedException | ExecutionException | TimeoutException e) {
+				// todo: error log?
+				System.out.println("fail");
+			}
+		}
+		
+		return statements;
 	}
 }

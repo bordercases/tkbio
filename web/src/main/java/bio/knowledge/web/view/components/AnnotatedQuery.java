@@ -19,6 +19,12 @@ import bio.knowledge.model.lang.Entity;
 
 public class AnnotatedQuery extends CustomLayout {
 	
+	//todo: default is longest range NOT longest length (delete too)
+	//todo: move util duplication
+	
+	private RangeSet<Integer> spans;
+	private RangeSet<Integer> antispans;
+	
 	private List<ComboBox> dropdowns = new ArrayList<>();
 	private Map<Range<Integer>, List<Entity>> optionLists = new HashMap<>();
 
@@ -30,11 +36,11 @@ public class AnnotatedQuery extends CustomLayout {
 			return;
 		}
 						
-		RangeSet<Integer> spans = TreeRangeSet.create();
+		spans = TreeRangeSet.create();
 		List<Range<Integer>> ranges = map(this::createRange, entities);
 		ranges.forEach(e -> spans.add(e));
 				
-		RangeSet<Integer> antispans = TreeRangeSet.create();
+		antispans = TreeRangeSet.create();
 		antispans.add(createRange(text));
 		antispans.removeAll(spans);
 		
@@ -74,9 +80,11 @@ public class AnnotatedQuery extends CustomLayout {
 		return entities;
 	}
 	
-	public List<Entity> getSelectedEntities() {
-		List<Entity> entities = map(d -> (Entity) d.getValue(), dropdowns);
-		return entities;
+	public RangeSet<Integer> getEntitySpans() { // todo: do properly for selected
+		return spans;
+	}
+	public RangeSet<Integer> getTextSpans() {
+		return antispans;
 	}
 	
 	private <T> List<T> interleave(List<T> l1, List<T> l2) {

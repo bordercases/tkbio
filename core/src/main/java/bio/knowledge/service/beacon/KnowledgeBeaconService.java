@@ -70,7 +70,7 @@ public class KnowledgeBeaconService {
 	private AggregatorApi aggregatorApi;
 	
 	private List<String> customBeacons = null;
-	private String sessionId = null;
+	private String sessionId = "meerag";
 	private Map<String, String> beaconIdMap;
 	
 	@PostConstruct
