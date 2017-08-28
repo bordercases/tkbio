@@ -133,7 +133,7 @@ public class StatementService
 			
 		case ENGLISH:
 			
-			return query.getCurrentNaturalQuery().getDataPage(kbService, pageIndex, pageSize, extraFilter);
+			return query.getCurrentNaturalQuery().getDataPage(kbService, pageIndex, pageSize);
 		}
 	}
 

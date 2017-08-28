@@ -1,6 +1,8 @@
 package bio.knowledge.service.lang;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +26,7 @@ public class NaturalQuery {
 	// todo: find paths and make sure relevant
 	// todo: relationships (or delete)
 	
+	private KnowledgeBeaconService kbService;
 	private Map<String, Concept> concepts = new HashMap<>();
 	private List<Relationship> relationships = new ArrayList<>();
 	
@@ -51,43 +54,89 @@ public class NaturalQuery {
 //		relationships.add(relationship);
 //	}
 		
-	public List<Statement> getDataPage(KnowledgeBeaconService kbService, int pageNumber, int pageSize, String filter) { // todo: use filter or not
+	public List<Statement> getDataPage(KnowledgeBeaconService kbService, int pageNumber, int pageSize) {
+		this.kbService = kbService;
+		List<Concept> c = new ArrayList<>(concepts.values());
+		return getConnections(c, new ArrayList<>(), pageNumber, pageSize);
+	}
+	
+	private List<Statement> getConnections(List<Concept> unknowns, List<Concept> knowns, int pageNumber, int pageSize) {
 		
-		int n = concepts.size();
-		int pairs = n * (n - 1) / 2; // see: Triangular Number Sequence
-		// todo: handle 0 or less pairs
+		// look for connections between unknowns
+		// (in addition to connections from unknowns to knowns)
+		// (and prepend so loop index doesn't double-search each pair of unknowns)
+		knowns.addAll(0, unknowns);
 		
 		List<CompletableFuture<List<Statement>>> futures = new ArrayList<>();
+		List<String> objects = new ArrayList<>();
 		List<Statement> statements = new ArrayList<>();
 		
-		int j = 0;
-		for (Concept subject : concepts.values()) {
-			for (Concept object : concepts.values()) {
-				if (subject != object) {
-					j++;
-					if (j != pageNumber) break;
-					
-					CompletableFuture<List<Statement>> future = kbService.getStatements(subject.getId(), object.getText(), "", pageNumber, 5);
-					future = future.thenApply(list -> {
-						Predicate<Statement> isRelevant = s -> (s.getSubject().getName() + s.getRelation().getName() + s.getObject().getName()).contains(object.getText());
-						return list.stream()
-							.filter(isRelevant)
-							.collect(Collectors.toList());
-					});
-					futures.add(future);
-				}
+		for (int i = 0; i < unknowns.size(); i++) {
+			for (int j = i; j < knowns.size(); j++) {
+				Concept subject = unknowns.get(i);
+				Concept object = knowns.get(j);
+
+				String filter = (subject == object)? "subclass" : object.getText();
+				
+				CompletableFuture<List<Statement>> future = kbService.getStatements(subject.getId(), filter, "", pageNumber, 5);
+
+				futures.add(future);
+				objects.add(subject == object? null : object.getText());
 			}
 		}
 		
-		for (int i = 0, t = 20; i < futures.size(); i++, t /= 2) {
-			try {
-				statements.addAll(futures.get(i).get(t, TimeUnit.SECONDS));
-			} catch (InterruptedException | ExecutionException | TimeoutException e) {
-				// todo: error log?
-				System.out.println("fail");
-			}
+		for (	int i = 0, t = 20;
+				i < futures.size();
+				i++, t /= 2
+			) {
+			
+			CompletableFuture<List<Statement>> future = futures.get(i);
+			String object = objects.get(i);
+			
+			List<Statement> response = waitFor(future, t);
+			if (response == null) continue;
+			System.out.println("123 response: " + response);
+//			List<Statement> relevant = filter(response, object);
+//			System.out.println("123 relevant: " + relevant);
+			statements.addAll(response);
+						
+			List<Statement> interesting = filter(response, "subclass");
+			System.out.println("123 interest: " + interesting);
+
 		}
 		
 		return statements;
 	}
+	
+	private List<Statement> filter(List<Statement> statements, String keywords) {
+		if (keywords == null || keywords.equals("")) return new ArrayList<>();
+		return statements.stream()
+				.filter(s -> (
+						s.getSubject().getName()
+						+ s.getRelation().getName()
+						+ s.getObject().getName()
+					).contains(keywords))
+				.collect(Collectors.toList());
+	}
+	
+//	private List<String> wordsIn(Statement s) {
+//		return Arrays.asList(
+//			s.getSubject().getName().split(" "),
+//			s.getRelation().getName().split(" "),
+//			s.getObject().getName().split(" ")
+//		).stream()
+//			.flatMap(Arrays::stream)
+//			.collect(Collectors.toList());
+//	}
+	
+	private <T> T waitFor(CompletableFuture<T> future, int timeout) {
+		try {
+			return future.get(timeout, TimeUnit.SECONDS);
+		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+			// todo: errorlog
+			System.out.println("123 fail: " + e.getMessage());
+			return null;
+		}
+	}
+
 }

@@ -238,6 +238,9 @@ public class KnowledgeBeaconService {
 	) {
 		CompletableFuture<List<Statement>> future = CompletableFuture.supplyAsync(new Supplier<List<Statement>>() {
 
+			/* (non-Javadoc)
+			 * @see java.util.function.Supplier#get()
+			 */
 			@Override
 			public List<Statement> get() {
 				List<Statement> statements = new ArrayList<Statement>();
@@ -275,7 +278,7 @@ public class KnowledgeBeaconService {
 
 
 				} catch (Exception e) {
-
+					System.err.println(e.getMessage());
 				}
 				
 				return statements;
