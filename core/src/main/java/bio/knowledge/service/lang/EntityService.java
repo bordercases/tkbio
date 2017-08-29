@@ -12,7 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import bio.knowledge.model.lang.Entity;
 import bio.knowledge.model.lang.PosTag;
 
-@Service // todo: service?
+@Service
 public class EntityService {
 	
 	private final String BASE_PATH = "https://scigraph-data.monarchinitiative.org/scigraph";

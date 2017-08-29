@@ -116,7 +116,12 @@ public class StatementService
 		
 		QueryType queryType = query.getCurrentQueryType();
 		switch (queryType) {
-			
+
+		case ENGLISH:
+			if (query.getCurrentNaturalQuery() != null) {
+				return query.getCurrentNaturalQuery().getDataPage(kbService, pageIndex, pageSize);
+			}
+		
 		default:
 		case KEYWORD:
 			
@@ -131,9 +136,6 @@ public class StatementService
 				return new ArrayList<Statement>();
 			}
 			
-		case ENGLISH:
-			
-			return query.getCurrentNaturalQuery().getDataPage(kbService, pageIndex, pageSize);
 		}
 	}
 

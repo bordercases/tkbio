@@ -57,7 +57,7 @@ public class DesktopView extends DesktopDesign implements View {
 
 	public static final String NAME = "desktop";
 	
-	private OptionGroup searchChooser; // todo: move this somewhere
+	private OptionGroup searchChooser;
 	private AnnotatedQuery annotatedQuery;
 	
 	public DesktopView() { }

@@ -10,7 +10,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import bio.knowledge.model.Statement;
@@ -21,10 +20,6 @@ import bio.knowledge.model.lang.Token;
 import bio.knowledge.service.beacon.KnowledgeBeaconService;
 
 public class NaturalQuery {
-	
-	// todo: add ability to question?
-	// todo: find paths and make sure relevant
-	// todo: relationships (or delete)
 	
 	private KnowledgeBeaconService kbService;
 	private Map<String, Concept> concepts = new HashMap<>();
@@ -95,13 +90,13 @@ public class NaturalQuery {
 			
 			List<Statement> response = waitFor(future, t);
 			if (response == null) continue;
-			System.out.println("123 response: " + response);
-//			List<Statement> relevant = filter(response, object);
-//			System.out.println("123 relevant: " + relevant);
+//			List<Statement> relevant = filter(response, object); // uncomment to filter results by keyword
 			statements.addAll(response);
 						
 			List<Statement> interesting = filter(response, "subclass");
-			System.out.println("123 interest: " + interesting);
+			// TODO: interesting statements can be recursively searched for
+			// (outside of this loop, and added to statements)
+			// eg. getConnections(interesting, knowns, pageNumber, pageSize) 
 
 		}
 		
@@ -133,8 +128,7 @@ public class NaturalQuery {
 		try {
 			return future.get(timeout, TimeUnit.SECONDS);
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
-			// todo: errorlog
-			System.out.println("123 fail: " + e.getMessage());
+			System.err.println(e.getMessage());
 			return null;
 		}
 	}

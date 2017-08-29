@@ -18,15 +18,13 @@ import com.vaadin.ui.CustomLayout;
 import bio.knowledge.model.lang.Entity;
 
 public class AnnotatedQuery extends CustomLayout {
-	
-	//todo: default is longest range NOT longest length (delete too)
-	//todo: move util duplication
-	
+		
 	private RangeSet<Integer> spans;
 	private RangeSet<Integer> antispans;
 	
-	private List<ComboBox> dropdowns = new ArrayList<>();
+	private Map<Range<Integer>, ComboBox> dropdowns = new HashMap<>();
 	private Map<Range<Integer>, List<Entity>> optionLists = new HashMap<>();
+	private Map<Range<Integer>, Entity> selections = new HashMap<>();
 
 	public AnnotatedQuery(String text, List<Entity> entities) {
 		
@@ -69,18 +67,19 @@ public class AnnotatedQuery extends CustomLayout {
 		String annotatedText = String.join("", ordered);
 		
 		setTemplateContents(annotatedText);
+		
 	}
 	
 	public void addSelectionListener() {
 		//getcom
 	}
 	
-	public List<Entity> getDefaultEntities() { // todo: remove + have outside give default choice, not this class
+	public List<Entity> getDefaultEntities() {
 		List<Entity> entities = map(o -> o.get(0), optionLists.values());
 		return entities;
 	}
 	
-	public RangeSet<Integer> getEntitySpans() { // todo: do properly for selected
+	public RangeSet<Integer> getEntitySpans() { // TODO: do properly for selected
 		return spans;
 	}
 	public RangeSet<Integer> getTextSpans() {
@@ -104,12 +103,18 @@ public class AnnotatedQuery extends CustomLayout {
 	private String makeClickable(String s, Range<Integer> r) {
 		
 		List<Entity> options = optionLists.get(r);
-		ComboBox dropdown = new ComboBox();
+		selections.put(r, options.get(0));
+
+		ComboBox dropdown = new ComboBox();		
 		dropdown.addItems(options);
-		dropdown.setNullSelectionItemId(options.get(0)); // todo: allow actual empty selection in case not a noun?
+		dropdown.setNullSelectionItemId(selections.get(r));
+		dropdown.addValueChangeListener(e -> {
+			selections.put(r, (Entity) dropdowns.get(r).getValue());
+		});
 		
 		addComponent(dropdown, r.toString());
-		dropdowns.add(dropdown);
+		dropdowns.put(r, dropdown);
+
 		
 		return "<span location='" + r + "'></span>";
 	}

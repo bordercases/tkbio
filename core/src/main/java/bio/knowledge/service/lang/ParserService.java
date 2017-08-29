@@ -16,6 +16,7 @@ import com.google.gwt.thirdparty.guava.common.collect.Range;
 import com.google.gwt.thirdparty.guava.common.collect.RangeSet;
 
 import bio.knowledge.model.lang.Concept;
+import bio.knowledge.model.lang.Entity;
 import bio.knowledge.model.lang.Relationship;
 import opennlp.tools.cmdline.parser.ParserTool;
 import opennlp.tools.parser.Parse;
@@ -28,10 +29,12 @@ import opennlp.tools.util.Span;
 @Service
 public class ParserService {
 	
-//	private static final List<String> NOUN = Arrays.asList("NN", "NNS", "NNP", "NNPS");
+	private static final List<String> TOKEN = Arrays.asList("TK");
+	private static final List<String> NOUN = Arrays.asList("NN", "NNS", "NNP", "NNPS");
 	private static final List<String> NOUN_PHRASE = Arrays.asList("NP", "NX");
 	private static final List<String> VERB = Arrays.asList("VB", "VBD", "VBG", "VBN", "VBP", "VBZ");
 	private static final List<String> VERB_PHRASE = Arrays.asList("VP");
+	private static final List<String> ADJECTIVE = Arrays.asList("JJ", "JJR", "JJS");
 	private static final List<String> CLAUSE = Arrays.asList("S", "SBAR", "SBARQ", "SINV", "SQ");
 
 	private Parser parser;
@@ -39,7 +42,7 @@ public class ParserService {
 	public ParserService() {
 				
 		try {
-			File file = new File("/Users/meera/Documents/knowledge-bio/tkbio/core/src/main/resources/en-parser-chunking.bin"); // todo: get in portable way
+			File file = new File(getClass().getClassLoader().getResource("en-parser-chunking.bin").getFile());
 			ParserModel model = new ParserModel(file);
 			parser = new Parser(model);
 			
@@ -48,31 +51,53 @@ public class ParserService {
 		}
 	}
 	
-	public List<Relationship> parse(String text, RangeSet<Integer> spans, RangeSet<Integer> antispans) { // todo: make work with multiple sentences
-		System.out.println("123 new parse");
-		Parse[] parses = ParserTool.parseLine(text, parser, makeTokenizer(spans, antispans), 20);
-		List<Relationship> relations = new ArrayList<>();
-		for (Parse parse : parses) {
-			relations = extractRelations(parse);
-			System.out.println();
-			parse.show();
-			relations.forEach(r -> {
-				System.out.println(
-						r == null?
-							"NO RELATION"
-						:
-							(r.getSubject() == null? "NONE" : r.getSubject().getText())
-							+ " -["
-							+ r.getText()
-							+ "]-> "
-							+ (r.getObject() == null? "NONE" : r.getObject().getText())
-				);
-			});
-			
-		}
-		return relations;
+	public List<Entity> filterLexical(String text, List<Entity> entities) {
+		Parse[] parses = ParserTool.parseLine(text, parser, 1);
+		parses[0].show();
+		entities = new ArrayList<Entity>(entities);
+		removeNonLexical(parses[0], entities);
+		return entities;
 	}
 	
+	private void removeNonLexical(Parse parse, List<Entity> entities) {
+		if (parse.getChildCount() == 1 && hasType(parse.getChildren()[0], TOKEN)) {
+			if (! (hasType(parse, NOUN) || hasType(parse, ADJECTIVE))
+				) {
+				entities.removeIf(e ->
+					parse.getSpan().getStart() <= e.getStart()
+					&& e.getEnd() <= parse.getSpan().getEnd());
+			}
+		} else {
+			for (Parse child : parse.getChildren()) {
+				removeNonLexical(child, entities);
+			}
+		}
+	}
+	
+//	public List<Relationship> parse(String text, RangeSet<Integer> spans, RangeSet<Integer> antispans) {
+//		Parse[] parses = ParserTool.parseLine(text, parser, makeTokenizer(spans, antispans), 20);
+//		List<Relationship> relations = new ArrayList<>();
+//		for (Parse parse : parses) {
+//			relations = extractRelations(parse);
+//			System.out.println();
+//			parse.show();
+//			relations.forEach(r -> {
+//				System.out.println(
+//						r == null?
+//							"NO RELATION"
+//						:
+//							(r.getSubject() == null? "NONE" : r.getSubject().getText())
+//							+ " -["
+//							+ r.getText()
+//							+ "]-> "
+//							+ (r.getObject() == null? "NONE" : r.getObject().getText())
+//				);
+//			});
+//			
+//		}
+//		return relations;
+//	}
+//	
 	private List<Relationship> extractRelations(Parse phrase) {
 		
 		List<Relationship> relations = new ArrayList<>();
@@ -89,7 +114,7 @@ public class ParserService {
 
 	}
 	
-	private Relationship makeRelation(Parse clause) { // todo: handle conjunction
+	private Relationship makeRelation(Parse clause) {
 		
 		Relationship relation = new Relationship();
 		for (Parse child : clause.getChildren()) {

@@ -873,7 +873,7 @@ public class DesktopUI extends UI implements MessageService {
 		radioGroup.addStyleName("horizontal");
 		desktopView.setSearchOptions(radioGroup);
 		
-		AnnotatedQuery annotatedQuery = new AnnotatedQuery("", new ArrayList<>()); // todo: just use setter after this?
+		AnnotatedQuery annotatedQuery = new AnnotatedQuery("", new ArrayList<>());
 		desktopView.setAnnotatedQuery(annotatedQuery);
 
 		// Button to reinitialize the query and map
@@ -1145,8 +1145,8 @@ public class DesktopUI extends UI implements MessageService {
 		case ENGLISH:
 			
 			List<Entity> entities = entityService.getEntities(queryText);
+			entities = parserService.filterLexical(queryText, entities);
 			AnnotatedQuery annotatedQuery = new AnnotatedQuery(queryText, entities);
-			parserService.parse(queryText, annotatedQuery.getEntitySpans(), annotatedQuery.getTextSpans());
 			NaturalQuery natQuery = new NaturalQuery(annotatedQuery.getDefaultEntities());
 			query.setCurrentNaturalQuery(natQuery);
 			desktopView.setAnnotatedQuery(annotatedQuery);
