@@ -12,6 +12,13 @@ import org.neo4j.ogm.annotation.Transient;
 
 import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
 
+/**
+ * Contains authentication details and user profile information.
+ * User IDs are only used to annotate concept maps with their authors.
+ * 
+ * @author Meera Godden
+ *
+ */
 public class User extends Neo4jAbstractIdentifiedEntity {
 
 	private String userId;
@@ -52,6 +59,10 @@ public class User extends Neo4jAbstractIdentifiedEntity {
 		return email;
 	}
 	
+	
+	/**
+	 * @param username (NOT a valid email address)
+	 */
 	public void setUsername(String username) {
 		this.username = username;
 	}

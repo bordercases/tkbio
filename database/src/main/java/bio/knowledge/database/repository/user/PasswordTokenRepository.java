@@ -11,6 +11,11 @@ public interface PasswordTokenRepository extends GraphRepository<PasswordResetTo
 	@Query("CREATE CONSTRAINT ON (token:PasswordResetToken) ASSERT token.token IS UNIQUE")
 	void createUniqueConstraintOnToken();
 	
+	/**
+	 * 
+	 * @param token string
+	 * @return token node with associated user node
+	 */
 	@Query("MATCH path = (token:PasswordResetToken) -[*0..1]- ()"
 		+ " WHERE token.token = {token}"
 		+ " RETURN token, nodes(path), relationships(path)")

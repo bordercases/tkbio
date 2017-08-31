@@ -7,6 +7,14 @@ import org.neo4j.ogm.annotation.Relationship;
 
 import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
 
+/**
+ * Used to manage concept map sharing.
+ * Group IDs are only used to annotate concept maps.
+ * Groups' full names are intended to be unique.
+ * 
+ * @author Meera Godden
+ *
+ */
 public class Group extends Neo4jAbstractIdentifiedEntity {
 		
 	private String groupId;

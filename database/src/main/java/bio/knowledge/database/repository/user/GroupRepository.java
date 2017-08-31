@@ -17,6 +17,11 @@ public interface GroupRepository extends GraphRepository<Group> {
 	@Query("CREATE CONSTRAINT ON (group:Group) ASSERT group.fullGroupName IS UNIQUE")
 	void createUniqueConstraintOnFullGroupName();
 	
+	/**
+	 * 
+	 * @param userId
+	 * @return groups owned + their member-user nodes
+	 */
 	@Query("MATCH path = (owner) <-[:OWNER]- (group:Group) -[:MEMBER*0..1]-> (member)"
 		+ " WHERE ID(owner) = {userId}"
 		+ " RETURN group, nodes(path), rels(path)")

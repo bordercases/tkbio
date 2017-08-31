@@ -6,6 +6,14 @@ import java.util.UUID;
 
 import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
 
+/**
+ * Used to generate and remember the URL for password reset links.
+ * Tokens expire after 24 hours.
+ * 
+ * @author Meera Godden
+ *
+ */
+
 public class PasswordResetToken extends Neo4jAbstractIdentifiedEntity {
 
 	private User user;

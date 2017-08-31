@@ -43,12 +43,26 @@ public class UserService implements UserDetailsService {
 		repo.save(user);
 	}
 	
+	/**
+	 * 
+	 * Encodes the password before saving it to the database
+	 * 
+	 * @param user
+	 * @param password (unencoded)
+	 */
 	public void updatePassword(User user, String password) {
 		String secret = encoder.encode(password);
 		user.setPassword(secret);
 		save(user);
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.security.core.userdetails.UserDetailsService#loadUserByUsername(java.lang.String)
+	 * 
+	 * The login parameter (which Spring security calls a username) can be either an email or a username.
+	 * The return value contains the (encoded) password which Spring Security uses for authentication.
+	 */
 	@Override
 	public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
 				

@@ -20,6 +20,13 @@ public class PasswordTokenService {
 	@Autowired
 	UserRepository userRepo;
 	
+	/**
+	 * Puts a newly generated token in the database
+	 * Also deletes any expired tokens that are found
+	 * 
+	 * @param email address
+	 * @return a token object associated to the user
+	 */
 	public PasswordResetToken generateToken(String email) {
 		
 		Iterable<PasswordResetToken> expired = tokenRepo.findExpiredBefore(Calendar.getInstance().getTimeInMillis());
@@ -43,6 +50,11 @@ public class PasswordTokenService {
 		return token;
 	}
 	
+	/**
+	 * 
+	 * @param tokenString a UUID
+	 * @return the token object, unless it has expired
+	 */
 	public PasswordResetToken findByTokenString(String tokenString) {
 		
 		PasswordResetToken token = tokenRepo.findByTokenString(tokenString);
@@ -50,7 +62,7 @@ public class PasswordTokenService {
 		if (token == null || token.isValid()) {
 			return token;
 		} else {
-			tokenRepo.delete(token);
+			tokenRepo.delete(token); // expired tokens can (and should) be deleted
 			return null;
 		}
 	}

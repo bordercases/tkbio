@@ -21,6 +21,13 @@ import bio.knowledge.service.user.UserService;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.authentication.AuthenticationManager;
 
+/**
+ * 
+ * Configure Spring Security to work with {@code UserService} and a specific password decoder.
+ * 
+ * @author Meera Godden
+ *
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -35,9 +42,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http
 			.headers()
-				.xssProtection().disable()
+				.xssProtection().disable() // fixes a bug with concept map downloads
 			.authorizeRequests()
-				.anyRequest().permitAll()
+				.anyRequest().permitAll() // all pages can be requested, because this is a single page application
 				.and()
 			.formLogin()
 				.permitAll()
@@ -51,11 +58,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.exceptionHandling()
 				.authenticationEntryPoint(new Http403ForbiddenEntryPoint())
 				.and()
-			.csrf().disable(); //Vaadin already handles CSRF protection
+			.csrf().disable(); // Vaadin already handles CSRF protection
 	}
 
 	@Autowired
 	@Override
+	/*
+	 * Sets up Spring Security to use BCEnc
+	 * (non-Javadoc)
+	 * @see org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter#configure(org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder)
+	 */
 	public void configure(AuthenticationManagerBuilder auth) throws Exception {		
 		auth
 			.userDetailsService(userService).passwordEncoder(encoder);
@@ -68,6 +80,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 	
 	@Bean
+	/**
+	 * BCryptPasswordEncoder, to be used to encode passwords before storage.
+	 * @return
+	 */
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}

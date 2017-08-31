@@ -218,6 +218,19 @@ public class AuthenticationManager {
 		groupService.removeMember(group, user);
 	}
 	
+	/**
+	 * Creates a new user with the CLIENT role.
+	 * Arguments should be pre-validated.
+	 * 
+	 * @param username
+	 * @param firstName
+	 * @param lastName
+	 * @param email
+	 * @param password
+	 * @throws EmailAlreadyInUseException
+	 * @throws UsernameAlreadyInUseException
+	 * @throws MissingNameException
+	 */
 	public void createAccount(String username, String firstName, String lastName, String email, String password)
 			throws EmailAlreadyInUseException, UsernameAlreadyInUseException, MissingNameException {
 			//, PasswordTooShortException, PasswordLacksCapitalLetterOrNumberException, MissingEmailException, InvalidEmailFormatException, AccountDoesNotExistException,
@@ -279,6 +292,10 @@ public class AuthenticationManager {
 		return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 	}
 	
+	/**
+	 * 
+	 * @return URL used in the HTTP request to the website
+	 */
 	public String getRootURL() {
 		
 		HttpServletRequest request = getRequest();
@@ -301,6 +318,9 @@ public class AuthenticationManager {
 	/**
 	 * Creates a full URL using the given (unencoded) fragment.
 	 * The plus sign is percent-encoded for compatibility with Vaadin.
+	 * 
+	 * @param fragment portion of URL (unencoded)
+	 * @return a full URL
 	 */
 	public String makeSafeURL(String fragment) {
 		try {
@@ -357,6 +377,10 @@ public class AuthenticationManager {
 		
 	}
 	
+	/**
+	 * @param tokenString
+	 * @return true iff token exists and is not expired
+	 */
 	public boolean isValidPasswordToken(String tokenString) {
 		if (tokenString == null || tokenString.isEmpty()|| tokenService.findByTokenString(tokenString) == null) {
 			return false;
@@ -365,6 +389,14 @@ public class AuthenticationManager {
 		}
 	}
 	
+	/**
+	 * Replace old password with new one.
+	 * 
+	 * @param tokenString
+	 * @param newPassword
+	 * @throws InvalidPasswordResetToken
+	 * @throws PasswordTooShortException
+	 */
 	public void resetPassword(String tokenString, String newPassword) throws InvalidPasswordResetToken, PasswordTooShortException {//, PasswordLacksCapitalLetterOrNumberException {
 		
 		if (tokenString == null || tokenString.isEmpty()) {

@@ -136,10 +136,13 @@ public class ConceptMapDisplay extends AbstractJavaScriptComponent implements Gr
 			DesktopUI ui = DesktopUI.getCurrent();
 			Slider slider = ui.getDesktop().getZoomSlider();
 			
-			DesktopUI.getCurrent().setZoomEnabled(false);
+			// must temporarily disable zoom to prevent infinite (set zoom / on zoom) loop
+			ui.setZoomEnabled(false);
+			
 			// set slider to value, or set it to min/max possible value
 			slider.setValue(Math.max(slider.getMin(), Math.min(value, slider.getMax())));
-			DesktopUI.getCurrent().setZoomEnabled(true);
+			
+			ui.setZoomEnabled(true);
 		});
 
 		// node deletion on client-side requires server-side data, so the client
