@@ -1,5 +1,9 @@
 package bio.knowledge.model.lang;
 
+/**
+ * Concept with just an id and name.
+ *
+ */
 public class Concept {
 	
 	private String id;

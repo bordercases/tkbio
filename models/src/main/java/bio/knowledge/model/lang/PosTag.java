@@ -1,5 +1,10 @@
 package bio.knowledge.model.lang;
 
+/**
+ * Represents a Part-Of-Speech tag on a section of text.
+ * Can be used to deserialize POS tags from the Monarch Scigraph service.
+ *
+ */
 public class PosTag {
 	
 	private String token;

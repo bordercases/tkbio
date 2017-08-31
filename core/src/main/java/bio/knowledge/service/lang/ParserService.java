@@ -26,6 +26,13 @@ import opennlp.tools.tokenize.SimpleTokenizer;
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.util.Span;
 
+/**
+ * Given some potential entities in sentence,
+ * handles extraction of valid entities from sentence.
+ * 
+ * @author Meera Godden
+ *
+ */
 @Service
 public class ParserService {
 	
@@ -51,6 +58,13 @@ public class ParserService {
 		}
 	}
 	
+	/**
+	 * Returns only the entities that contain content words (e.g. nouns and not conjunctions).
+	 * 
+	 * @param text
+	 * @param entities
+	 * @return
+	 */
 	public List<Entity> filterLexical(String text, List<Entity> entities) {
 		Parse[] parses = ParserTool.parseLine(text, parser, 1);
 		parses[0].show();

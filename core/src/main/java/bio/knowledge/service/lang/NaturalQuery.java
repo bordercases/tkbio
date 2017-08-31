@@ -19,6 +19,13 @@ import bio.knowledge.model.lang.Relationship;
 import bio.knowledge.model.lang.Token;
 import bio.knowledge.service.beacon.KnowledgeBeaconService;
 
+/**
+ * Given some entities, handles logic for constructing/executing a query.
+ * Can and should be replaced once Beacon API supports path-finding
+ * 
+ * @author Meera Godden
+ *
+ */
 public class NaturalQuery {
 	
 	private KnowledgeBeaconService kbService;

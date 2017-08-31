@@ -2,6 +2,10 @@ package bio.knowledge.model.lang;
 
 import java.util.List;
 
+/**
+ * Represents a section of text that (might) refer to a concept.
+ * Can be used to deserialize an entity from the Monarch Scigraph service.
+ */
 public class Entity {
 
 	private Token token;

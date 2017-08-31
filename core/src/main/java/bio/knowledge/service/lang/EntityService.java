@@ -12,6 +12,12 @@ import org.springframework.web.client.RestTemplate;
 import bio.knowledge.model.lang.Entity;
 import bio.knowledge.model.lang.PosTag;
 
+/**
+ * Wraps Monarch Scigraph service.
+ * 
+ * @author Meera Godden
+ *
+ */
 @Service
 public class EntityService {
 	

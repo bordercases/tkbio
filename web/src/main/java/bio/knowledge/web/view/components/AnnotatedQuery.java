@@ -17,6 +17,13 @@ import com.vaadin.ui.CustomLayout;
 
 import bio.knowledge.model.lang.Entity;
 
+/**
+ * Component for displaying query text with concepts visible.
+ * Currently just uses dropdowns to show possible disambiguations.
+ * 
+ * @author Meera Godden
+ *
+ */
 public class AnnotatedQuery extends CustomLayout {
 		
 	private RangeSet<Integer> spans;
@@ -70,20 +77,9 @@ public class AnnotatedQuery extends CustomLayout {
 		
 	}
 	
-	public void addSelectionListener() {
-		//getcom
-	}
-	
 	public List<Entity> getDefaultEntities() {
 		List<Entity> entities = map(o -> o.get(0), optionLists.values());
 		return entities;
-	}
-	
-	public RangeSet<Integer> getEntitySpans() { // TODO: do properly for selected
-		return spans;
-	}
-	public RangeSet<Integer> getTextSpans() {
-		return antispans;
 	}
 	
 	private <T> List<T> interleave(List<T> l1, List<T> l2) {

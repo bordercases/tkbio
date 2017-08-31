@@ -2,6 +2,10 @@ package bio.knowledge.model.lang;
 
 import java.util.List;
 
+/**
+ * Represents a concept with a list of names.
+ *
+ */
 public class Token {
 	
 	private String id;
